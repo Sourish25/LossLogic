@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LossLogic — AI-Powered Continuous Cyber Risk Quantification & Investment Optimization</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 38' fill='none'%3E%3Cpath d='M 7 11 V 30 A 3 3 0 0 0 10 33 H 23' stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M 25 27 V 8 A 3 3 0 0 0 22 5 H 9' stroke='%2394a3b8' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Background LiquidGL Canvas Layer -->
+  <canvas id="liquid-canvas"></canvas>
+  <div class="ambient-vignette"></div>
+
+  <!-- Main Viewport Wrapper -->
+  <div class="app-viewport">
+
+    <!-- Floating Apple Liquid Glass Navigation Pill -->
+    <header class="liquid-nav">
+      <div class="brand-wrapper">
+        <div class="brand-insignia" title="LossLogic">
+          <svg class="brand-logo-svg" viewBox="0 0 32 38" fill="none">
+            <!-- L1 (Loss): Upright at bottom-left -->
+            <path class="logo-l1" d="M 7 11 V 30 A 3 3 0 0 0 10 33 H 23" stroke="var(--logo-l1)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- L2 (Logic): Inverted at top-right, completing the rectangle -->
+            <path class="logo-l2" d="M 25 27 V 8 A 3 3 0 0 0 22 5 H 9" stroke="var(--logo-l2)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="brand-title">LossLogic</span>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Segmented Tab Navigation -->
+        <div class="segmented-control">
+          <button class="tab-pill active" data-tab="executive">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            Executive
+          </button>
+          <button class="tab-pill" data-tab="technical">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg>
+            Technical
+          </button>
+        </div>
+
+        <!-- Currency Switcher (INR / USD) -->
+        <button id="btn-currency" class="glass-btn" title="Toggle Currency (₹ INR / $ USD)">
+          <span style="font-size:0.9rem;">₹</span> INR
+        </button>
+
+        <!-- Theme Toggle (Dark / Light) -->
+        <button id="btn-theme" class="glass-btn" title="Toggle Theme (Dark / Light)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          Dark
+        </button>
+
+        <!-- Export Report -->
+        <button id="btn-export" class="glass-btn" title="Export Executive Summary (PDF / Print)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-viewport">
+
+      <!-- ================================================================= -->
+      <!-- TAB 1: EXECUTIVE / BOARD VIEW -->
+      <!-- ================================================================= -->
+      <div id="tab-executive" class="tab-content active">
+
+        <!-- Executive 5-KPI Glass Card Strip -->
+        <div class="kpi-grid">
+          <!-- KPI 1: EAL -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Expected Annual Loss</span>
+              <span class="kpi-badge badge-high">-12.4% MoM</span>
+            </div>
+            <div id="kpi-eal" class="kpi-value">₹ 4.82 Cr</div>
+            <div class="kpi-subtext">Annualized financial risk exposure</div>
+          </div>
+
+          <!-- KPI 2: VaR 90% -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Value-at-Risk (90%)</span>
+              <span class="kpi-badge badge-med">1-in-10 Year</span>
+            </div>
+            <div id="kpi-var90" class="kpi-value">₹ 8.20 Cr</div>
+            <div class="kpi-subtext">10% annual exceedance threshold</div>
+          </div>
+
+          <!-- KPI 3: VaR 95% -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Value-at-Risk (95%)</span>
+              <span class="kpi-badge badge-high">1-in-20 Year</span>
+            </div>
+            <div id="kpi-var95" class="kpi-value">₹ 12.40 Cr</div>
+            <div class="kpi-subtext">95th percentile loss tail</div>
+          </div>
+
+          <!-- KPI 4: Solvency VaR 99% -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Tail Catastrophe (99%)</span>
+              <span class="kpi-badge badge-crit">Solvency Risk</span>
+            </div>
+            <div id="kpi-var99" class="kpi-value">₹ 24.10 Cr</div>
+            <div class="kpi-subtext">1-in-100 year capital solvency exposure</div>
+          </div>
+
+          <!-- KPI 5: Compliance -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Regulatory Posture</span>
+              <span class="kpi-badge badge-spec">5 Frameworks</span>
+            </div>
+            <div id="kpi-compliance" class="kpi-value">84.6%</div>
+            <div class="kpi-subtext">Unified compliance posture</div>
+          </div>
+        </div>
+
+        <!-- Executive Analytics Panels (2-Column Grid) -->
+        <div class="analytics-grid">
+          <!-- Panel 1: Loss Exceedance Curve (LEC) -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                </div>
+                Loss Exceedance Curve
+              </div>
+            </div>
+            <div id="chart-lec" class="chart-container"></div>
+          </div>
+
+          <!-- Panel 2: Threat Trajectory Forecasting -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                90-Day Threat Trajectory
+              </div>
+            </div>
+            <div id="chart-trajectory" class="chart-container"></div>
+          </div>
+        </div>
+
+        <!-- Investment Optimization & AI Decision Support Grid -->
+        <div class="analytics-grid">
+          <!-- Panel 3: Capital Allocation Optimizer -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m16 10-4 4-2-2"/></svg>
+                </div>
+                Budget Optimization
+              </div>
+            </div>
+
+            <!-- Budget Range Slider -->
+            <div class="slider-group">
+              <div class="slider-label">
+                <span>Capital Budget Allocation:</span>
+                <span id="budget-display" style="color:var(--text-heading); font-weight:800;">₹ 45.00 L</span>
+              </div>
+              <input type="range" id="slider-budget" class="slider-input" min="500000" max="10000000" step="250000" value="4500000">
+            </div>
+
+            <!-- Optimization 4-Tile Metric Strip -->
+            <div class="opt-tiles-grid">
+              <div class="opt-tile">
+                <div class="opt-tile-label">Allocated Spend</div>
+                <div id="opt-spend" class="opt-tile-val">₹ 45.00 L</div>
+              </div>
+              <div class="opt-tile">
+                <div class="opt-tile-label">Risk Mitigated</div>
+                <div id="opt-reduction" class="opt-tile-val">₹ 1.45 Cr</div>
+              </div>
+              <div class="opt-tile">
+                <div class="opt-tile-label">Residual EAL</div>
+                <div id="opt-residual" class="opt-tile-val">₹ 3.37 Cr</div>
+              </div>
+              <div class="opt-tile">
+                <div class="opt-tile-label">Portfolio ROSI</div>
+                <div id="opt-rosi" class="opt-tile-val">222.2%</div>
+              </div>
+            </div>
+
+            <!-- Interactive Pareto Frontier Chart -->
+            <div id="chart-frontier" class="chart-container" style="height:170px;"></div>
+          </div>
+
+          <!-- Panel 4: AI Decision Support & Natural Language Query (NLQ) -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                Decision Support
+              </div>
+            </div>
+
+            <div class="nlq-container">
+              <div class="nlq-input-wrapper">
+                <svg class="nlq-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="nlq-input" class="nlq-input" placeholder="Ask a financial cyber risk question..." value="What is our highest financial cyber risk today?">
+              </div>
+              <button id="btn-nlq" class="btn-primary">Ask AI</button>
+            </div>
+
+            <!-- Structured AI Result Box -->
+            <div id="nlq-result" class="nlq-result">
+              <div style="margin-bottom:0.45rem;"><strong>Intent Detected:</strong> <span class="nlq-highlight">HIGHEST_RISK</span> (Confidence: 95%)</div>
+              <div>Our highest financial cyber exposure resides in <strong>Core Banking PostgreSQL Primary (asset-core-db-01)</strong>, contributing <strong>₹ 1.85 Cr</strong> in Expected Annual Loss due to critical vulnerability CVE-2023-34362. Prioritized patch deployment is urgently advised.</div>
+            </div>
+
+            <!-- Prompt Suggestions -->
+            <div class="nlq-suggestions">
+              <div><strong>Try asking:</strong></div>
+              <ul>
+                <li>“Which vulnerabilities contribute most to expected losses?”</li>
+                <li>“What mitigation should we fund with ₹ 50 Lakhs budget?”</li>
+                <li>“What is the financial cost of delaying remediation by 30 days?”</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- TAB 2: TECHNICAL SECOPS VIEW -->
+      <!-- ================================================================= -->
+      <div id="tab-technical" class="tab-content">
+
+        <!-- 5-Domain Telemetry Summary Strip -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Vulnerability (CVE)</span>
+              <span class="kpi-badge badge-crit">Critical</span>
+            </div>
+            <div id="cnt-vuln" class="kpi-value">1 Active</div>
+            <div class="kpi-subtext">MOVEit SQLi (CVSS 9.8, EPSS 0.92)</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">SIEM Monitoring</span>
+              <span class="kpi-badge badge-high">High Surge</span>
+            </div>
+            <div id="cnt-siem" class="kpi-value">1 Alert</div>
+            <div class="kpi-subtext">Brute Force Credential Stuffing</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">IAM & Privileged</span>
+              <span class="kpi-badge badge-crit">Critical</span>
+            </div>
+            <div id="cnt-iam" class="kpi-value">1 Finding</div>
+            <div class="kpi-subtext">Unrestricted Root Role Missing MFA</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">EDR Telemetry</span>
+              <span class="kpi-badge badge-high">High</span>
+            </div>
+            <div id="cnt-edr" class="kpi-value">1 Finding</div>
+            <div class="kpi-subtext">Agent Offline / Anti-Tamper Disabled</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">CSPM Posture</span>
+              <span class="kpi-badge badge-crit">Critical</span>
+            </div>
+            <div id="cnt-cspm" class="kpi-value">1 Finding</div>
+            <div class="kpi-subtext">Public S3 Bucket With Cardholder Data</div>
+          </div>
+        </div>
+
+        <!-- Technical Analytics: What-If Sandbox & Framework Heatmap -->
+        <div class="analytics-grid">
+          <!-- Panel 1: What-If Counterfactual & Remediation Delay Sandbox -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                What-If Simulator
+              </div>
+            </div>
+
+            <div style="font-size:0.82rem; color:var(--text-secondary); font-weight:600; margin-bottom:0.75rem;">
+              Select candidate mitigations to simulate immediate loss containment:
+            </div>
+
+            <!-- Checkbox List -->
+            <div id="what-if-toggles"></div>
+
+            <!-- Delay Slider -->
+            <div class="slider-group">
+              <div class="slider-label">
+                <span>Remediation Delay (Days):</span>
+                <span id="delay-display" style="color:var(--text-heading); font-weight:800;">0 Days</span>
+              </div>
+              <input type="range" id="slider-delay" class="slider-input" min="0" max="90" step="5" value="0">
+            </div>
+
+            <!-- 3-Tile What-If Metrics Strip -->
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.75rem; text-align:center;">
+              <div class="opt-tile">
+                <div class="opt-tile-label">Risk Delta</div>
+                <div id="wi-delta" class="opt-tile-val">₹ 1.25 Cr</div>
+              </div>
+              <div class="opt-tile">
+                <div class="opt-tile-label">Simulated EAL</div>
+                <div id="wi-simeal" class="opt-tile-val">₹ 3.57 Cr</div>
+              </div>
+              <div class="opt-tile">
+                <div class="opt-tile-label">Delay Penalty</div>
+                <div id="wi-penalty" class="opt-tile-val">₹ 0.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 2: Regulatory Framework Matrix & Control Gaps -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                Regulatory Frameworks
+              </div>
+            </div>
+
+            <div id="heatmap-grid" class="heatmap-grid"></div>
+          </div>
+        </div>
+
+        <!-- Full-Width Prioritized Technical Remediation Backlog -->
+        <div class="glass-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="panel-title-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </div>
+              Remediation Backlog
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Finding ID</th>
+                  <th>Target Asset</th>
+                  <th>Domain</th>
+                  <th>Severity</th>
+                  <th>CVSS</th>
+                  <th>Attributed EAL</th>
+                  <th>Recommended Mitigation</th>
+                </tr>
+              </thead>
+              <tbody id="table-backlog"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Glass Footer -->
+    <footer class="liquid-footer">
+      <div>
+        <strong>LossLogic</strong> — Cyber Risk Quantification & Investment Optimization
+      </div>
+      <div class="footer-links">
+        <a href="/docs" target="_blank">API Docs</a>
+        <a href="/redoc" target="_blank">ReDoc</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="/static/js/liquidGL.js"></script>
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

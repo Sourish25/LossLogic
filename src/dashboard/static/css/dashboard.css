@@ -1,0 +1,1627 @@
+/* =============================================================================
+   CyberRiskQuant — Apple Liquid Glass & Monochrome Design System
+   Full Dual-Theme Engine (Light Studio Crystal & Dark Obsidian Glass)
+   Inspired by Apple VisionOS / macOS Liquid Glass & liquidGL WebGL Optics
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   CSS Variables & Theme Tokens
+   ----------------------------------------------------------------------------- */
+:root,
+[data-theme="dark"] {
+  --theme-mode: "dark";
+
+  /* Canvas & Surface Base */
+  --surface-void: #000000;
+  --surface-base: #060608;
+  --surface-canvas: #030305;
+
+  /* Glass Pane Translucency (Authentic Apple Liquid Glass - Tuned Crystal Glass) */
+  --glass-bg-primary: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.35) 100%), rgba(14, 17, 24, 0.48);
+  --glass-bg-secondary: rgba(20, 24, 32, 0.42);
+  --glass-bg-elevated: rgba(26, 30, 42, 0.55);
+  --glass-bg-hover: rgba(255, 255, 255, 0.12);
+  --glass-bg-input: rgba(0, 0, 0, 0.55);
+  --glass-bg-tile: rgba(255, 255, 255, 0.06);
+
+  /* Crystalline Hairlines & Specular Bevels (liquidGL Physical Curvature) */
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-border-subtle: rgba(255, 255, 255, 0.10);
+  --glass-border-hover: rgba(255, 255, 255, 0.50);
+  --glass-specular-bevel: inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.45), inset 1px 0 1.5px 0 rgba(255, 255, 255, 0.20), inset 0 -2px 4px 0 rgba(0, 0, 0, 0.50), inset -1px 0 2px 0 rgba(0, 0, 0, 0.35);
+  --glass-specular-subtle: inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+  --glass-depth-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.90), 0 8px 24px -4px rgba(0, 0, 0, 0.60);
+  --glass-hover-shadow: 0 32px 75px -16px rgba(0, 0, 0, 0.95), 0 0 32px 0 rgba(255, 255, 255, 0.12);
+
+  /* High-Contrast Monochrome Typography (White in Dark Mode) */
+  --text-heading: #ffffff;
+  --text-primary: #ffffff;
+  --text-secondary: #f4f4f5;
+  --text-muted: #e4e4e7;
+  --text-dim: #d4d4d8;
+
+  /* Interactive Elements */
+  --active-tab-bg: #ffffff;
+  --active-tab-text: #000000;
+  --btn-glass-bg: rgba(255, 255, 255, 0.08);
+  --btn-glass-border: rgba(255, 255, 255, 0.20);
+  --btn-glass-text: #ffffff;
+  --btn-glass-hover-bg: rgba(255, 255, 255, 0.18);
+  --btn-glass-hover-text: #ffffff;
+
+  /* Chart Visualizer */
+  --chart-curve: #ffffff;
+  --chart-area-stop1: rgba(255, 255, 255, 0.22);
+  --chart-area-stop2: rgba(0, 0, 0, 0);
+  --chart-grid: rgba(255, 255, 255, 0.14);
+  --chart-axis-text: #f4f4f6;
+  --chart-node-fill: #ffffff;
+  --chart-node-stroke: #000000;
+
+  /* Sliders & Tracks */
+  --slider-track: rgba(255, 255, 255, 0.15);
+  --slider-thumb-grad1: #ffffff;
+  --slider-thumb-grad2: #d4d4d8;
+
+  /* Table */
+  --table-th-bg: rgba(255, 255, 255, 0.06);
+  --table-border: rgba(255, 255, 255, 0.10);
+  --table-hover: rgba(255, 255, 255, 0.08);
+
+  /* Brand Logo & Insignia */
+  --logo-l1: #ffffff;
+  --logo-l2: #e4e4e7;
+  --logo-box-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.06) 100%);
+  --logo-box-border: rgba(255, 255, 255, 0.30);
+  --logo-box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.6), 0 4px 14px rgba(0, 0, 0, 0.4);
+
+  /* Optical Filter Engine */
+  --backdrop-blur: blur(20px) saturate(190%);
+}
+
+/* -----------------------------------------------------------------------------
+   Light Theme: Apple Studio Pristine Crystal Glass
+   ----------------------------------------------------------------------------- */
+[data-theme="light"] {
+  --theme-mode: "light";
+
+  /* Canvas & Surface Base */
+  --surface-void: #f1f4f9;
+  --surface-base: #f8fafc;
+  --surface-canvas: #f4f6fb;
+
+  /* Glass Pane Translucency (Authentic Studio Crystal - Tuned Liquid Glass) */
+  --glass-bg-primary: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.42) 45%, rgba(238, 242, 250, 0.52) 100%), rgba(255, 255, 255, 0.45);
+  --glass-bg-secondary: rgba(255, 255, 255, 0.42);
+  --glass-bg-elevated: rgba(255, 255, 255, 0.60);
+  --glass-bg-hover: rgba(255, 255, 255, 0.75);
+  --glass-bg-input: rgba(255, 255, 255, 0.70);
+  --glass-bg-tile: rgba(0, 0, 0, 0.04);
+
+  /* Crystalline Hairlines & Specular Bevels (liquidGL Physical Curvature) */
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-border-subtle: rgba(255, 255, 255, 0.50);
+  --glass-border-hover: rgba(255, 255, 255, 0.98);
+  --glass-specular-bevel: inset 0 2px 3px 0 rgba(255, 255, 255, 1.0), inset 1.5px 0 2px 0 rgba(255, 255, 255, 0.80), inset 0 -2px 4px 0 rgba(0, 0, 0, 0.08), inset -1px 0 2px 0 rgba(0, 0, 0, 0.04);
+  --glass-specular-subtle: inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+  --glass-depth-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.10), 0 6px 18px -4px rgba(0, 0, 0, 0.05);
+  --glass-hover-shadow: 0 28px 55px -14px rgba(0, 0, 0, 0.15), 0 0 24px 0 rgba(255, 255, 255, 0.50);
+
+  /* High-Contrast Monochrome Typography (Deep Pitch Black/Charcoal in Light Mode) */
+  --text-heading: #000000;
+  --text-primary: #09090b;
+  --text-secondary: #18181b;
+  --text-muted: #27272a;
+  --text-dim: #3f3f46;
+
+  /* Interactive Elements */
+  --active-tab-bg: #000000;
+  --active-tab-text: #ffffff;
+  --btn-glass-bg: rgba(255, 255, 255, 0.88);
+  --btn-glass-border: rgba(0, 0, 0, 0.15);
+  --btn-glass-text: #09090b;
+  --btn-glass-hover-bg: #000000;
+  --btn-glass-hover-text: #ffffff;
+
+  /* Chart Visualizer */
+  --chart-curve: #000000;
+  --chart-area-stop1: rgba(0, 0, 0, 0.14);
+  --chart-area-stop2: rgba(255, 255, 255, 0);
+  --chart-grid: rgba(0, 0, 0, 0.10);
+  --chart-axis-text: #18181b;
+  --chart-node-fill: #000000;
+  --chart-node-stroke: #ffffff;
+
+  /* Sliders & Tracks */
+  --slider-track: rgba(0, 0, 0, 0.12);
+  --slider-thumb-grad1: #ffffff;
+  --slider-thumb-grad2: #18181b;
+
+  /* Table */
+  --table-th-bg: rgba(0, 0, 0, 0.03);
+  --table-border: rgba(0, 0, 0, 0.06);
+  --table-hover: rgba(0, 0, 0, 0.025);
+
+  /* Brand Logo & Insignia */
+  --logo-l1: #09090b;
+  --logo-l2: #64748b;
+  --logo-box-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.88) 100%);
+  --logo-box-border: rgba(0, 0, 0, 0.14);
+  --logo-box-shadow: inset 0 1px 1px #ffffff, 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  /* Optical Filter Engine */
+  --backdrop-blur: blur(14px) saturate(160%);
+}
+
+/* -----------------------------------------------------------------------------
+   Base Layout & Viewport Configuration
+   ----------------------------------------------------------------------------- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+  background-color: var(--surface-void);
+  color: var(--text-heading);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+body {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background-color: transparent;
+  color: var(--text-primary);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+}
+
+/* -----------------------------------------------------------------------------
+   liquidGL WebGL Optical Refraction Surface
+   ----------------------------------------------------------------------------- */
+#liquid-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.ambient-vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.03) 0%, transparent 65%);
+}
+
+[data-theme="light"] .ambient-vignette {
+  background: radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.04) 0%, transparent 65%);
+}
+
+.app-viewport {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* -----------------------------------------------------------------------------
+   Header & Floating Navigation Pill
+   ----------------------------------------------------------------------------- */
+header.liquid-nav {
+  position: sticky;
+  top: 14px;
+  z-index: 100;
+  width: calc(100% - 2.5rem);
+  max-width: 1720px;
+  margin: 0.85rem auto 0 auto;
+  padding: 0.85rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  box-shadow: var(--glass-specular-bevel), var(--glass-depth-shadow);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  overflow: hidden;
+}
+
+header.liquid-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.14), transparent 60%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 1;
+}
+
+[data-theme="light"] header.liquid-nav::before {
+  background: radial-gradient(420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.60), transparent 60%);
+}
+
+header.liquid-nav:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--glass-specular-bevel), var(--glass-hover-shadow);
+}
+
+header.liquid-nav:hover::before {
+  opacity: 1;
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.brand-insignia {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--logo-box-bg);
+  border: 1px solid var(--logo-box-border);
+  box-shadow: var(--logo-box-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.brand-insignia:hover {
+  transform: scale(1.05);
+  border-color: var(--glass-border-hover);
+}
+
+.brand-logo-svg {
+  width: 22px;
+  height: 26px;
+  display: block;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-insignia:hover .brand-logo-svg {
+  transform: scale(1.04);
+}
+
+.brand-title {
+  font-size: 1.28rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-heading);
+  line-height: 1;
+}
+
+/* Nav Controls & Segmented Tabs */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.segmented-control {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: 9999px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.tab-pill {
+  padding: 0.42rem 1.15rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tab-pill:hover {
+  color: var(--text-heading);
+}
+
+.tab-pill.active {
+  background: var(--active-tab-bg);
+  color: var(--active-tab-text);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  font-weight: 700;
+}
+
+[data-theme="light"] .tab-pill.active {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Action Glass Buttons */
+.glass-btn {
+  padding: 0.42rem 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border-radius: 9999px;
+  border: 1px solid var(--btn-glass-border);
+  background: var(--btn-glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--btn-glass-text);
+  cursor: pointer;
+  box-shadow: var(--glass-specular-subtle), 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.glass-btn:hover {
+  background: var(--btn-glass-hover-bg);
+  color: var(--btn-glass-hover-text);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-specular-bevel), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.glass-btn:active {
+  transform: translateY(1px);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border-subtle);
+  color: var(--text-secondary);
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-heading);
+  box-shadow: 0 0 8px var(--text-heading);
+  animation: liquidPulse 2.2s infinite ease-in-out;
+}
+
+@keyframes liquidPulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+/* -----------------------------------------------------------------------------
+   Main Layout & Liquid Glass Cards
+   ----------------------------------------------------------------------------- */
+main.main-viewport {
+  width: calc(100% - 2.5rem);
+  max-width: 1720px;
+  margin: 1.5rem auto 3rem auto;
+  flex: 1;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeLiquidIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeLiquidIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Apple Liquid Glass Panels & 3D Tilt */
+.glass-panel {
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--glass-specular-bevel), var(--glass-depth-shadow);
+  transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s ease-out;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(520px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.13), transparent 55%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 1;
+}
+
+[data-theme="light"] .glass-panel::before {
+  background: radial-gradient(520px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.55), transparent 55%);
+}
+
+.glass-panel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 5%;
+  right: 5%;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--glass-border-hover), transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.glass-panel:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--glass-specular-bevel), var(--glass-hover-shadow);
+}
+
+.glass-panel:hover::before {
+  opacity: 1;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--glass-border-subtle);
+}
+
+.panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-heading);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.panel-title-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-heading);
+}
+
+/* -----------------------------------------------------------------------------
+   KPI Grid & Apple Glass Metric Cards
+   ----------------------------------------------------------------------------- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.6rem;
+}
+
+@media (max-width: 1280px) {
+  .kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+.kpi-card {
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 1.25rem 1.3rem;
+  box-shadow: var(--glass-specular-bevel), var(--glass-depth-shadow);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.14), transparent 60%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 1;
+}
+
+[data-theme="light"] .kpi-card::before {
+  background: radial-gradient(380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.55), transparent 60%);
+}
+
+.kpi-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--glass-border-hover), transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--glass-specular-bevel), var(--glass-hover-shadow);
+}
+
+.kpi-card:hover::before {
+  opacity: 1;
+}
+
+.kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  min-height: 24px;
+}
+
+.kpi-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+[data-theme="light"] .kpi-title {
+  text-shadow: none;
+  color: #18181b;
+}
+
+.kpi-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--text-heading);
+  margin-bottom: 0.35rem;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] .kpi-value {
+  text-shadow: none;
+  color: #000000;
+}
+
+.kpi-subtext {
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  line-height: 1.35;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  min-height: 2rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+[data-theme="light"] .kpi-subtext {
+  text-shadow: none;
+  color: #27272a;
+}
+
+/* -----------------------------------------------------------------------------
+   Monochrome Badges (Adaptive across Dark and Light)
+   ----------------------------------------------------------------------------- */
+.kpi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+/* Dark Mode Badges */
+[data-theme="dark"] .badge-crit { background: #ffffff; color: #000000; box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); font-weight: 800; }
+[data-theme="dark"] .badge-high { background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.40); color: #ffffff; }
+[data-theme="dark"] .badge-med { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.28); color: #ffffff; }
+[data-theme="dark"] .badge-spec { background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08)); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; }
+
+/* Light Mode Badges */
+[data-theme="light"] .badge-crit { background: #000000; color: #ffffff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); font-weight: 800; }
+[data-theme="light"] .badge-high { background: rgba(0, 0, 0, 0.10); border: 1px solid rgba(0, 0, 0, 0.30); color: #000000; }
+[data-theme="light"] .badge-med { background: rgba(0, 0, 0, 0.06); border: 1px solid rgba(0, 0, 0, 0.20); color: #000000; }
+[data-theme="light"] .badge-spec { background: linear-gradient(135deg, rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.04)); border: 1px solid rgba(0, 0, 0, 0.22); color: #000000; }
+
+/* Backward Compatibility */
+.badge-danger { com-poses: badge-crit; }
+.badge-warning { com-poses: badge-high; }
+.badge-info { com-poses: badge-med; }
+.badge-success { com-poses: badge-med; }
+.badge-purple { com-poses: badge-spec; }
+
+/* -----------------------------------------------------------------------------
+   Analytics Grid & Visualizations
+   ----------------------------------------------------------------------------- */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.6rem;
+}
+
+@media (max-width: 1024px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-container {
+  width: 100%;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.chart-caption {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: 0.65rem;
+  letter-spacing: 0.01em;
+}
+
+/* -----------------------------------------------------------------------------
+   Apple Liquid Glass Floating Tooltip System
+   ----------------------------------------------------------------------------- */
+.liquid-glass-tooltip {
+  position: fixed;
+  z-index: 999999;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -100%) scale(0.95);
+  padding: 0.42rem 0.85rem;
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-shadow: var(--glass-specular-bevel), 0 10px 25px rgba(0, 0, 0, 0.45);
+  color: var(--text-heading);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.15s;
+}
+
+.liquid-glass-tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -100%) scale(1);
+}
+
+[data-theme="light"] .liquid-glass-tooltip {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(0, 0, 0, 0.14);
+  box-shadow: inset 0 1px 1px #ffffff, 0 8px 22px rgba(0, 0, 0, 0.12);
+  color: #09090b;
+}
+
+/* -----------------------------------------------------------------------------
+   Apple Liquid Glass Range Sliders
+   ----------------------------------------------------------------------------- */
+.slider-group {
+  margin-bottom: 1.25rem;
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+}
+
+.slider-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.slider-input {
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--slider-track);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s;
+}
+
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--slider-thumb-grad1) 0%, var(--slider-thumb-grad2) 100%);
+  border: 1px solid var(--glass-border-hover);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 2px 8px rgba(0, 0, 0, 0.25);
+  cursor: grab;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.slider-input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.slider-input::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
+
+/* Optimization Metric Tiles Grid */
+.opt-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.65rem;
+  margin-bottom: 1.15rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .opt-tiles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.opt-tile {
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border-subtle);
+  padding: 0.65rem 0.5rem;
+  border-radius: 12px;
+  box-shadow: var(--glass-specular-subtle);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.opt-tile:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+}
+
+.opt-tile-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .opt-tile-label {
+  text-shadow: none;
+  color: #27272a;
+}
+
+.opt-tile-val {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--text-heading);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+/* -----------------------------------------------------------------------------
+   AI Decision Support & Natural Language Query Bar
+   ----------------------------------------------------------------------------- */
+.nlq-container {
+  display: flex;
+  gap: 0.65rem;
+  margin-bottom: 1.15rem;
+}
+
+.nlq-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.nlq-input {
+  width: 100%;
+  padding: 0.75rem 1.15rem 0.75rem 2.4rem;
+  font-size: 0.88rem;
+  font-family: inherit;
+  background: var(--glass-bg-input);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-heading);
+  outline: none;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08), var(--glass-specular-subtle);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.nlq-input:focus {
+  border-color: var(--glass-border-hover);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 12px rgba(128, 128, 128, 0.2);
+}
+
+.nlq-input::placeholder {
+  color: var(--text-dim);
+}
+
+.nlq-icon {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.btn-primary {
+  padding: 0.75rem 1.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  background: var(--text-heading);
+  color: var(--surface-void);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.nlq-result {
+  background: var(--glass-bg-input);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: 14px;
+  padding: 1.15rem 1.25rem;
+  font-size: 0.86rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.nlq-result strong {
+  color: var(--text-heading);
+  font-weight: 700;
+}
+
+.nlq-highlight {
+  color: var(--text-heading);
+  background: var(--glass-bg-tile);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", monospace;
+  font-size: 0.8rem;
+}
+
+.nlq-suggestions {
+  margin-top: 1rem;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.nlq-suggestions ul {
+  list-style: none;
+  margin-top: 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.nlq-suggestions li {
+  cursor: pointer;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: all 0.2s;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border-subtle);
+}
+
+.nlq-suggestions li:hover {
+  color: var(--text-heading);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+}
+
+/* -----------------------------------------------------------------------------
+   Interactive What-If Control Switches & Sliders
+   ----------------------------------------------------------------------------- */
+.whatif-control-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.15rem;
+}
+
+.whatif-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.85rem;
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.whatif-row:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+}
+
+.whatif-label-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.whatif-cost {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.glass-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--glass-border-hover);
+  background: var(--glass-bg-tile);
+  cursor: pointer;
+  position: relative;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.glass-checkbox:checked {
+  background: var(--text-heading);
+  border-color: var(--text-heading);
+}
+
+.glass-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--surface-void);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* -----------------------------------------------------------------------------
+   Regulatory Framework Matrix & Compliance Scorecards
+   ----------------------------------------------------------------------------- */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.framework-card {
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  box-shadow: var(--glass-specular-subtle);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.framework-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+  transform: translateY(-2px);
+}
+
+.fw-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-heading);
+  margin-bottom: 0.45rem;
+  letter-spacing: -0.015em;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: var(--slider-track);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0.6rem 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--text-muted), var(--text-heading));
+  border-radius: 9999px;
+  box-shadow: 0 0 10px rgba(128, 128, 128, 0.4);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* -----------------------------------------------------------------------------
+   Prioritized Technical Remediation Backlog Table
+   ----------------------------------------------------------------------------- */
+.table-responsive {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--table-border);
+  background: var(--glass-bg-primary);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.84rem;
+}
+
+th {
+  background: var(--table-th-bg);
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 0.85rem 1.15rem;
+  border-bottom: 1px solid var(--table-border);
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+td {
+  padding: 0.95rem 1.15rem;
+  border-bottom: 1px solid var(--table-border);
+  color: var(--text-secondary);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr {
+  transition: background-color 0.2s;
+}
+
+tr:hover {
+  background-color: var(--table-hover);
+}
+
+td strong {
+  color: var(--text-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+td code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", monospace;
+  font-size: 0.76rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border);
+  color: var(--text-heading);
+}
+
+/* -----------------------------------------------------------------------------
+   Footer
+   ----------------------------------------------------------------------------- */
+footer.liquid-footer {
+  width: calc(100% - 2.5rem);
+  max-width: 1720px;
+  margin: 0 auto 1.5rem auto;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--glass-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: var(--text-dim);
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--text-heading);
+}
+
+/* -----------------------------------------------------------------------------
+   Responsive Breakpoints
+   ----------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  header.liquid-nav {
+    width: calc(100% - 1.5rem);
+    flex-direction: column;
+    gap: 0.85rem;
+    border-radius: 24px;
+    padding: 1rem;
+  }
+
+  main.main-viewport {
+    width: calc(100% - 1.5rem);
+  }
+
+  .nav-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  footer.liquid-footer {
+    width: calc(100% - 1.5rem);
+    flex-direction: column;
+    gap: 0.65rem;
+    text-align: center;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Executive PDF / Print Export Stylesheet (Archival & Board-Ready)
+   ----------------------------------------------------------------------------- */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+
+  /* Reset layout, remove blurs, shadows, and dark backgrounds */
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #09090b !important;
+    font-size: 10pt !important;
+    line-height: 1.35 !important;
+    width: 100% !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Hide interactive web components & WebGL canvas */
+  #liquid-canvas,
+  .ambient-vignette,
+  .nav-actions,
+  .segmented-control,
+  #btn-theme,
+  #btn-currency,
+  #btn-export,
+  .pulse-dot,
+  .nlq-container,
+  .nlq-suggestions,
+  #slider-budget,
+  #slider-delay,
+  .footer-links {
+    display: none !important;
+  }
+
+  /* Executive Print Header */
+  header.liquid-nav {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 14pt 0 !important;
+    padding: 0 0 10pt 0 !important;
+    border: none !important;
+    border-bottom: 2pt solid #09090b !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .brand-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8pt !important;
+  }
+
+  .brand-insignia {
+    width: 26pt !important;
+    height: 26pt !important;
+    border-radius: 6pt !important;
+    background: #09090b !important;
+    border: 1pt solid #09090b !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .brand-insignia svg rect {
+    stroke: #ffffff !important;
+  }
+
+  .brand-insignia svg path {
+    fill: #ffffff !important;
+  }
+
+  .brand-title {
+    font-size: 15pt !important;
+    font-weight: 800 !important;
+    color: #09090b !important;
+  }
+
+  header.liquid-nav::after {
+    content: "Executive Cyber Risk Quantification Report | Confidential";
+    font-size: 8.5pt !important;
+    font-weight: 600 !important;
+    color: #52525b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  main.main-viewport {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Show active view cleanly */
+  .tab-content {
+    display: none !important;
+  }
+
+  .tab-content.active {
+    display: block !important;
+  }
+
+  /* Cards & Panels */
+  .glass-panel,
+  .kpi-card {
+    background: #ffffff !important;
+    border: 1pt solid #e4e4e7 !important;
+    border-radius: 6pt !important;
+    padding: 10pt 12pt !important;
+    margin-bottom: 12pt !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .glass-panel::before,
+  .glass-panel::after,
+  .kpi-card::before,
+  .kpi-card::after {
+    display: none !important;
+  }
+
+  .panel-header {
+    border-bottom: 1pt solid #e4e4e7 !important;
+    padding-bottom: 6pt !important;
+    margin-bottom: 8pt !important;
+  }
+
+  .panel-title {
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    color: #09090b !important;
+  }
+
+  .panel-title-icon {
+    display: none !important;
+  }
+
+  /* 5-Card KPI Grid in Print */
+  .kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 8pt !important;
+    margin-bottom: 12pt !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .kpi-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 3pt !important;
+    margin-bottom: 4pt !important;
+    min-height: auto !important;
+  }
+
+  .kpi-title {
+    font-size: 6.2pt !important;
+    font-weight: 700 !important;
+    color: #3f3f46 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    letter-spacing: 0 !important;
+    line-height: 1.15 !important;
+  }
+
+  .kpi-value {
+    font-size: 13pt !important;
+    font-weight: 800 !important;
+    color: #09090b !important;
+    margin-bottom: 2pt !important;
+  }
+
+  .kpi-subtext {
+    font-size: 6.2pt !important;
+    color: #71717a !important;
+    min-height: auto !important;
+    line-height: 1.25 !important;
+  }
+
+  .kpi-badge {
+    background: #f4f4f5 !important;
+    border: 0.75pt solid #d4d4d8 !important;
+    color: #09090b !important;
+    font-size: 5.5pt !important;
+    padding: 1pt 4pt !important;
+    align-self: flex-start !important;
+  }
+
+  .badge-crit {
+    background: #09090b !important;
+    color: #ffffff !important;
+  }
+
+  /* Analytics Grid in Print (2 columns) */
+  .analytics-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10pt !important;
+    margin-bottom: 12pt !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .chart-container {
+    height: 170pt !important;
+  }
+
+  .chart-container svg path {
+    stroke: #09090b !important;
+  }
+
+  .chart-container svg circle {
+    stroke: #09090b !important;
+  }
+
+  .chart-container svg text {
+    fill: #09090b !important;
+  }
+
+  .chart-container svg line {
+    stroke: #d4d4d8 !important;
+  }
+
+  /* Optimization Section */
+  .slider-group {
+    background: #fafafa !important;
+    border: 1pt solid #e4e4e7 !important;
+    padding: 8pt 10pt !important;
+    border-radius: 6pt !important;
+    margin-bottom: 8pt !important;
+  }
+
+  .slider-header {
+    font-size: 8.5pt !important;
+    color: #09090b !important;
+    margin-bottom: 0 !important;
+  }
+
+  .slider-header span,
+  #budget-display {
+    color: #09090b !important;
+    font-weight: 700 !important;
+  }
+
+  .opt-tiles {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6pt !important;
+    margin: 8pt 0 10pt 0 !important;
+  }
+
+  .opt-tile {
+    background: #f4f4f5 !important;
+    border: 0.75pt solid #e4e4e7 !important;
+    border-radius: 4pt !important;
+    padding: 6pt !important;
+    text-align: center !important;
+  }
+
+  .opt-tile-label {
+    font-size: 6pt !important;
+    color: #71717a !important;
+  }
+
+  .opt-tile-val {
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    color: #09090b !important;
+  }
+
+  /* NLQ Result in Print */
+  .nlq-result {
+    display: block !important;
+    background: #f8fafc !important;
+    border: 1pt solid #e2e8f0 !important;
+    border-radius: 6pt !important;
+    padding: 8pt 10pt !important;
+    font-size: 8.5pt !important;
+    color: #09090b !important;
+    margin-top: 0 !important;
+  }
+
+  .nlq-result strong {
+    color: #09090b !important;
+  }
+
+  .nlq-highlight {
+    background: #09090b !important;
+    color: #ffffff !important;
+    padding: 1pt 4pt !important;
+    border-radius: 3pt !important;
+  }
+
+  /* Framework & Telemetry Progress */
+  .framework-card {
+    background: #f8fafc !important;
+    border: 1pt solid #e2e8f0 !important;
+    border-radius: 6pt !important;
+    padding: 8pt !important;
+  }
+
+  .framework-track {
+    background: #e2e8f0 !important;
+    height: 5pt !important;
+    border-radius: 3pt !important;
+  }
+
+  .framework-fill {
+    background: #09090b !important;
+    height: 100% !important;
+    border-radius: 3pt !important;
+  }
+
+  /* Tables in Print */
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 7.5pt !important;
+  }
+
+  th {
+    background: #f4f4f5 !important;
+    color: #09090b !important;
+    border-bottom: 1.5pt solid #09090b !important;
+    padding: 5pt 6pt !important;
+    text-align: left !important;
+  }
+
+  td {
+    border-bottom: 0.5pt solid #e4e4e7 !important;
+    padding: 5pt 6pt !important;
+    color: #18181b !important;
+  }
+
+  /* Print Footer */
+  footer.liquid-footer {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-top: 1pt solid #e4e4e7 !important;
+    padding: 8pt 0 0 0 !important;
+    margin: 12pt 0 0 0 !important;
+    font-size: 7pt !important;
+    color: #71717a !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    page-break-inside: avoid !important;
+  }
+}

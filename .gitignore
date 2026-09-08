@@ -1,0 +1,13 @@
+﻿__pycache__/
+*.py[cod]
+*.class
+.pytest_cache/
+.agents/
+run_shots.py
+test_shot.png
+.env
+.venv/
+env/
+venv/
+.DS_Store
+Thumbs.db
