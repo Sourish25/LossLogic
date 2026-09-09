@@ -1,10 +1,10 @@
-﻿# LossLogic: Quantified Cyber Risk & Actuarial Capital Allocation Platform
+# LossLogic: Quantified Cyber Risk & Actuarial Capital Allocation Platform
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![SciPy HiGHS](https://img.shields.io/badge/Optimization-SciPy%20HiGHS%20MILP-red)](https://scipy.org/)
 [![SIH 2026](https://img.shields.io/badge/Smart%20India%20Hackathon-PS%20ID%3A%2026105-orange)](https://www.sih.gov.in/)
-[![Standards](https://img.shields.io/badge/Frameworks-RBI%20%7C%20SEBI%20%7C%20NIST%20%7C%20ISO-green)](#-regulatory-compliance-crosswalk)
+[![Standards](https://img.shields.io/badge/Frameworks-RBI%20%7C%20SEBI%20%7C%20NIST%20%7C%20ISO-green)](#5-multi-framework-regulatory-crosswalk)
 
 > **Smart India Hackathon 2026** • **Problem Statement ID: 26105**  
 > **Organization:** Ministry / AICTE Cyber Security Cell  
@@ -27,43 +27,48 @@ In enterprise cybersecurity governance, an existential communication divide sepa
 
 ## 🏛️ System Architecture
 
-`mermaid
+```mermaid
 flowchart TD
-    subgraph INGESTION ["1. Enterprise Telemetry & Assets"]
-        A1[Asset Registry / CMDB] --> DAG[NetworkX Dependency DAG]
-        A2[Vulnerability Scanners] --> VULN[Threat Parameter Extractor]
-        A3[SIEM / EDR Logs] --> TEF[Threat Event Frequency]
+    subgraph S1 ["1. Enterprise Telemetry & Assets"]
+        A1["Asset Registry (CMDB)"] --> DAG["NetworkX Dependency DAG"]
+        A2["Vulnerability Scanners"] --> VULN["Threat Extractor"]
+        A3["SIEM & EDR Logs"] --> TEF["Threat Event Frequency"]
     end
 
-    subgraph QUANT ["2. Open FAIR™ Actuarial Engine"]
-        DAG --> PERC[Cascading Blast Radius]
-        TEF --> MC[Monte Carlo Simulator\n10,000 Stochastic Iterations]
+    subgraph S2 ["2. Open FAIR Actuarial Quant"]
+        DAG --> PERC["Cascading Blast Radius"]
+        TEF --> MC["Monte Carlo Simulator
+(10,000 Stochastic Iterations)"]
         VULN --> MC
         PERC --> MC
-        MC --> LOSS[Loss Exceedance Curve\nEAL & VaR 90/95/99%]
+        MC --> LOSS["Loss Exceedance Curve
+(EAL & VaR 90/95/99%)"]
     end
 
-    subgraph OPTIMIZER ["3. Combinatorial Resource Allocator"]
-        LOSS --> MILP[SciPy HiGHS MILP Knapsack Solver]
-        BUDGET[Budget Constraint Slider\n to ,000] --> MILP
-        PREREQ[Control Dependencies & Prerequisites] --> MILP
-        MILP --> PARETO[Pareto Frontier & ROSI Knee-Point]
-        MILP --> VEC[Optimal Binary Selection Vector]
+    subgraph S3 ["3. Combinatorial Resource Allocator"]
+        LOSS --> MILP["SciPy HiGHS MILP Knapsack Solver"]
+        BUDGET["Budget Slider ($0 to $50,000)"] --> MILP
+        PREREQ["Prerequisites & Exclusions"] --> MILP
+        MILP --> PARETO["Pareto Frontier & ROSI Knee-Point"]
+        MILP --> VEC["Optimal Binary Selection Vector"]
     end
 
-    subgraph GOVERNANCE ["4. Regulatory Crosswalk & Decision Support"]
-        VEC --> REG[5-Framework Compliance Mapper\nRBI CSF | SEBI CSCRF | ISO 27001 | NIST]
-        VEC --> NLG[Deterministic Decision Support / NLG]
-        NLG -.-> GEMINI[Google Gemini 3.5 Flash Lite\nTool-Calling Upgrade Roadmap]
+    subgraph S4 ["4. Regulatory Crosswalk & Decision Support"]
+        VEC --> REG["5-Framework Compliance Mapper
+(RBI CSF | SEBI CSCRF | ISO 27001 | NIST)"]
+        VEC --> NLG["Deterministic Decision Support / NLG"]
+        NLG -.-> GEMINI["Google Gemini 3.5 Flash Lite
+(Tool-Calling Upgrade Roadmap)"]
     end
 
-    subgraph PRESENTATION ["5. Liquid Glass Dashboard"]
-        PARETO --> UI[Apple Liquid Glass Web UI\nFastAPI + SVG Data Vis]
+    subgraph S5 ["5. Executive Presentation"]
+        PARETO --> UI["Liquid Glass Dashboard
+(FastAPI + SVG Data Vis)"]
         REG --> UI
         VEC --> UI
         LOSS --> UI
     end
-`
+```
 
 ---
 
@@ -74,14 +79,13 @@ flowchart TD
 * Calculates true actuarial metrics: **Expected Annual Loss (EAL)** and tail risk percentiles (**VaR 90%**, **VaR 95%**, **VaR 99%**).
 
 ### 2. Asset Dependency Graph & Blast Radius Propagation
-* Models enterprise digital infrastructure as a **Directed Acyclic Graph (DAG)** using 
-etworkx.
+* Models enterprise digital infrastructure as a **Directed Acyclic Graph (DAG)** using `networkx`.
 * Identifies single points of failure (Core Banking, SWIFT Gateway, Active Directory) and computes the **cascading blast radius multiplier** across downstream business services.
 
 ### 3. SciPy HiGHS Mixed-Integer Linear Programming (MILP)
 * Solves the constrained 0/1 Knapsack optimization problem in real time (~4ms):
-  \text{Maximize } \sum (x_i \cdot \Delta\text{EAL}_i) \quad \text{subject to} \quad \sum (x_i \cdot \text{Cost}_i) \le \text{Budget}
-* Enforces structural prerequisites (e.g., Multi-Factor Authentication requires an Identity & Access Management system).
+  $$\max \sum_{i=1}^n x_i \cdot \Delta\text{EAL}_i \quad \text{subject to} \quad \sum_{i=1}^n x_i \cdot \text{Cost}_i \le \text{Budget}, \quad x_i \in \{0, 1\}$$
+* Enforces structural prerequisites (e.g., Multi-Factor Authentication requires an Identity & Access Management system: $x_j \le x_k$).
 
 ### 4. True Catmull-Rom Pareto Frontier
 * Sweeps the budget space to construct the true non-dominated investment curve.
@@ -111,7 +115,7 @@ The platform features an Apple-inspired **Liquid Glass UI design system** with s
 
 ## 📂 Project Structure
 
-`
+```
 LossLogic/
 ├── src/
 │   ├── api/                   # FastAPI application factory & REST endpoints (/api/v1/...)
@@ -127,8 +131,11 @@ LossLogic/
 ├── LossLogic_Project_Report.pdf # Comprehensive 6-page project guide & pitch cheat sheet
 ├── requirements.txt           # Python dependencies
 ├── run_server.py              # Cloud & local ASGI server startup script
+├── llms.txt                   # LLM & AI agent sitemap and index
+├── llms-full.txt              # Complete AI context & architectural reference
+├── PROJECT_CONTEXT.md         # Exhaustive developer and agent codebase reference
 └── README.md                  # Project documentation
-`
+```
 
 ---
 
@@ -139,51 +146,59 @@ LossLogic/
 * Git
 
 ### 2. Clone and Install
-`ash
+```bash
 git clone https://github.com/Sourish25/LossLogic.git
 cd LossLogic
 
 # Install dependencies
 pip install -r requirements.txt
-`
+```
 
 ### 3. Run the Platform
-`ash
+```bash
 python run_server.py
-`
+```
 Open your browser and navigate to:
-* **Interactive Dashboard:** http://127.0.0.1:8000/
-* **Swagger API Docs:** http://127.0.0.1:8000/docs
-* **Health Probe:** http://127.0.0.1:8000/api/v1/health
+* **Interactive Dashboard:** `http://127.0.0.1:8000/`
+* **Swagger API Docs:** `http://127.0.0.1:8000/docs`
+* **Health Probe:** `http://127.0.0.1:8000/api/v1/health`
 
 ### 4. Run Test Suite
-`ash
+```bash
 pytest tests/
-`
+```
 *(429 unit tests covering quant math, knapsack optimization, and compliance mapping)*
 
 ---
 
 ## ☁️ Deployment on Render (Step-by-Step)
 
-Deploying LossLogic on Render gives you a **free, public HTTPS link** (e.g., https://losslogic.onrender.com) that judges can test live:
+Deploying LossLogic on Render gives you a **free, public HTTPS link** (e.g., `https://losslogic.onrender.com`) that judges can test live:
 
 1. **Sign Up / Log In:** Go to [render.com](https://render.com/) and log in with your GitHub account.
 2. **Create New Web Service:**
    * Click **New +** $\rightarrow$ **Web Service**.
-   * Select your GitHub repository: Sourish25/LossLogic.
+   * Select your GitHub repository: `Sourish25/LossLogic`.
 3. **Configure Settings:**
-   * **Name:** losslogic (or your preferred name)
+   * **Name:** `losslogic` (or your preferred name)
    * **Region:** Any close region (e.g., Singapore / Frankfurt)
-   * **Branch:** main
-   * **Runtime:** Python 3
-   * **Build Command:** pip install -r requirements.txt
-   * **Start Command:** python run_server.py
-   * **Instance Type:** Free
+   * **Branch:** `main`
+   * **Runtime:** `Python 3`
+   * **Build Command:** `pip install -r requirements.txt`
+   * **Start Command:** `python run_server.py`
+   * **Instance Type:** `Free`
 4. **Click "Deploy Web Service"**:
    * Render will clone your repository, install packages, and launch the server.
    * Within ~2 minutes, your live link will be available at:  
-     https://<your-service-name>.onrender.com
+     `https://<your-service-name>.onrender.com`
+
+---
+
+## 🤖 For AI Coding Assistants & Agents
+If you clone this repository to any environment and ask an AI assistant about this project, reference:
+* **`llms.txt`**: Standardized directory structure and capability index for LLMs.
+* **`llms-full.txt`**: Complete consolidated technical context, algorithms, math formulas, and schemas.
+* **`PROJECT_CONTEXT.md`**: Deep developer specification covering all modules, solvers, and API payloads.
 
 ---
 

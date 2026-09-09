@@ -1,0 +1,26 @@
+# LossLogic — LLM Context & Agent Sitemap
+> LossLogic: AI-Powered Actuarial Cyber Risk Quantification & Investment Optimization Platform
+> Smart India Hackathon 2026 | Problem Statement ID: 26105 | AICTE Cyber Security Cell
+
+## Overview
+LossLogic translates technical cybersecurity telemetry (vulnerabilities, SIEM events, IAM flaws, EDR logs) into actuarial financial loss distributions (Expected Annual Loss and Value-at-Risk) using the Open FAIR™ standard (ISO/IEC 27005). It then solves the budget-constrained capital allocation problem using SciPy's HiGHS Mixed-Integer Linear Programming (MILP) knapsack solver, computing the optimal Return on Security Investment (ROSI) and generating the Pareto Diminishing Returns frontier.
+
+## Key Files for AI Agents
+- [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md): Exhaustive codebase specification, data structures, math formulas, and API reference.
+- [llms-full.txt](llms-full.txt): Complete consolidated system prompt and knowledge dump for LLMs.
+- [LossLogic_Project_Report.pdf](LossLogic_Project_Report.pdf): 6-page printable executive and teammate pitch guide.
+- [src/quant/monte_carlo.py](src/quant/monte_carlo.py): Vectorized Compound Poisson-LogNormal FAIR Monte Carlo simulator.
+- [src/assets/graph.py](src/assets/graph.py): NetworkX Directed Acyclic Graph (DAG) for asset dependency and blast radius percolation.
+- [src/optimization/solver.py](src/optimization/solver.py): SciPy HiGHS MILP 0/1 knapsack solver with prerequisite constraints.
+- [src/optimization/frontier.py](src/optimization/frontier.py): Andrew's Monotone Chain Pareto convex hull and knee-point calculation.
+- [src/compliance/catalog.py](src/compliance/catalog.py): 5-framework regulatory catalogs (RBI CSF, SEBI CSCRF, ISO 27001, NIST CSF 2.0, CIS v8).
+- [src/decision_support/nlq_parser.py](src/decision_support/nlq_parser.py): Deterministic natural language query parser.
+- [src/api/app.py](src/api/app.py): FastAPI application factory and static web asset mounting.
+- [run_server.py](run_server.py): Cloud and local ASGI server runner with dynamic $PORT binding.
+
+## Core Capabilities & Math
+1. **Actuarial Risk Modeling**: Beta-PERT (TEF & RS) + Log-Normal (Loss Magnitude) over 10,000 Monte Carlo iterations.
+2. **Blast Radius Percolation**: Directed Acyclic Graph (DAG) propagation calculating upstream and downstream cascading business interruptions.
+3. **Linear Programming Knapsack**: Maximizes Total Risk Reduction subject to budget and prerequisite constraints (x_j <= x_k).
+4. **Pareto Frontier**: Identifies non-dominated investment packages and warns when budget reaches saturation (100% funded surplus).
+5. **AI Upgrade Blueprint**: Designed to interface with Google Gemini 3.5 Flash Lite / 2.0 Flash via structured Function Calling (Tool Calling).
