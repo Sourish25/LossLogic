@@ -2,7 +2,8 @@
 src/optimization/models.py - Pydantic v2 data contracts for Investment Optimization & ROSI.
 """
 
-from typing import Any, Dict, List, Optional
+from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Field, model_validator
 
 from src.config import USD_TO_INR_RATE, INR_TO_USD_RATE, usd_to_inr, inr_to_usd
@@ -19,10 +20,91 @@ except ImportError:
         pass
 
 
+class ThreatVectorEnum(str, Enum):
+    """
+    Canonical threat vectors modeled across enterprise attack surfaces.
+    Maps forward-looking defense mechanisms against modern adversary tactics.
+    """
+    ZERO_DAY_RCE = "Zero-Day RCE"
+    RANSOMWARE_LATERAL = "Ransomware Lateral Movement"
+    VOLUMETRIC_DDOS = "Volumetric DDoS"
+    CREDENTIAL_STUFFING = "Credential Stuffing"
+    DATA_EXFILTRATION = "Data Exfiltration"
+
+    @classmethod
+    def _missing_(cls, value: object) -> Any:
+        """
+        Permissive resolver allowing lookup via string literals, snake_case,
+        or legacy terminology without runtime KeyError / ValidationError.
+        """
+        if isinstance(value, str):
+            norm = value.strip().upper().replace(" ", "_").replace("-", "_")
+            # 1. Exact match on member name
+            if norm in cls.__members__:
+                return cls.__members__[norm]
+            # 2. Case-insensitive value match
+            for member in cls:
+                if member.value.upper() == value.strip().upper():
+                    return member
+            # 3. Permissive synonyms & abbreviations
+            if norm in ("RANSOMWARE_LATERAL_MOVEMENT", "RANSOMWARE", "LATERAL_MOVEMENT"):
+                return cls.RANSOMWARE_LATERAL
+            if norm in ("DDOS", "DDOS_SURGE", "VOLUMETRIC_DDOS_ATTACK"):
+                return cls.VOLUMETRIC_DDOS
+            if norm in ("DATA_LEAK", "EXFILTRATION", "DATA_BREACH", "SQL_DATA_LEAK"):
+                return cls.DATA_EXFILTRATION
+            if norm in ("RCE", "ZERO_DAY", "REMOTE_CODE_EXECUTION"):
+                return cls.ZERO_DAY_RCE
+            if norm in ("CREDENTIALS", "STUFFING", "BRUTE_FORCE"):
+                return cls.CREDENTIAL_STUFFING
+        return None
+
+
+class ThreatShield(BaseModel):
+    """
+    Proactive future threat immunity provided by an enterprise security mitigation.
+    Demonstrates defense-in-depth problem-solving capabilities beyond localized CVE patches.
+    """
+    threat_vector: ThreatVectorEnum
+    neutralized_attack_types: List[str] = Field(
+        default_factory=list,
+        description="Specific adversary techniques, CVE exploit patterns, or tactics neutralized."
+    )
+    future_immunity_pct: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=100.0,
+        description="Estimated preventative immunity percentage bounded in [0.0, 100.0]."
+    )
+    protective_mechanism: str = Field(
+        default="",
+        description="Underlying technical defense mechanism (e.g. eBPF syscall filtering, Anycast scrubbing)."
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_shield_inputs(cls, data: Any) -> Any:
+        """
+        Enables seamless interop with alternative naming conventions:
+        - immunity_percentage -> future_immunity_pct
+        - protection_mechanism -> protective_mechanism
+        - attack_vector -> threat_vector
+        """
+        if isinstance(data, dict):
+            if "immunity_percentage" in data and "future_immunity_pct" not in data:
+                data["future_immunity_pct"] = data["immunity_percentage"]
+            if "protection_mechanism" in data and "protective_mechanism" not in data:
+                data["protective_mechanism"] = data["protection_mechanism"]
+            if "attack_vector" in data and "threat_vector" not in data:
+                data["threat_vector"] = data["attack_vector"]
+        return data
+
+
 class SecurityControl(BaseModel):
     """
     Representation of a candidate security mitigation or investment control.
-    Supports multi-currency cost parameters, effectiveness, dependencies, and conflicts.
+    Supports multi-currency cost parameters, effectiveness, dependencies, conflicts,
+    and proactive future threat shields.
     """
     control_id: str
     name: str
@@ -39,6 +121,10 @@ class SecurityControl(BaseModel):
     is_mandatory: bool = False
     framework_mappings: Dict[str, Any] = Field(default_factory=dict)
     mapped_frameworks: Dict[str, Any] = Field(default_factory=dict)
+    future_threat_shields: List[ThreatShield] = Field(
+        default_factory=list,
+        description="List of future multi-threat defense shields provided by this mitigation."
+    )
 
     @model_validator(mode="before")
     @classmethod
@@ -91,6 +177,17 @@ class SecurityControl(BaseModel):
             return self.risk_reduction_inr if self.risk_reduction_inr > 0.0 else usd_to_inr(self.risk_reduction_usd)
         return self.risk_reduction_usd if self.risk_reduction_usd > 0.0 else inr_to_usd(self.risk_reduction_inr)
 
+    def get_threat_shield(self, vector: Union[ThreatVectorEnum, str]) -> Optional[ThreatShield]:
+        """Lookup specific future threat shield by vector name or enum."""
+        try:
+            resolved = ThreatVectorEnum(vector) if not isinstance(vector, ThreatVectorEnum) else vector
+        except (ValueError, TypeError):
+            return None
+        for shield in self.future_threat_shields:
+            if shield.threat_vector == resolved:
+                return shield
+        return None
+
 
 class OptimizationRequest(BaseModel):
     """Request payload for investment portfolio optimization."""
@@ -122,6 +219,7 @@ class FrontierPoint(BaseModel, BaseFrontierPoint):
     portfolio_rosi: float = 0.0
     marginal_cost_benefit_ratio: float = 0.0
     is_elbow_point: bool = False
+    security_upgrade_pct: float = Field(default=0.0, description="Security upgrade percentage [0, 100]")
     # Conftest / legacy compatibility fields
     spend: float = 0.0
     risk_mitigated: float = 0.0
@@ -197,6 +295,7 @@ class OptimizationResult(BaseModel, BaseOptimizationResult):
     allocated_spend: float = 0.0
     risk_mitigated: float = 0.0
     residual_eal: float = 0.0
+    security_upgrade_pct: float = Field(default=0.0, description="Security upgrade percentage [0, 100]")
     efficiency_frontier: List[FrontierPoint] = Field(default_factory=list)
 
     @model_validator(mode="before")

@@ -2108,8 +2108,8 @@
             vec2 lp1 = vec2(sin(u_time*0.2), cos(u_time*0.3))*0.6 + 0.5;
             vec2 lp2 = vec2(sin(u_time*-0.4+1.5), cos(u_time*0.25-0.5))*0.6 + 0.5;
             float h = 0.0;
-            h += smoothstep(0.4,0.0,distance(v_uv, lp1))*0.1;
-            h += smoothstep(0.5,0.0,distance(v_uv, lp2))*0.08;
+            h += smoothstep(0.4,0.0,distance(v_uv, lp1))*0.04;
+            h += smoothstep(0.5,0.0,distance(v_uv, lp2))*0.03;
             final.rgb += h;
           }
 
@@ -2399,7 +2399,7 @@
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
       gl.uniform1i(this.u.tex, 0);
 
-      const time = (Date.now() - this.startTime) / 1000;
+      const time = ((Date.now() - this.startTime) / 1000) * 0.28;
       gl.uniform1f(this.u.time, time);
 
       this._updateDynamicVideos();

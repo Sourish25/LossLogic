@@ -57,3 +57,156 @@ Provide a comprehensive automated test suite and verification scripts validating
 - [ ] Web dashboard renders executive financial charts (EAL, VaR, loss distributions) and technical drill-downs without console or rendering errors.
 - [ ] Regulatory compliance matrix displays coverage and mapped control status across ISO 27001, NIST CSF, CIS Controls, RBI CSF, and SEBI Framework.
 - [ ] Automated test suite runs with 100% passing tests via command-line execution (`pytest`).
+
+## Follow-up — 2026-09-09T19:01:38Z
+
+Implement five high-impact live demonstration capabilities into the LossLogic Cyber Risk Quantification and Capital Allocation Platform for a live jury hackathon presentation: real-time virtual investment risk/security visualizer, future multi-threat product capabilities, a multi-device e-commerce ("BharatCart") attack injection engine with continuous dynamic SOC telemetry, explicit security upgrade percentage metrics, and a CEO vendor benchmarking matrix.
+
+Working directory: `C:\Users\jaisw\Desktop\Loss Logic\LossLogic`  
+Integrity mode: development  
+
+## Verification Resources
+- Existing test suite of 414 passing tests in `tests/` (`pytest --ignore=tests/api -q`).
+- Seeded enterprise asset topology and NetworkX DAG in `src/assets/`.
+- Open FAIR Monte Carlo simulation engine in `src/quant/monte_carlo.py`.
+- SciPy HiGHS MILP 0/1 knapsack solver in `src/optimization/solver.py`.
+- Apple Liquid Glass UI system in `src/dashboard/`.
+
+## Requirements
+
+### R1. Live Virtual Investment Impact Visualizer & Security Factor Gauge
+Implement a real-time reactive visualizer in the executive interface that shows immediate changes in overall risk factor and security posture as capital budget is altered or controls are selected. The display must provide a side-by-side comparison of pre-investment exposure versus residual post-investment exposure, financial losses prevented in real currency (₹ INR / $ USD), and real-time posture transformation.
+
+### R2. Future Problem-Solving Capabilities & Multi-Threat Immunity Matrix
+Extend the security control catalog and decision support layer so that when an organization invests in a specific security product/mitigation (e.g., CrowdStrike Falcon EDR, Cloudflare Enterprise WAF, Okta Zero-Trust, Wiz CSPM), the platform visualizes the broad-spectrum future defensive capabilities provided beyond the immediate patch. The matrix must articulate future immunity against attack vectors such as Zero-Day RCE, Ransomware Lateral Movement, Volumetric DDoS, Credential Stuffing, and Data Exfiltration.
+
+### R3. Live E-Commerce ("BharatCart" / Flipkart-Style) Multi-Device Attack Injection & Dynamic Telemetry
+Implement a live e-commerce demonstration scenario ("BharatCart") with critical service nodes (Payment Gateway, Flash Sale Microservice, Customer PII Vault, API Gateway). Provide an unauthenticated network REST endpoint `POST /api/v1/demo/inject-attack` allowing a second user laptop or mobile device on the same local network to inject real-time attacks (e.g., DDoS Surge, Ransomware Outage, SQL Data Leak, Credential Stuffing). Additionally, establish a continuous, dynamic background telemetry ticker that subtly shifts event frequencies and alert counts every 2-3 seconds, ensuring the UI reflects an active, living enterprise environment rather than static data.
+
+### R4. Explicit Security Upgrade Percentage (+X% Protection Boost)
+Formulate and display an explicit Security Upgrade Percentage (SUP %) metric measuring the exact percentage boost in organizational cyber resilience achieved for a given financial investment:
+$$\text{Security Upgrade \%} = \frac{\text{Risk Mitigated}}{\text{Baseline Enterprise Exposure}} \times 100\%$$
+Present this prominently in both executive summary cards and optimization results (e.g., "+34.2% Security Boost for ₹45 Lakhs Investment").
+
+### R5. Executive CEO Vendor Benchmarking & Product Comparison Matrix
+Build a dedicated decision-support matrix for CEOs and executive boards comparing market-leading vendor solutions across core cybersecurity categories (Endpoint/EDR, Perimeter/WAF, Identity/PAM, Cloud/CSPM). For each vendor solution, display annual licensing costs, overall security coverage rating (%), future threat coverage scores, compliance alignment, and LossLogic recommendation tags (e.g., "Best-in-Class ROSI", "Budget Friendly"), complete with a one-click virtual purchase action that updates the live risk model.
+
+### R6. Automated Test Suite & Invariant Preservation
+Ensure that all new API routes, schemas, and mathematical calculations are covered by automated tests, while strictly preserving all existing mathematical invariants: positive EAL, strict Value-at-Risk ordering ($VaR_{90} < VaR_{95} < VaR_{99}$), and zero-tolerance budget ceilings.
+
+## Acceptance Criteria
+
+### Live Investment & Security Factor
+- [ ] Moving the budget slider or selecting controls updates the live Risk Factor score and Security Posture Gauge in real-time (<50ms).
+- [ ] Displays exact currency amounts for financial exposure before investment, residual exposure after investment, and net capital saved.
+
+### Future Capabilities Matrix
+- [ ] Each candidate security control exposes a structured `future_threat_shields` list detailing attack types neutralized, future immunity percentages, and protective mechanisms.
+- [ ] Clicking a funded control renders an interactive modal or detail card presenting its future threat defense breakdown.
+
+### Live Multi-Device Attack Demo & Dynamic Ticker
+- [ ] Calling `POST /api/v1/demo/inject-attack` from an external device on the network successfully injects an attack and returns 200 OK.
+- [ ] Upon attack injection, the dashboard triggers visual alert cues, spikes Threat Event Frequency and EAL, degrades Security Posture, and generates an immediate countermeasure recommendation.
+- [ ] Dashboard displays continuous, non-hardcoded telemetry variations updating automatically every 2-3 seconds without full page refreshes.
+
+### Security Upgrade Metric
+- [ ] Explicit Security Upgrade Percentage (+X.X%) is dynamically computed and rendered upon any budget allocation or control selection.
+- [ ] Value is mathematically bounded between 0% and 100% and scales proportionately with risk mitigation.
+
+### CEO Vendor Evaluation Matrix
+- [ ] Dedicated UI section displays comparative vendor product profiles across EDR, WAF, IAM, and CSPM.
+- [ ] Includes vendor names (CrowdStrike, Microsoft, Cloudflare, Okta, Wiz, etc.), costs, security ratings, and strategic recommendation tags.
+- [ ] Clicking "Select Product" immediately applies the product to the active investment portfolio and re-renders the risk model.
+
+### Test Verification
+- [ ] All automated tests pass with 100% success rate via `pytest`.
+
+## Follow-up — 2026-09-11T15:00:56Z
+
+# Teamwork Project Prompt — Final
+
+> Status: Launched
+> Goal: Multi-agent execution via teamwork_preview
+> Requested team: Full agent team working in parallel (separate streams for UI de-emojification, real-time data streaming, and jury UX polish)
+
+Upgrade LossLogic into a professional-grade, jury-ready Cyber Risk Quantification platform by replacing all emojis with clean enterprise SVGs, implementing continuous dynamic telemetry streaming with interactive event injection, and aligning UX with SIH Problem Statement 26105.
+
+Working directory: `C:\Users\jaisw\Desktop\Loss Logic\LossLogic`
+Integrity mode: development
+
+## Requirements
+
+### R1. UI De-emojification and Professional Design System
+Eradicate all emoji unicode characters across the entire frontend and backend codebases (HTML templates, JavaScript handlers, logging utilities, tooltips, and report generators). Replace them with clean, modern SVG iconography (such as Lucide/Feather styles) and typographic badges suited for an institutional enterprise risk platform.
+
+### R2. Continuous Dynamic Telemetry and Interactive Event Triggering
+Implement continuous, live data streaming where risk metrics, active alerts, and telemetry counts periodically update from dynamic backend API responses rather than displaying a static snapshot. Provide an interactive scenario injection panel that allows the presenter to trigger simulated cyber events (e.g., ransomware outbreak, zero-day CVE, or cloud IAM compromise) and immediately observe real-time risk recalculation (EAL, VaR, and posture drift).
+
+### R3. Jury Experience and Problem Statement Alignment
+Streamline the navigation and presentation of LossLogic's core pillars: Open FAIR probabilistic Monte Carlo quantification, cascading asset failure DAGs, SciPy HiGHS MILP budget allocation, and multi-framework compliance crosswalks (RBI CSF, SEBI CSCRF, ISO 27001, NIST CSF 2.0). Ensure the presentation interface is intuitive, responsive, and free of visual artifacts.
+
+## Acceptance Criteria
+
+### Iconography and Aesthetic Standards
+- [ ] Programmatic scan across all source and template files (`src/**/*.html`, `src/**/*.js`, `src/**/*.py`) detects zero emoji unicode characters (`[\u{1F300}-\u{1FAFF}]`, `[\u{2600}-\u{26FF}]`, `[\u{2700}-\u{27BF}]`).
+- [ ] All alert logs, vendor cards, category badges, and metrics render with sharp vector SVGs or refined CSS pills.
+
+### Dynamic Telemetry and Simulation
+- [ ] Dashboard displays an active, continuous background telemetry feed that visibly updates metric values and log streams on a periodic cycle without full page reload.
+- [ ] The interactive event trigger panel allows firing simulated threat events on demand, dynamically updating API state, increasing financial risk exposure, and populating live event logs.
+- [ ] Reset/normalize control cleanly restores baseline steady-state values.
+
+### Core Functionality and Regression Prevention
+- [ ] The complete test suite (`pytest`) passes with 100% success and no regressions.
+- [ ] All primary API endpoints (`/api/v1/assets`, `/api/v1/quant/simulate`, `/api/v1/optimize/allocate`, `/api/v1/compliance/matrix`, and live telemetry endpoints) return HTTP 200 with valid JSON payloads.
+- [ ] Web dashboard runs cleanly without JavaScript runtime errors in the browser console.
+
+## Follow-up — 2026-09-11T17:04:00Z
+
+Integrate Google Gemini 3.5 Flash Lite (`gemini-3.5-flash-lite`) via `geminiAPI.txt` for conversational cyber risk decision support, smart platform navigation, and real-time executive briefings, paired with a spacious, de-cluttered Liquid Glass UI redesign featuring calibrated contrast, refined motion dynamics, and unmistakable live telemetry indicators for jury evaluation.
+
+Working directory: C:\Users\jaisw\Desktop\Loss Logic\LossLogic
+Integrity mode: development
+
+## Requirements
+
+### R1. Google Gemini 3.5 Flash Lite AI Copilot & Action Engine
+- Verify and connect to Google Gemini API using model `gemini-3.5-flash-lite` with the API key stored in `geminiAPI.txt`.
+- Implement FastAPI endpoints for:
+  - **Conversational Decision Support**: Answering complex cyber risk, capital allocation, and regulatory compliance queries based on live platform state (EAL, VaR tail risk, Pareto frontier ROI, and RBI/SEBI/NIST crosswalks).
+  - **Natural Language Navigation & Parameter Execution**: Interpreting user commands (e.g., "Take me to BharatCart blast radius", "Simulate a zero-day exploit", "Optimize for 50 Lakh budget") and returning structured action payloads that switch tabs, set sliders, and trigger simulations.
+  - **Instant Jury & Board Briefing**: Generating concise 30-second executive elevator summaries from live telemetry and current optimization outcomes.
+- Provide a robust local fallback mechanism so the platform remains fully functional even if offline or if external API rate limits are encountered.
+
+### R2. Spacious Liquid Glass UI/UX Redesign & Motion Calibration
+- **Spatial Hierarchy & Scaling**: Overhaul CSS density and visual scale to a comfortable, uncrowded layout (~125-135% effective visual scale), increasing card padding, margin whitespace, and generous grid gutters to eliminate any cramped or "vibe-coded" appearance.
+- **Glass Transparency & Apple Specular Styling**: Increase the transparency of glass panels (`backdrop-filter: blur(20px)`, subtle gradient tint, refined specular border highlights).
+- **Calm Motion Dynamics**: Tone down background canvas particle speed and soften cursor mouse ripple intensity for an elegant, non-distracting background.
+- **Light Mode Color & Contrast Accessibility**: Fix light-mode alert banners ("CRITICAL LIVE THREAT DETECTED") by replacing low-contrast saturated deep reds with WCAG-compliant high-contrast styling (crisp text, refined badges, clear readability).
+- **Slide-Out AI Copilot Drawer**: Implement a sleek slide-out drawer accessible from any view with quick-action chips (`30-Sec Jury Pitch`, `Analyze Blast Radius`, `Auto-Optimize Portfolio`) and an interactive chat stream.
+
+### R3. Unmistakable Dynamic Telemetry & Live Jury Presentation HUD
+- Add a prominent, high-visibility "LIVE TELEMETRY STREAMING" status HUD featuring real-time pulse heartbeat, dynamic event counters, and query timestamps so judges immediately recognize that data is dynamically changing.
+- Seamlessly synchronize live ticker pulses, attack surges, and vendor procurement across Executive KPI cards and the BharatCart NetworkX DAG topology.
+- Maintain mathematical invariants: $EAL < VaR_{90} < VaR_{95} < VaR_{99}$ and strict budget ceilings under SciPy HiGHS MILP knapsack optimization.
+
+## Acceptance Criteria
+
+### AI Integration & Verification
+- [ ] Direct execution of `gemini-3.5-flash-lite` API calls with the key in `geminiAPI.txt` succeeds and handles structured input/output.
+- [ ] Endpoints `/api/v1/ai/chat`, `/api/v1/ai/navigate`, and `/api/v1/ai/executive-summary` return HTTP 200 with valid JSON response schemas.
+- [ ] Natural language commands return actionable payloads that drive frontend tab switching and parameter updates.
+- [ ] Automated tests in `tests/api/test_ai_copilot_jury.py` pass 100%.
+
+### Visual Layout, Scaling & Contrast
+- [ ] UI layout scale feels spacious and readable with increased card paddings, grid gutters, and comfortable typography.
+- [ ] Glass panels feature heightened translucency with backdrop blur and refined specular edge borders.
+- [ ] Mouse ripple effect is subtle and background canvas motion is smooth and non-distracting.
+- [ ] In Light Mode, alert banners ("CRITICAL LIVE THREAT DETECTED") have high-contrast, fully legible text conforming to WCAG contrast guidelines.
+- [ ] Slide-out AI Copilot drawer opens smoothly with responsive input and quick-action prompt chips.
+
+### Dynamic Telemetry & Test Preservation
+- [ ] Prominent HUD clearly signals active live telemetry with heartbeat pulses and dynamic query metrics.
+- [ ] Attack simulations (DDoS, Ransomware, SQLi, Credential Stuffing, Zero-Day CVE, Cloud IAM) dynamically trigger visual surges and terminal logs.
+- [ ] All 393+ existing tests across unit, api, invariants, and e2e continue to pass with zero regressions.
+

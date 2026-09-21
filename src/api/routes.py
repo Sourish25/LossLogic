@@ -21,7 +21,21 @@ from src.api.schemas import (
     OptimizeResponse,
     ComplianceMatrixResponse,
     TelemetryDrilldownResponse,
+    AttackInjectionRequest,
+    AttackInjectionResponse,
+    TelemetryTickerResponse,
+    ResetAttackResponse,
+    VendorComparisonResponse,
+    VirtualPurchaseRequest,
+    VirtualPurchaseResponse,
+    AIChatRequest,
+    AIChatResponse,
+    AINavigateRequest,
+    AINavigateResponse,
+    AIExecutiveSummaryRequest,
+    AIExecutiveSummaryResponse,
 )
+from src.ai import get_copilot
 from src.compliance.catalog import get_all_frameworks, get_framework_controls_as_dicts
 from src.compliance.mapper import ComplianceMapper
 from src.compliance.scoring import ComplianceScorer
@@ -30,9 +44,17 @@ from src.decision_support.narrative import ExecutiveNarrativeGenerator, format_c
 from src.decision_support.what_if import WhatIfEngine
 from src.decision_support.delay_cost import DelayedRemediationModel
 from src.decision_support.trajectory import ThreatTrajectoryForecaster
-from src.optimization.models import OptimizationRequest, SecurityControl
+from src.optimization.models import OptimizationRequest, SecurityControl, ThreatShield, ThreatVectorEnum
 from src.optimization.solver import OptimizationSolver
+from src.optimization.vendor_benchmarking import (
+    get_ceo_vendor_catalog,
+    get_vendor_by_id,
+    apply_virtual_vendor_purchase,
+    VENDOR_CATALOG,
+)
 from src.quant.monte_carlo import MonteCarloEngine
+from src.telemetry.attack_engine import AttackType, DemoAttackStateManager
+from src.telemetry.generator import ApexEnterpriseGenerator
 
 router = APIRouter(prefix="/api/v1", tags=["CyberRiskQuant"])
 
@@ -45,6 +67,8 @@ _trajectory_engine = ThreatTrajectoryForecaster()
 _delay_model = DelayedRemediationModel()
 _opt_solver = OptimizationSolver()
 _quant_engine = MonteCarloEngine(iterations=3000, seed=42)
+_demo_state_manager = DemoAttackStateManager()
+_ai_copilot = get_copilot()
 
 # Canonical enterprise mock data for immediate instant responses
 CANONICAL_CONTROLS = [
@@ -59,6 +83,20 @@ CANONICAL_CONTROLS = [
         effectiveness=0.88,
         is_mandatory=True,
         mapped_frameworks={"RBI": "RBI-IAM-01", "SEBI": "SEBI-WIT-01", "ISO": "ISO-A.8.2"},
+        future_threat_shields=[
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.CREDENTIAL_STUFFING,
+                future_immunity_pct=98.5,
+                protective_mechanism="FIDO2 WebAuthn cryptographic hardware keys and adaptive session step-up authentication",
+                neutralized_attack_types=["Brute Force", "Credential Stuffing", "Session Hijacking", "Password Spraying"],
+            ),
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.RANSOMWARE_LATERAL,
+                future_immunity_pct=88.0,
+                protective_mechanism="Zero-trust continuous authentication and administrative privilege isolation",
+                neutralized_attack_types=["Pass-the-Hash", "Lateral Privilege Escalation"],
+            ),
+        ],
     ),
     SecurityControl(
         control_id="CTRL-PATCH",
@@ -71,6 +109,20 @@ CANONICAL_CONTROLS = [
         effectiveness=0.92,
         is_mandatory=False,
         mapped_frameworks={"RBI": "RBI-VAP-01", "CIS": "CIS-7.4", "ISO": "ISO-A.8.8"},
+        future_threat_shields=[
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.ZERO_DAY_RCE,
+                future_immunity_pct=87.5,
+                protective_mechanism="Automated continuous vulnerability remediation and 48-hour SLA hot-patching pipeline",
+                neutralized_attack_types=["Memory Corruption", "Deserialization RCE", "SQL Injection"],
+            ),
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.DATA_EXFILTRATION,
+                future_immunity_pct=82.0,
+                protective_mechanism="Elimination of unauthenticated service bypass flaws and known remote exploit surfaces",
+                neutralized_attack_types=["Database Dumping", "Arbitrary File Read"],
+            ),
+        ],
     ),
     SecurityControl(
         control_id="CTRL-EDR",
@@ -83,6 +135,20 @@ CANONICAL_CONTROLS = [
         effectiveness=0.85,
         is_mandatory=False,
         mapped_frameworks={"SEBI": "SEBI-CON-02", "RBI": "RBI-MAL-01", "ISO": "ISO-A.8.7"},
+        future_threat_shields=[
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.RANSOMWARE_LATERAL,
+                future_immunity_pct=96.5,
+                protective_mechanism="Kernel-level ring-0 behavioral heuristics, eBPF syscall filtering, and shadow copy tamper locking",
+                neutralized_attack_types=["PsExec Spreading", "WMI Execution", "LSASS Dumping", "VSS Deletion"],
+            ),
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.ZERO_DAY_RCE,
+                future_immunity_pct=91.0,
+                protective_mechanism="Exploit mitigation engine preventing heap spray, shellcode execution, and process hollowing",
+                neutralized_attack_types=["Memory Injection", "Process Hollow", "Living-off-the-land"],
+            ),
+        ],
     ),
     SecurityControl(
         control_id="CTRL-S3-ENCR",
@@ -95,6 +161,20 @@ CANONICAL_CONTROLS = [
         effectiveness=0.95,
         is_mandatory=True,
         mapped_frameworks={"RBI": "RBI-DAT-01", "SEBI": "SEBI-WIT-03", "ISO": "ISO-A.8.24"},
+        future_threat_shields=[
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.DATA_EXFILTRATION,
+                future_immunity_pct=97.4,
+                protective_mechanism="KMS customer-managed envelope encryption, automated SCP guardrails, and public block enforcement",
+                neutralized_attack_types=["S3 Bucket Dumping", "DNS Tunneling", "Unauthorized Role Delegation"],
+            ),
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.RANSOMWARE_LATERAL,
+                future_immunity_pct=85.0,
+                protective_mechanism="S3 Object Lock with WORM immutable compliance retention",
+                neutralized_attack_types=["Cloud Data Encryption Extortion"],
+            ),
+        ],
     ),
     SecurityControl(
         control_id="CTRL-SIEM-AI",
@@ -108,6 +188,52 @@ CANONICAL_CONTROLS = [
         prerequisites=["CTRL-EDR"],
         is_mandatory=False,
         mapped_frameworks={"RBI": "RBI-SOC-01", "SEBI": "SEBI-CON-01", "CIS": "CIS-8.2"},
+        future_threat_shields=[
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.VOLUMETRIC_DDOS,
+                future_immunity_pct=84.0,
+                protective_mechanism="Real-time multi-source log correlation and dynamic upstream rate-limiting orchestration",
+                neutralized_attack_types=["Layer 7 Flood", "Ingress Surge"],
+            ),
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.CREDENTIAL_STUFFING,
+                future_immunity_pct=89.5,
+                protective_mechanism="Anomaly detection over authentication velocity and global IP reputation scoring",
+                neutralized_attack_types=["Distributed Password Spraying"],
+            ),
+        ],
+    ),
+    SecurityControl(
+        control_id="CTRL-WAF",
+        name="Enterprise Cloud WAF & Layer 7 DDoS Mitigation",
+        category="Network & Perimeter",
+        cost=600000.0,
+        cost_inr=600000.0,
+        cost_usd=inr_to_usd(600000.0),
+        target_finding_ids=["SIEM-001", "VULN-001"],
+        effectiveness=0.94,
+        is_mandatory=False,
+        mapped_frameworks={"RBI": "RBI-NET-01", "SEBI": "SEBI-CON-01", "ISO": "ISO-A.8.20"},
+        future_threat_shields=[
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.VOLUMETRIC_DDOS,
+                future_immunity_pct=99.8,
+                protective_mechanism="Anycast BGP distributed scrubbing network (>280 Tbps capacity) and challenge-response filtering",
+                neutralized_attack_types=["SYN Flood", "UDP Amplification", "HTTP Flood", "Slowloris"],
+            ),
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.CREDENTIAL_STUFFING,
+                future_immunity_pct=95.2,
+                protective_mechanism="Behavioral bot management, TLS fingerprinting, and client-side challenge verification",
+                neutralized_attack_types=["Automated Botnets", "Credential Stuffing", "Account Takeover"],
+            ),
+            ThreatShield(
+                threat_vector=ThreatVectorEnum.ZERO_DAY_RCE,
+                future_immunity_pct=92.0,
+                protective_mechanism="Signatureless payload inspection, OWASP Core Ruleset, and virtual patching at edge",
+                neutralized_attack_types=["Log4Shell", "Spring4Shell", "Command Injection"],
+            ),
+        ],
     ),
 ]
 
@@ -194,6 +320,27 @@ CANONICAL_FINDINGS = [
 def health_check() -> HealthResponse:
     """Readiness probe checking engine integrity and status."""
     return HealthResponse()
+
+
+@router.get("/assets")
+def get_assets():
+    """Retrieve complete enterprise asset inventory."""
+    gen = ApexEnterpriseGenerator(seed=42)
+    assets = gen.generate_assets()
+    return {
+        "total_assets": len(assets),
+        "assets": [
+            {
+                "asset_id": a.asset_id,
+                "name": a.name,
+                "business_unit": a.business_unit,
+                "asset_type": a.asset_type.value if hasattr(a.asset_type, "value") else str(a.asset_type),
+                "criticality_tier": a.data_sensitivity_tier.value if hasattr(a.data_sensitivity_tier, "value") else str(a.data_sensitivity_tier),
+                "environment": a.environment.value if hasattr(a.environment, "value") else str(a.environment),
+            }
+            for a in assets
+        ],
+    }
 
 
 @router.get("/dashboard/executive", response_model=ExecutiveDashboardResponse)
@@ -294,6 +441,7 @@ def get_technical_dashboard(currency: str = Query(default="INR")) -> TechnicalDa
     )
 
 
+@router.post("/quant/simulate", response_model=SimulationResponse)
 @router.post("/risk/simulate", response_model=SimulationResponse)
 def simulate_risk(request: SimulationRequest) -> SimulationResponse:
     """Execute continuous Monte Carlo risk simulation."""
@@ -403,6 +551,7 @@ def query_nlq(request: NLQRequest) -> NLQResponse:
     )
 
 
+@router.post("/optimize/allocate", response_model=OptimizeResponse)
 @router.post("/optimize/portfolio", response_model=OptimizeResponse)
 @router.post("/optimize", response_model=OptimizeResponse)
 def optimize_portfolio(request: OptimizeRequest) -> OptimizeResponse:
@@ -495,3 +644,245 @@ def get_telemetry_drilldown(domain: str) -> TelemetryDrilldownResponse:
         count=len(filtered),
         findings=filtered,
     )
+
+
+# =========================================================================
+# Live Hackathon Demonstration REST Endpoints (R3 & R5)
+# =========================================================================
+
+@router.post(
+    "/demo/inject-attack",
+    response_model=AttackInjectionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Inject Live Cyber Attack on BharatCart Topology (R3)",
+    description="Unauthenticated endpoint allowing remote mobile devices or secondary laptops to trigger real-time attacks."
+)
+def inject_demo_attack(request: AttackInjectionRequest) -> AttackInjectionResponse:
+    """
+    Triggers simulated attack on BharatCart infrastructure.
+    Spikes Threat Event Frequency, elevates EAL (+₹4.58 Cr baseline), degrades posture score by 25-50 points,
+    and outputs actionable contextual countermeasure.
+    """
+    res = _demo_state_manager.inject(
+        attack_type=request.attack_type,
+        target_node=request.target_node,
+        intensity=request.intensity,
+        source_device=request.source_device or "Remote Network Device",
+    )
+    return AttackInjectionResponse(
+        success=True,
+        attack_id=res.attack_id,
+        timestamp=res.timestamp,
+        attack_type=res.attack_type.value,
+        target_node=res.target_node,
+        intensity=res.intensity,
+        status="INJECTED",
+        tef_spike_multiplier=res.tef_spike_multiplier,
+        tef_spike_factor=res.tef_spike_multiplier,
+        nominal_tef=res.nominal_tef,
+        spiked_tef=res.spiked_tef,
+        baseline_eal_inr=res.baseline_eal_inr,
+        baseline_eal=res.baseline_eal_inr,
+        direct_loss_inr=res.direct_loss_inr,
+        cascading_loss_inr=res.cascading_loss_inr,
+        total_surge_inr=res.total_surge_inr,
+        eal_surge_inr=res.total_surge_inr,
+        eal_delta=res.total_surge_inr,
+        spiked_eal_inr=res.spiked_eal_inr,
+        new_eal_inr=res.spiked_eal_inr,
+        spiked_eal=res.spiked_eal_inr,
+        spiked_eal_usd=res.spiked_eal_usd,
+        new_eal_usd=res.spiked_eal_usd,
+        posture_before=res.posture_before,
+        posture_after=res.posture_after,
+        posture_degradation_pts=res.posture_degradation_pts,
+        posture_degradation_pct=-res.posture_degradation_pts,
+        posture_drift_pct=res.posture_drift_pct,
+        var_90_inr=res.var_90_inr,
+        var_95_inr=res.var_95_inr,
+        var_99_inr=res.var_99_inr,
+        recommended_control_id=res.recommended_control_id,
+        recommended_product_id=res.recommended_product_id,
+        recommended_countermeasure=res.recommended_countermeasure,
+        neutralization_efficacy_pct=round(res.neutralization_efficacy * 100.0, 1),
+        source_device=res.source_device,
+        currency="INR",
+    )
+
+
+@router.get(
+    "/demo/telemetry-ticker",
+    response_model=TelemetryTickerResponse,
+    summary="Retrieve Dynamic Telemetry Pulse (R3)",
+    description="Returns real-time stochastic variations for TEF, EPS, and alert counts every 2-3 seconds."
+)
+def get_demo_telemetry_ticker() -> TelemetryTickerResponse:
+    """
+    Emits continuous, non-hardcoded telemetry variations to drive living SOC UI displays.
+    """
+    pulse = _demo_state_manager.get_telemetry_pulse()
+    return TelemetryTickerResponse(**pulse)
+
+
+@router.post(
+    "/demo/reset-attack",
+    response_model=ResetAttackResponse,
+    summary="Reset Live Demo State (R3)",
+    description="Restores EAL, posture score, and telemetry rates to baseline nominal conditions."
+)
+def reset_demo_attack() -> ResetAttackResponse:
+    """
+    Clears all active attacks and restores baseline enterprise conditions.
+    """
+    res = _demo_state_manager.reset()
+    return ResetAttackResponse(**res)
+
+
+@router.get(
+    "/vendor-benchmark/matrix",
+    response_model=VendorComparisonResponse,
+    summary="Retrieve CEO Vendor Benchmarking Comparison Matrix (R5)",
+    description="Provides comparative profiles of leading enterprise vendors across EDR, WAF, IAM, and CSPM."
+)
+@router.get(
+    "/vendors/benchmark",
+    response_model=VendorComparisonResponse,
+    include_in_schema=False
+)
+def get_vendor_benchmark_matrix(currency: str = Query(default="INR")) -> VendorComparisonResponse:
+    """
+    Evaluates commercial cybersecurity vendors against 5 threat vectors, compliance, and ROSI.
+    """
+    curr = currency.upper().strip()
+    catalog = get_ceo_vendor_catalog()
+    vendors_data = []
+    total_spend = 0.0
+
+    for v in catalog:
+        cost = v.annual_cost_inr if curr == "INR" else v.annual_cost_usd
+        is_active = v.vendor_id in _demo_state_manager.purchased_vendor_ids
+        if is_active:
+            total_spend += cost
+
+        shields_dicts = []
+        for ts in v.future_threat_shields:
+            sd = ts.model_dump()
+            imm = getattr(ts, "future_immunity_pct", 95.0)
+            mech = getattr(ts, "protective_mechanism", "")
+            sd["neutralization_rate_pct"] = imm
+            sd["future_immunity_pct"] = imm
+            sd["proactive_defense_mechanism"] = mech
+            sd["protective_mechanism"] = mech
+            sd["threat_vector"] = ts.threat_vector.value if hasattr(ts.threat_vector, "value") else str(ts.threat_vector)
+            sd["description"] = mech
+            sd["coverage_tier"] = "ENTERPRISE_SHIELD"
+            shields_dicts.append(sd)
+
+        vendors_data.append({
+            "vendor_id": v.vendor_id,
+            "vendor_name": v.vendor_name,
+            "product_name": v.product_name,
+            "category": v.category,
+            "annual_cost": round(cost, 2),
+            "annual_cost_inr": v.annual_cost_inr,
+            "annual_cost_usd": v.annual_cost_usd,
+            "overall_coverage_rating": v.overall_coverage_rating,
+            "future_threat_shields": shields_dicts,
+            "compliance_alignment": v.compliance_alignment,
+            "recommendation_tags": v.recommendation_tags,
+            "rosi_estimate_pct": v.rosi_estimate_pct,
+            "associated_control_id": v.associated_control_id,
+            "target_node_ids": v.target_node_ids,
+            "is_funded": is_active,
+        })
+
+    return VendorComparisonResponse(
+        currency=curr,
+        categories=["EDR", "WAF", "IAM", "CSPM"],
+        vendors=vendors_data,
+        active_purchases=list(_demo_state_manager.purchased_vendor_ids),
+        total_vendor_spend=round(total_spend, 2),
+    )
+
+
+@router.post(
+    "/vendor-benchmark/purchase",
+    response_model=VirtualPurchaseResponse,
+    summary="One-Click Virtual Vendor Procurement (R5)",
+    description="Virtually funds vendor solution, updating the live risk model and Security Posture Gauge."
+)
+@router.post(
+    "/vendors/purchase",
+    response_model=VirtualPurchaseResponse,
+    include_in_schema=False
+)
+def purchase_vendor_solution(request: VirtualPurchaseRequest) -> VirtualPurchaseResponse:
+    """
+    Applies product purchase to enterprise portfolio and computes new residual EAL and SUP %.
+    """
+    try:
+        res = _demo_state_manager.apply_vendor_purchase(vendor_id=request.vendor_id, currency=request.currency)
+        return VirtualPurchaseResponse(**res)
+    except (ValueError, KeyError) as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+# --- Google Gemini 3.5 Flash Lite AI Copilot & Action Engine Endpoints (R1) ---
+
+
+@router.post(
+    "/ai/chat",
+    response_model=AIChatResponse,
+    summary="Google Gemini 3.5 Flash Lite Live Grounded Copilot (R1)",
+    description="Conversational cyber risk decision support grounded in live platform state (EAL, tail VaR, ROSI, compliance)."
+)
+async def ai_chat(request: AIChatRequest) -> AIChatResponse:
+    """
+    Executes conversational cyber risk query grounded in live platform metrics.
+    Automatically falls back to local heuristic reasoning if offline, timed out, or rate-limited.
+    """
+    res = await _ai_copilot.chat(
+        message=request.message,
+        currency=request.currency,
+        history=request.history,
+        context=request.context,
+    )
+    return AIChatResponse(**res)
+
+
+@router.post(
+    "/ai/navigate",
+    response_model=AINavigateResponse,
+    summary="Natural Language Navigation & Parameter Execution (R1)",
+    description="Interprets natural language commands and generates structured ActionPayloads for frontend execution."
+)
+async def ai_navigate(request: AINavigateRequest) -> AINavigateResponse:
+    """
+    Translates user instructions into structured action payloads for tab switches, sliders, or threat injections.
+    """
+    res = await _ai_copilot.navigate(
+        command=request.command,
+        currency=request.currency,
+    )
+    return AINavigateResponse(**res)
+
+
+@router.post(
+    "/ai/executive-summary",
+    response_model=AIExecutiveSummaryResponse,
+    summary="Instant 30-Second Jury & Board Briefing (R1)",
+    description="Generates concise 30-second executive elevator summary from live telemetry and optimization state."
+)
+async def ai_executive_summary(request: AIExecutiveSummaryRequest) -> AIExecutiveSummaryResponse:
+    """
+    Synthesizes a 30-second elevator pitch and high-impact executive takeaway bullets for presentation.
+    """
+    audience = request.target_audience or request.audience or "jury"
+    res = await _ai_copilot.executive_summary(
+        target_audience=audience,
+        currency=request.currency,
+        focus_domain=request.focus_domain,
+    )
+    return AIExecutiveSummaryResponse(**res)
+
+

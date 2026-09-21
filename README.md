@@ -12,7 +12,7 @@
 
 ---
 
-## 📌 Executive Overview
+## Executive Overview
 
 In enterprise cybersecurity governance, an existential communication divide separates technical security teams (CISOs) from financial fiduciaries (CFOs, Boards of Directors, Risk Committees). Technical teams track vulnerabilities via CVEs, CVSS scores, and subjective 5×5 colored heatmaps (*"Low"*, *"Medium"*, *"High"*). In contrast, executive leadership allocates capital based on **Expected Annual Loss (EAL)**, **Value-at-Risk (VaR)**, **EBITDA protection**, and **Return on Security Investment (ROSI)**.
 
@@ -25,7 +25,7 @@ In enterprise cybersecurity governance, an existential communication divide sepa
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
@@ -72,7 +72,7 @@ flowchart TD
 
 ---
 
-## 🌟 Core Platform Pillars
+## Core Platform Pillars
 
 ### 1. Open FAIR™ Actuarial Monte Carlo Engine
 * Runs **10,000 stochastic trials** per scenario using calibrated Beta-PERT (Threat Event Frequency & Resistance Strength) and Log-Normal (Loss Magnitude) probability distributions.
@@ -93,11 +93,11 @@ flowchart TD
 
 ### 5. Multi-Framework Regulatory Crosswalk
 * Every security control is mapped simultaneously across 5 compliance frameworks:
-  * 🏦 **RBI Cyber Security Framework** (Annex-1 & Continuous Testing)
-  * 📈 **SEBI CSCRF 2024** (Market Infrastructure Cyber Resilience)
-  * 🌐 **ISO/IEC 27001:2022** (Information Security Management)
-  * 🛡️ **NIST CSF 2.0** (Identify, Protect, Detect, Respond, Recover)
-  * 🔒 **CIS Controls v8** (Implementation Groups 1, 2, 3)
+  * **RBI Cyber Security Framework** (Annex-1 & Continuous Testing)
+  * **SEBI CSCRF 2024** (Market Infrastructure Cyber Resilience)
+  * **ISO/IEC 27001:2022** (Information Security Management)
+  * **NIST CSF 2.0** (Identify, Protect, Detect, Respond, Recover)
+  * **CIS Controls v8** (Implementation Groups 1, 2, 3)
 
 ### 6. Decision Support & Google Gemini AI Integration
 * **Current Deterministic Engine**: Zero-hallucination regular expression query parser and Natural Language Generation (NLG) engine synthesizing live simulation vectors into board-level rationale.
@@ -105,7 +105,7 @@ flowchart TD
 
 ---
 
-## 🖥️ User Interface Showcase
+## User Interface Showcase
 
 The platform features an Apple-inspired **Liquid Glass UI design system** with specular highlights, multi-layer backdrop blurs, dynamic SVG Catmull-Rom spline curves, and high-contrast telemetry.
 
@@ -113,7 +113,7 @@ The platform features an Apple-inspired **Liquid Glass UI design system** with s
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 LossLogic/
@@ -139,7 +139,7 @@ LossLogic/
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## Quick Start (Local Development)
 
 ### 1. Prerequisites
 * Python 3.11, 3.12, 3.13, or 3.14
@@ -171,7 +171,7 @@ pytest tests/
 
 ---
 
-## ☁️ Deployment on Render (Step-by-Step)
+## Deployment on Render (Step-by-Step)
 
 Deploying LossLogic on Render gives you a **free, public HTTPS link** (e.g., `https://losslogic.onrender.com`) that judges can test live:
 
@@ -194,7 +194,7 @@ Deploying LossLogic on Render gives you a **free, public HTTPS link** (e.g., `ht
 
 ---
 
-## 🤖 For AI Coding Assistants & Agents
+## For AI Coding Assistants & Agents
 If you clone this repository to any environment and ask an AI assistant about this project, reference:
 * **`llms.txt`**: Standardized directory structure and capability index for LLMs.
 * **`llms-full.txt`**: Complete consolidated technical context, algorithms, math formulas, and schemas.
@@ -202,7 +202,7 @@ If you clone this repository to any environment and ask an AI assistant about th
 
 ---
 
-## ⚖️ License & Attribution
+## License & Attribution
 
 Developed for **Smart India Hackathon 2026** (Problem Statement ID: 26105) by Team LossLogic.  
 Built upon the **Open FAIR™ Risk Taxonomy (O-RT)** and **Open FAIR™ Risk Analysis (O-RA)** standards published by The Open Group.
