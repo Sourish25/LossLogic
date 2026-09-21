@@ -120,7 +120,110 @@ class ApexEnterpriseGenerator:
             ),
         ]
 
-    def generate_assets(self) -> List[AssetRecord]:
+    # -----------------------------------------------------------------------
+    # BharatCart Live E-Commerce Scenario Services & Assets
+    # -----------------------------------------------------------------------
+    def generate_bharatcart_services(self) -> List[BusinessService]:
+        """Creates the core revenue-generating business services for BharatCart E-Commerce."""
+        return [
+            BusinessService(
+                service_id="SVC-BC-CHECKOUT",
+                name="BharatCart Core Checkout & Order Placer",
+                business_unit="E-Commerce Digital",
+                revenue_per_hour_downtime=250_000.0,
+                criticality=0.98,
+                description="Real-time merchant card/UPI payment clearing and order commitment",
+            ),
+            BusinessService(
+                service_id="SVC-BC-FLASHSALE",
+                name="BharatCart Festive Flash Sale Engine",
+                business_unit="E-Commerce Digital",
+                revenue_per_hour_downtime=350_000.0,
+                criticality=0.92,
+                description="High-throughput distributed lock manager for festive inventory",
+            ),
+            BusinessService(
+                service_id="SVC-BC-PORTAL",
+                name="BharatCart Web & Mobile Consumer App",
+                business_unit="E-Commerce Digital",
+                revenue_per_hour_downtime=100_000.0,
+                criticality=0.88,
+                description="Public browsing, catalog search, and user authentication portal",
+            ),
+        ]
+
+    def generate_bharatcart_assets(self) -> List[AssetRecord]:
+        """
+        Creates the 4 mission-critical assets for the BharatCart live e-commerce scenario:
+          1. BC-API-GW-01: Kong API Gateway (Criticality 0.88, High revenue dependency)
+          2. BC-FLASH-SALE-01: Flash Sale Inventory Service (Criticality 0.92, High revenue dependency)
+          3. BC-PAY-GW-01: Stripe/Razorpay Core Payment Processor (Criticality 0.98, Max revenue dependency)
+          4. BC-PII-VAULT-01: Customer PII & Card Vault (Criticality 0.95, RESTRICTED sensitivity tier)
+        """
+        return [
+            AssetRecord(
+                asset_id="BC-API-GW-01",
+                name="kong-api-gateway-prod-01",
+                business_unit="E-Commerce Digital",
+                environment=EnvironmentTier.PRODUCTION,
+                asset_type=AssetType.API_GATEWAY,
+                data_sensitivity_tier=DataSensitivityTier.CONFIDENTIAL,
+                replacement_cost=120_000.0,
+                downtime_cost_per_hour=70_000.0,
+                dependent_services=["SVC-BC-PORTAL", "SVC-BC-FLASHSALE", "SVC-BC-CHECKOUT"],
+                asset_criticality_score=0.88,
+                hostname="api-gw-01.prod.bharatcart.internal",
+                ip_address="10.200.1.10",
+                tags={"platform": "BharatCart", "role": "edge_gateway", "engine": "Kong Enterprise"},
+            ),
+            AssetRecord(
+                asset_id="BC-FLASH-SALE-01",
+                name="flash-sale-inventory-k8s-pod",
+                business_unit="E-Commerce Digital",
+                environment=EnvironmentTier.PRODUCTION,
+                asset_type=AssetType.CONTAINER,
+                data_sensitivity_tier=DataSensitivityTier.INTERNAL,
+                replacement_cost=80_000.0,
+                downtime_cost_per_hour=120_000.0,
+                dependent_services=["SVC-BC-FLASHSALE"],
+                asset_criticality_score=0.92,
+                hostname="flash-sale-01.k8s.bharatcart.internal",
+                ip_address="10.200.2.25",
+                tags={"platform": "BharatCart", "role": "inventory_service", "runtime": "K8s Container"},
+            ),
+            AssetRecord(
+                asset_id="BC-PAY-GW-01",
+                name="stripe-razorpay-core-payment-switch-01",
+                business_unit="Payment Services",
+                environment=EnvironmentTier.PRODUCTION,
+                asset_type=AssetType.SERVER,
+                data_sensitivity_tier=DataSensitivityTier.RESTRICTED,
+                replacement_cost=350_000.0,
+                downtime_cost_per_hour=180_000.0,
+                dependent_services=["SVC-BC-CHECKOUT"],
+                asset_criticality_score=0.98,
+                hostname="pay-switch-01.prod.bharatcart.internal",
+                ip_address="10.200.3.50",
+                tags={"platform": "BharatCart", "role": "payment_processor", "compliance": "PCI-DSS Level 1"},
+            ),
+            AssetRecord(
+                asset_id="BC-PII-VAULT-01",
+                name="customer-pii-card-vault-pg-primary",
+                business_unit="E-Commerce Digital",
+                environment=EnvironmentTier.PRODUCTION,
+                asset_type=AssetType.DATABASE,
+                data_sensitivity_tier=DataSensitivityTier.RESTRICTED,
+                replacement_cost=500_000.0,
+                downtime_cost_per_hour=150_000.0,
+                dependent_services=["SVC-BC-CHECKOUT", "SVC-BC-PORTAL"],
+                asset_criticality_score=0.95,
+                hostname="pii-vault-db01.secure.bharatcart.internal",
+                ip_address="10.200.4.100",
+                tags={"platform": "BharatCart", "role": "card_and_pii_vault", "regulatory": "DPDP Act 2023"},
+            ),
+        ]
+
+    def generate_assets(self, include_bharatcart: bool = False) -> List[AssetRecord]:
         """
         Generates exactly 65 enterprise assets across 5 Business Units:
           - Payment Services: 15 assets
@@ -1112,6 +1215,9 @@ class ApexEnterpriseGenerator:
             )
         )
 
+        if include_bharatcart:
+            assets.extend(self.generate_bharatcart_assets())
+
         return assets
 
     def build_dependency_graph(
@@ -1198,7 +1304,133 @@ class ApexEnterpriseGenerator:
         graph.add_dependency("CORP-ERP-APP-01", "CORP-ERP-DB-01")
         graph.add_dependency("CORP-ERP-APP-01", "CORP-AD-DC-01")
 
+        # -------------------------------------------------------------------
+        # BharatCart Live E-Commerce Dependency Chain:
+        # BC-API-GW-01 -> BC-FLASH-SALE-01 -> BC-PAY-GW-01 -> BC-PII-VAULT-01
+        # -------------------------------------------------------------------
+        if "SVC-BC-PORTAL" in graph.services and "BC-API-GW-01" in graph.assets:
+            graph.add_dependency("SVC-BC-PORTAL", "BC-API-GW-01")
+        if "SVC-BC-FLASHSALE" in graph.services and "BC-FLASH-SALE-01" in graph.assets:
+            graph.add_dependency("SVC-BC-FLASHSALE", "BC-FLASH-SALE-01")
+        if "SVC-BC-CHECKOUT" in graph.services and "BC-PAY-GW-01" in graph.assets:
+            graph.add_dependency("SVC-BC-CHECKOUT", "BC-PAY-GW-01")
+
+        if "BC-API-GW-01" in graph.assets and "BC-FLASH-SALE-01" in graph.assets:
+            graph.add_dependency("BC-API-GW-01", "BC-FLASH-SALE-01")
+        if "BC-FLASH-SALE-01" in graph.assets and "BC-PAY-GW-01" in graph.assets:
+            graph.add_dependency("BC-FLASH-SALE-01", "BC-PAY-GW-01")
+        if "BC-PAY-GW-01" in graph.assets and "BC-PII-VAULT-01" in graph.assets:
+            graph.add_dependency("BC-PAY-GW-01", "BC-PII-VAULT-01")
+
         return graph
+
+    def construct_dependency_graph(
+        self,
+        services: Optional[List[BusinessService]] = None,
+        assets: Optional[List[AssetRecord]] = None,
+        include_bharatcart: bool = True,
+    ) -> EnterpriseDependencyGraph:
+        """
+        Explicit builder populating the EnterpriseDependencyGraph.
+        Optionally includes BharatCart live e-commerce scenario dependency chain:
+          BC-API-GW-01 -> BC-FLASH-SALE-01 -> BC-PAY-GW-01 -> BC-PII-VAULT-01
+        """
+        svcs = list(services or self.generate_business_services())
+        ast_list = list(assets or self.generate_assets())
+
+        if include_bharatcart:
+            bc_svcs = self.generate_bharatcart_services()
+            bc_asts = self.generate_bharatcart_assets()
+            existing_svc_ids = {s.service_id for s in svcs}
+            existing_ast_ids = {a.asset_id for a in ast_list}
+            for bs in bc_svcs:
+                if bs.service_id not in existing_svc_ids:
+                    svcs.append(bs)
+            for ba in bc_asts:
+                if ba.asset_id not in existing_ast_ids:
+                    ast_list.append(ba)
+
+        return self.build_dependency_graph(svcs, ast_list)
+
+    def generate_bharatcart_dataset(
+        self,
+    ) -> Tuple[List[AssetRecord], List[NormalizedFinding], EnterpriseDependencyGraph]:
+        """
+        Dedicated entrypoint generating the BharatCart live e-commerce scenario dataset:
+          1. 4 BharatCart assets + 3 services
+          2. NetworkX DAG with BC-API-GW-01 -> BC-FLASH-SALE-01 -> BC-PAY-GW-01 -> BC-PII-VAULT-01
+          3. Pre-mapped vulnerability and telemetry findings for attack injection
+        """
+        services = self.generate_bharatcart_services()
+        assets = self.generate_bharatcart_assets()
+        graph = self.build_dependency_graph(services, assets)
+        assets = self.populate_asset_criticality(assets, graph)
+        findings = self.generate_bharatcart_findings(assets)
+        return assets, findings, graph
+
+    def generate_bharatcart_findings(
+        self, assets: List[AssetRecord]
+    ) -> List[NormalizedFinding]:
+        """Generates baseline findings for BharatCart nodes."""
+        findings: List[NormalizedFinding] = []
+        now = datetime.now(timezone.utc)
+        findings.append(
+            NormalizedFinding(
+                finding_id="BC-VULN-DDOS-01",
+                asset_id="BC-API-GW-01",
+                domain=TelemetryDomain.VULNERABILITY,
+                severity=SeverityLevel.HIGH,
+                title="Kong Gateway HTTP/2 Rapid Reset & Stream Multiplex Vulnerability",
+                cvss_score=7.5,
+                epss_score=0.65,
+                threat_event_frequency=12.0,
+                resistance_strength=0.35,
+                timestamp=now,
+            )
+        )
+        findings.append(
+            NormalizedFinding(
+                finding_id="BC-EDR-RANSOM-01",
+                asset_id="BC-PAY-GW-01",
+                domain=TelemetryDomain.EDR,
+                severity=SeverityLevel.CRITICAL,
+                title="Payment Switch Lateral Kerberoasting & Service Ticket Extraction",
+                cvss_score=9.4,
+                epss_score=0.88,
+                threat_event_frequency=4.0,
+                resistance_strength=0.20,
+                timestamp=now,
+            )
+        )
+        findings.append(
+            NormalizedFinding(
+                finding_id="BC-CSPM-SQL-01",
+                asset_id="BC-PII-VAULT-01",
+                domain=TelemetryDomain.CSPM,
+                severity=SeverityLevel.CRITICAL,
+                title="PostgreSQL Customer PII Vault Unauthenticated Read Replica Port Exposure",
+                cvss_score=9.8,
+                epss_score=0.92,
+                threat_event_frequency=2.5,
+                resistance_strength=0.15,
+                timestamp=now,
+            )
+        )
+        findings.append(
+            NormalizedFinding(
+                finding_id="BC-SIEM-STUFF-01",
+                asset_id="BC-FLASH-SALE-01",
+                domain=TelemetryDomain.SIEM,
+                severity=SeverityLevel.HIGH,
+                title="Distributed Botnet Credential Replay on Festive Flash Sale Cart Checkout",
+                cvss_score=7.8,
+                epss_score=0.55,
+                threat_event_frequency=25.0,
+                resistance_strength=0.40,
+                timestamp=now,
+            )
+        )
+        return findings
 
     def populate_asset_criticality(
         self, assets: List[AssetRecord], graph: EnterpriseDependencyGraph

@@ -13,6 +13,7 @@ import scipy.sparse as sp
 from src.config import USD_TO_INR_RATE, INR_TO_USD_RATE, usd_to_inr, inr_to_usd
 from src.optimization.models import (
     FrontierPoint,
+    FrontierResult,
     OptimizationRequest,
     OptimizationResult,
     SecurityControl,

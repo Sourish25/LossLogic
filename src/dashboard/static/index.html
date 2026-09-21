@@ -41,6 +41,10 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg>
             Technical
           </button>
+          <button class="tab-pill" data-tab="demo" id="tab-pill-demo">
+            <span class="live-radar-dot"></span>
+            Live Jury Demo
+          </button>
         </div>
 
         <!-- Currency Switcher (INR / USD) -->
@@ -59,8 +63,140 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export
         </button>
+
+        <!-- AI Copilot Navigation Pill Trigger -->
+        <button id="btn-open-copilot" class="glass-btn btn-copilot-trigger" title="Open Gemini AI Risk Copilot (Ctrl+K)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/>
+          </svg>
+          <span class="copilot-btn-label">AI Copilot</span>
+          <span class="copilot-badge-pulse"></span>
+        </button>
       </div>
     </header>
+
+    <!-- Continuous Live SOC Telemetry & Threat Ticker (News Channel Right-to-Left Infinite Crawl) -->
+    <div id="soc-ticker-banner" class="soc-ticker-bar" role="status" aria-live="polite">
+      <div class="ticker-left">
+        <div class="heartbeat-indicator">
+          <span class="pulse-ring"></span>
+          <span class="ticker-pulse-beacon"></span>
+        </div>
+        <div class="ticker-hud-badge">
+          <span class="hud-status-text">LIVE TELEMETRY STREAMING</span>
+        </div>
+        <span class="ticker-company-badge">BharatCart E-Commerce (Flipkart Architecture)</span>
+      </div>
+
+      <!-- Continuous Right-to-Left News Broadcast Crawl Viewport -->
+      <div class="ticker-marquee-viewport" aria-label="Live Telemetry News Crawl">
+        <div class="ticker-marquee-inner">
+          <!-- Primary Track (Original IDs preserved for test assertions & telemetry hooks) -->
+          <div class="ticker-marquee-track primary-track">
+            <div class="ticker-metric" title="Continuous telemetry ingestion throughput">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">INGESTION VELOCITY:</span>
+              <span id="ticker-eps" class="tm-value font-mono ticker-eps-val">14,850 events/sec</span>
+            </div>
+            <div class="ticker-metric" title="Calibrated annual threat event frequency">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">THREAT FREQUENCY:</span>
+              <span id="ticker-tef" class="tm-value font-mono ticker-tef-val">12.40 / yr</span>
+            </div>
+            <div class="ticker-metric" title="Active critical incidents detected">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">ACTIVE ALERTS:</span>
+              <span id="ticker-alerts" class="tm-value badge-ticker-nominal ticker-alerts-val">0 Critical</span>
+            </div>
+            <div class="ticker-metric" title="Continuous security posture score and risk factor">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">POSTURE / RF:</span>
+              <span id="ticker-posture-quick" class="tm-value font-mono ticker-posture-val">84.6% (RF: 4.8)</span>
+            </div>
+            <div class="ticker-metric" title="Continuous Open FAIR quantitative calibration">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">OPEN FAIR:</span>
+              <span class="tm-value font-mono">100k Iterations</span>
+            </div>
+            <div class="ticker-metric" title="Overall platform operational status">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">STATUS:</span>
+              <span id="ticker-status" class="tm-value status-nominal ticker-status-val">NOMINAL &bull; 99.98%</span>
+            </div>
+            <div class="ticker-metric" title="Heartbeat telemetry synchronization timestamp">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">SYNC:</span>
+              <span id="ticker-last-sync" class="tm-value font-mono ticker-last-sync-val">LIVE FEED &bull; Syncing...</span>
+            </div>
+          </div>
+
+          <!-- Clone Track (Seamless infinite right-to-left crawl loop) -->
+          <div class="ticker-marquee-track clone-track" aria-hidden="true">
+            <div class="ticker-metric" title="Continuous telemetry ingestion throughput">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">INGESTION VELOCITY:</span>
+              <span class="tm-value font-mono ticker-eps-val">14,850 events/sec</span>
+            </div>
+            <div class="ticker-metric" title="Calibrated annual threat event frequency">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">THREAT FREQUENCY:</span>
+              <span class="tm-value font-mono ticker-tef-val">12.40 / yr</span>
+            </div>
+            <div class="ticker-metric" title="Active critical incidents detected">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">ACTIVE ALERTS:</span>
+              <span class="tm-value badge-ticker-nominal ticker-alerts-val">0 Critical</span>
+            </div>
+            <div class="ticker-metric" title="Continuous security posture score and risk factor">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">POSTURE / RF:</span>
+              <span class="tm-value font-mono ticker-posture-val">84.6% (RF: 4.8)</span>
+            </div>
+            <div class="ticker-metric" title="Continuous Open FAIR quantitative calibration">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">OPEN FAIR:</span>
+              <span class="tm-value font-mono">100k Iterations</span>
+            </div>
+            <div class="ticker-metric" title="Overall platform operational status">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">STATUS:</span>
+              <span class="tm-value status-nominal ticker-status-val">NOMINAL &bull; 99.98%</span>
+            </div>
+            <div class="ticker-metric" title="Heartbeat telemetry synchronization timestamp">
+              <span class="tm-bullet">&bull;</span>
+              <span class="tm-label">SYNC:</span>
+              <span class="tm-value font-mono ticker-last-sync-val">LIVE FEED &bull; Syncing...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Remote Attack Alert Floating Glass Banner -->
+    <div id="attack-alert-banner" class="attack-alert-banner" style="display: none;">
+      <div class="aab-glow-indicator"></div>
+      <div class="aab-content">
+        <div class="aab-header">
+          <span class="aab-badge">CRITICAL LIVE THREAT DETECTED</span>
+          <span id="aab-timestamp" class="aab-time">Just now</span>
+        </div>
+        <div class="aab-title" id="aab-title">High-Intensity Intrusion Targeting BharatCart Infrastructure</div>
+        <div class="aab-details" id="aab-details">
+          Vector: <strong id="aab-vector">DDOS_TRAFFIC_SURGE</strong> |
+          Target: <code id="aab-target">gateway.bharatcart-shop.internal</code> |
+          TEF Spiked: <strong id="aab-tef-spike">10.0x</strong> |
+          Financial Exposure Surge: <strong id="aab-loss-surge">+₹ 4.58 Cr</strong>
+        </div>
+        <div class="aab-remediation" id="aab-remediation">
+          <strong>AI Recommended Countermeasure:</strong> <span id="aab-countermeasure-text">Deploy Cloudflare Magic Transit to absorb volumetric ingestion.</span>
+        </div>
+      </div>
+      <div class="aab-actions">
+        <button id="btn-alert-mitigate" class="glass-btn btn-alert-procure">Deploy Countermeasure</button>
+        <button id="btn-alert-reset" class="glass-btn btn-alert-reset">Reset Attack</button>
+        <button id="btn-alert-dismiss" class="glass-btn btn-alert-close" title="Dismiss Alert">&times;</button>
+      </div>
+    </div>
 
     <!-- Main Content Container -->
     <main class="main-viewport">
@@ -382,7 +518,310 @@
 
       </div>
 
+      <!-- ================================================================= -->
+      <!-- TAB 3: LIVE JURY DEMO & BHARATCART THREAT DEFENSE -->
+      <!-- ================================================================= -->
+      <div id="tab-demo" class="tab-content">
+
+        <!-- 5-Metric Strip: Live Posture Dial, Risk Factor Gauge, SUP %, Live EAL, Immunity Shields -->
+        <div class="kpi-grid">
+          <!-- Dial 1: Real-Time Security Posture (0-100%) -->
+          <div class="kpi-card live-dial-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Live Security Posture</span>
+              <span id="demo-posture-badge" class="kpi-badge badge-high">Resilient</span>
+            </div>
+            <div class="dial-display-container">
+              <div class="dial-meter-wrapper">
+                <svg class="posture-dial-svg" viewBox="0 0 120 120">
+                  <circle class="dial-track" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
+                  <circle id="posture-meter-bar" class="dial-bar" cx="60" cy="60" r="50" fill="none" stroke-width="10" stroke-dasharray="314.159" stroke-dashoffset="48.3"/>
+                </svg>
+                <div class="dial-meter-value">
+                  <span id="demo-posture-val">84.6</span><span class="dial-unit">%</span>
+                </div>
+              </div>
+            </div>
+            <div class="kpi-subtext" id="demo-posture-subtext">Composite defense efficiency across active controls</div>
+          </div>
+
+          <!-- Dial 2: Real-Time Risk Factor Gauge (0.0 - 10.0) -->
+          <div class="kpi-card live-dial-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Real-Time Risk Factor</span>
+              <span id="demo-risk-badge" class="kpi-badge badge-med">Moderate (4.8)</span>
+            </div>
+            <div class="dial-display-container">
+              <div class="risk-factor-bar-wrapper">
+                <div class="rf-value-display">
+                  <span id="demo-rf-val">4.8</span><span class="rf-scale">/ 10.0</span>
+                </div>
+                <div class="rf-bar-track">
+                  <div id="demo-rf-indicator" class="rf-bar-fill" style="width: 48%;"></div>
+                </div>
+                <div class="rf-zone-labels">
+                  <span>0 Low</span>
+                  <span>4 Mod</span>
+                  <span>7 High</span>
+                  <span>10 Crit</span>
+                </div>
+              </div>
+            </div>
+            <div class="kpi-subtext" id="demo-rf-subtext">Calibrated actuarial risk multiplier (spikes under attack)</div>
+          </div>
+
+          <!-- Metric 3: Security Upgrade Percentage (SUP %) -->
+          <div class="kpi-card live-dial-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Security Upgrade % (SUP)</span>
+              <span id="demo-sup-badge" class="kpi-badge badge-spec">Baseline</span>
+            </div>
+            <div id="demo-sup-val" class="kpi-value" style="font-size: 2.1rem; color: var(--text-heading);">0.0%</div>
+            <div class="sup-formula-container">
+              <div class="sup-formula-text">SUP = (Risk Mitigated / Baseline EAL) &times; 100</div>
+              <div id="demo-sup-detail" class="sup-detail-text">Invest in vendors below to unlock defense upgrade</div>
+            </div>
+            <div class="kpi-subtext">Quantified security upgrade delivered per capital invested</div>
+          </div>
+
+          <!-- Metric 4: Dynamic Loss Exposure (Live EAL) -->
+          <div class="kpi-card live-dial-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Current Annual Loss (EAL)</span>
+              <span id="demo-eal-badge" class="kpi-badge badge-high">Nominal State</span>
+            </div>
+            <div id="demo-eal-val" class="kpi-value">₹ 4.82 Cr</div>
+            <div id="demo-eal-delta" class="opt-tile-label" style="margin-top:0.2rem; color:var(--text-muted);">Baseline: ₹ 4.82 Cr</div>
+            <div class="kpi-subtext" id="demo-eal-subtext">Annualized financial cyber loss across BharatCart nodes</div>
+          </div>
+
+          <!-- Metric 5: Future Immunity Shields -->
+          <div class="kpi-card live-dial-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Threat Shields Active</span>
+              <span id="demo-shields-badge" class="kpi-badge badge-spec">Proactive</span>
+            </div>
+            <div id="demo-shields-val" class="kpi-value">5 Active</div>
+            <div id="demo-vendors-funded" class="opt-tile-label" style="margin-top:0.2rem; color:var(--text-muted);">0 Commercial Vendors Procured</div>
+            <div class="kpi-subtext">Multi-vector shields neutralizing future cyber catastrophes</div>
+          </div>
+        </div>
+
+        <!-- 2-Column Live Demo Sandbox Grid -->
+        <div class="analytics-grid">
+          <!-- Column 1: BharatCart Attack Simulator & Remote 2nd-Laptop Trigger -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                BharatCart Multi-Laptop Attack Simulator
+              </div>
+              <button id="btn-reset-demo" class="glass-btn" title="Reset BharatCart to Nominal State">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                Reset Simulation
+              </button>
+            </div>
+
+            <div style="font-size:0.83rem; color:var(--text-secondary); margin-bottom:1rem; line-height:1.45;">
+              Simulate high-impact attacks against <strong>BharatCart E-Commerce</strong> (Flipkart-scale architecture). Trigger directly from this screen or remotely from any jury laptop / mobile device via the network cURL API.
+            </div>
+
+            <!-- BharatCart Architecture DAG Dependency Pipeline -->
+            <div class="topology-dag-strip" style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:1rem; padding:0.75rem; background:var(--glass-bg-primary); border:1px solid var(--glass-border); border-radius:12px; font-size:0.75rem;">
+              <div class="topo-node" id="topo-BC-API-GW-01" style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.2);">
+                <span style="font-weight:600; color:var(--text-heading);">API Gateway</span>
+                <span class="topo-badge" style="font-size:0.65rem; color:#22c55e;">ONLINE</span>
+              </div>
+              <span style="color:var(--text-muted); font-weight:700;">&rarr;</span>
+              <div class="topo-node" id="topo-BC-FLASH-SALE-01" style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.2);">
+                <span style="font-weight:600; color:var(--text-heading);">Flash Sale K8s</span>
+                <span class="topo-badge" style="font-size:0.65rem; color:#22c55e;">ONLINE</span>
+              </div>
+              <span style="color:var(--text-muted); font-weight:700;">&rarr;</span>
+              <div class="topo-node" id="topo-BC-PAY-GW-01" style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.2);">
+                <span style="font-weight:600; color:var(--text-heading);">Payment Switch</span>
+                <span class="topo-badge" style="font-size:0.65rem; color:#22c55e;">ONLINE</span>
+              </div>
+              <span style="color:var(--text-muted); font-weight:700;">&rarr;</span>
+              <div class="topo-node" id="topo-BC-PII-VAULT-01" style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.2);">
+                <span style="font-weight:600; color:var(--text-heading);">PII Vault DB</span>
+                <span class="topo-badge" style="font-size:0.65rem; color:#22c55e;">ONLINE</span>
+              </div>
+            </div>
+
+            <!-- Target Node Selector -->
+            <div class="target-node-picker">
+              <label for="demo-target-node" class="picker-label">Target Infrastructure Node:</label>
+              <select id="demo-target-node" class="glass-select">
+                <option value="gateway-01" selected>gateway.bharatcart-shop.internal (BC-API-GW-01 & Ingress)</option>
+                <option value="db-cluster-01">db.bharatcart-shop.internal (BC-PII-VAULT-01 & Cardholder Vault)</option>
+                <option value="k8s-order-service">k8s.bharatcart-shop.internal (BC-FLASH-SALE-01 & Order Pipeline)</option>
+                <option value="auth-vault-01">auth.bharatcart-shop.internal (BC-PAY-GW-01 & Payment Gateway)</option>
+              </select>
+            </div>
+
+            <!-- 6 Attack Injection Buttons -->
+            <div class="attack-buttons-grid">
+              <button class="attack-btn" data-attack="DDOS_TRAFFIC_SURGE">
+                <div class="ab-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <div class="ab-text">
+                  <div class="ab-title">DDoS Traffic Surge</div>
+                  <div class="ab-desc">380 Gbps L7 HTTP flood, +₹4.58 Cr EAL</div>
+                </div>
+              </button>
+              <button class="attack-btn" data-attack="RANSOMWARE_OUTAGE">
+                <div class="ab-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <div class="ab-text">
+                  <div class="ab-title">LockBit Ransomware</div>
+                  <div class="ab-desc">Lateral spread, volume encryption, 42pt drop</div>
+                </div>
+              </button>
+              <button class="attack-btn" data-attack="SQL_DATA_EXFILTRATION">
+                <div class="ab-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                </div>
+                <div class="ab-text">
+                  <div class="ab-title">SQLi Data Exfiltration</div>
+                  <div class="ab-desc">2.4M cardholder dump, regulatory breach</div>
+                </div>
+              </button>
+              <button class="attack-btn" data-attack="CREDENTIAL_STUFFING">
+                <div class="ab-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+                </div>
+                <div class="ab-text">
+                  <div class="ab-title">Credential Stuffing</div>
+                  <div class="ab-desc">50k bot logins/min, auth token takeover</div>
+                </div>
+              </button>
+              <button class="attack-btn" data-attack="ZERO_DAY_CVE">
+                <div class="ab-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>
+                </div>
+                <div class="ab-text">
+                  <div class="ab-title">Zero-Day CVE Exploit</div>
+                  <div class="ab-desc">Unpatched RCE vulnerability, remote memory hijack</div>
+                </div>
+              </button>
+              <button class="attack-btn" data-attack="CLOUD_IAM_COMPROMISE">
+                <div class="ab-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="M12 12v3"/><path d="M12 18h.01"/></svg>
+                </div>
+                <div class="ab-text">
+                  <div class="ab-title">Cloud IAM Compromise</div>
+                  <div class="ab-desc">Privilege escalation & shadow admin hijacking</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Multi-Laptop Remote Command Box -->
+            <div class="remote-curl-box">
+              <div class="rcb-header">
+                <span class="rcb-title">
+                  <span class="live-pulse-indicator" style="background:#22c55e;"></span>
+                  Trigger Attack from 2nd Laptop / Phone (cURL API)
+                </span>
+                <button id="btn-copy-curl" class="glass-btn btn-copy-code" title="Copy cURL to Clipboard">Copy cURL</button>
+              </div>
+              <div class="rcb-snippet">
+                <code id="curl-command-display">curl -X POST http://localhost:8000/api/v1/demo/inject-attack -H "Content-Type: application/json" -d '{"attack_type":"DDOS_TRAFFIC_SURGE","source_device":"Jury-Laptop"}'</code>
+              </div>
+              <div class="rcb-caption">
+                Run this command on another laptop on the network to attack BharatCart and witness real-time loss surge on this screen!
+              </div>
+            </div>
+
+            <!-- Attack Injection Terminal / Event Log -->
+            <div class="terminal-log-container">
+              <div class="tlc-header">
+                <span>SOC Incident Response Telemetry Feed</span>
+                <span id="tlc-status" class="tlc-status-live">STREAMING</span>
+              </div>
+              <div id="demo-terminal-feed" class="tlc-body">
+                <div class="terminal-line">[00:00:01] SOC telemetry stream established. Listening on 0.0.0.0:8000.</div>
+                <div class="terminal-line">[00:00:02] BharatCart topology nominal. Ingress TEF = 3.24/yr, EAL = ₹ 4.82 Cr.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: CEO Vendor Selection & Benchmarking Matrix -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg>
+                </div>
+                CEO Vendor Benchmarking & Virtual Procurement
+              </div>
+              <div class="vendor-filter-pills">
+                <span class="kpi-badge badge-med" style="font-size:0.7rem;">5 Enterprise Leaders</span>
+              </div>
+            </div>
+
+            <div style="font-size:0.83rem; color:var(--text-secondary); margin-bottom:1rem; line-height:1.45;">
+              Executive decision matrix comparing commercial cybersecurity products. Click <strong>"Procure Solution"</strong> to simulate instant virtual investment, update the real-time risk factor, and unlock future threat shields.
+            </div>
+
+            <!-- Total Vendor Spend Bar -->
+            <div class="vendor-spend-summary">
+              <div class="vss-item">
+                <span class="vss-label">Virtually Allocated Spend:</span>
+                <span id="vss-total-spend" class="vss-value">₹ 0.00</span>
+              </div>
+              <div class="vss-item">
+                <span class="vss-label">Procured Solutions:</span>
+                <span id="vss-count" class="vss-value">0 / 5</span>
+              </div>
+              <div class="vss-item">
+                <span class="vss-label">Net Capital Saved:</span>
+                <span id="vss-capital-saved" class="vss-value">₹ 0.00</span>
+              </div>
+            </div>
+
+            <!-- Vendor Cards List -->
+            <div id="vendor-benchmark-cards" class="vendor-cards-list">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </main>
+
+    <!-- Future Threat Immunity & Problem Solving Arsenal Modal -->
+    <div id="modal-threat-immunity" class="glass-modal-backdrop" style="display:none;">
+      <div class="glass-modal-content">
+        <div class="glass-modal-header">
+          <div>
+            <h3 id="modal-vendor-name" class="modal-title">CrowdStrike Falcon Complete — Threat Shield Matrix</h3>
+            <p id="modal-vendor-desc" class="modal-subtitle">Future Problem-Solving Capabilities & Long-Term Attack Neutralization</p>
+          </div>
+          <button id="btn-close-modal" class="glass-btn btn-modal-close" title="Close Modal">&times;</button>
+        </div>
+        <div class="modal-highlight-box">
+          <div class="mhb-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div class="mhb-text">
+            <strong>Long-Term Multi-Threat Defense:</strong> Investing in this product to resolve today's vulnerability automatically establishes proactive immunity against unforeseen future attack vectors, preventing compounding loss escalation.
+          </div>
+        </div>
+        <div id="modal-shields-grid" class="shields-grid">
+          <!-- Dynamically populated -->
+        </div>
+        <div class="modal-footer">
+          <button id="btn-modal-procure" class="btn-primary">One-Click Procure Solution</button>
+          <button id="btn-modal-close-bottom" class="glass-btn">Close</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Glass Footer -->
     <footer class="liquid-footer">
@@ -396,6 +835,82 @@
     </footer>
 
   </div>
+
+  <!-- Slide-Out AI Copilot Backdrop -->
+  <div id="copilot-backdrop" class="copilot-backdrop"></div>
+
+  <!-- Slide-Out AI Copilot Drawer -->
+  <aside id="copilot-drawer" class="copilot-drawer" aria-label="AI Risk Copilot" aria-hidden="true">
+    <!-- Drawer Header -->
+    <div class="copilot-header">
+      <div class="copilot-header-left">
+        <div class="copilot-avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="copilot-title">
+            LossLogic AI Copilot
+            <span class="copilot-model-badge">Gemini 3.5 Flash Lite</span>
+          </div>
+          <div class="copilot-status">
+            <span class="pulse-dot"></span> Live Decision Support &amp; Action Engine
+          </div>
+        </div>
+      </div>
+      <button id="btn-close-copilot" class="glass-btn copilot-close-btn" title="Close Copilot (Esc)">&times;</button>
+    </div>
+
+    <!-- Quick-Action Chips Strip -->
+    <div class="copilot-chips-container">
+      <div class="copilot-chips-label">QUICK ACTIONS</div>
+      <div class="copilot-chips-row">
+        <button class="copilot-chip" data-action="jury-pitch">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          30-Sec Jury Pitch
+        </button>
+        <button class="copilot-chip" data-action="blast-radius">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m16 10-4 4-2-2"/></svg>
+          Analyze Blast Radius
+        </button>
+        <button class="copilot-chip" data-action="auto-optimize">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Auto-Optimize Portfolio
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive Chat Stream -->
+    <div id="copilot-chat-stream" class="copilot-chat-stream">
+      <div class="chat-msg chat-msg-assistant">
+        <div class="chat-msg-header">
+          <span class="chat-sender">LossLogic Copilot</span>
+          <span class="chat-time">Just now</span>
+        </div>
+        <div class="chat-msg-body">
+          Welcome! I am connected to <strong>Google Gemini 3.5 Flash Lite</strong>, continuously grounded in your live Open FAIR loss distributions, cascading asset graph, and capital allocation frontier. Ask any financial cyber risk question or select a quick action above to navigate and execute platform actions.
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Input Form -->
+    <form id="copilot-form" class="copilot-input-form">
+      <div class="copilot-input-wrapper">
+        <input type="text" id="copilot-input" class="copilot-input" placeholder="Ask Gemini or command platform (e.g. 'Optimize for ₹50L')..." autocomplete="off" />
+        <button type="submit" id="btn-copilot-send" class="copilot-send-btn" title="Send message">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </form>
+  </aside>
+
+  <!-- Floating Action Button (FAB) for Bottom-Right Access -->
+  <button id="fab-open-copilot" class="copilot-fab" title="Open AI Risk Copilot">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/>
+    </svg>
+  </button>
 
   <script src="/static/js/liquidGL.js"></script>
   <script src="/static/js/dashboard.js"></script>

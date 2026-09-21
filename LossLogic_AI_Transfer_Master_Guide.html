@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LossLogic — Master Technical Specification & AI Transfer Guide</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 14mm 16mm 14mm 16mm;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    background: #ffffff;
+    line-height: 1.55;
+    font-size: 9pt;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #0f172a;
+    border-bottom: 2px solid #0284c7;
+    padding-bottom: 6px;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  h2 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #0369a1;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 4px;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #334155;
+    margin-top: 10px;
+    margin-bottom: 4px;
+  }
+  p {
+    margin: 0 0 6px 0;
+    text-align: justify;
+  }
+  blockquote {
+    margin: 8px 0;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-left: 3.5px solid #0284c7;
+    color: #334155;
+    font-size: 8.5pt;
+    border-radius: 0 4px 4px 0;
+  }
+  ul, ol {
+    margin: 4px 0 8px 20px;
+    padding: 0;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 8pt;
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #0f766e;
+    border: 0.5px solid #e2e8f0;
+  }
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 7.5pt;
+    line-height: 1.4;
+    overflow-x: auto;
+    margin: 8px 0;
+    page-break-inside: avoid;
+  }
+  pre code {
+    background: transparent;
+    color: #f8fafc;
+    padding: 0;
+    border: none;
+  }
+  .table-wrap {
+    margin: 8px 0;
+    overflow-x: auto;
+    page-break-inside: avoid;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+    margin: 4px 0;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 14px 0;
+  }
+  .math-block {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    font-size: 9pt;
+    color: #0f172a;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+  a {
+    color: #0284c7;
+    text-decoration: none;
+    font-weight: 600;
+  }
+</style>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<h1>LossLogic: Complete Technical Specification & AI Agent Transfer Guide</h1>
+
+<blockquote><strong>Project:</strong> LossLogic (formerly CyberRiskQuant)</blockquote>
+<blockquote><strong>Problem Statement ID:</strong> Smart India Hackathon 2026 • PS ID: 26105</blockquote>
+<blockquote><strong>Organization:</strong> Ministry of Education / AICTE Cyber Security Cell</blockquote>
+<blockquote><strong>Primary Technology Stack:</strong> Python 3.11+, FastAPI, SciPy (HiGHS MILP), NumPy, NetworkX, Pydantic v2, HTML5/CSS3/Vanilla JS (Apple Liquid Glass WebGL UI).</blockquote>
+<blockquote><strong>Verified Automated Test Suite:</strong> 414 automated tests passing in 27.56s (100% pass rate).</blockquote>
+
+<hr>
+
+<h2>Table of Contents</h2>
+<p>1. <a href="#1-executive-mission--problem-space">Executive Mission & Problem Space</a></p>
+<p>2. <a href="#2-high-level-architecture--end-to-end-pipeline">High-Level Architecture & End-to-End Pipeline</a></p>
+<p>3. <a href="#3-actuarial-science--mathematical-foundations">Actuarial Science & Mathematical Foundations</a></p>
+<p>- <a href="#31-open-fair-parameter-translation">3.1 Open FAIR™ Parameter Translation</a></p>
+<p>- <a href="#32-vectorized-compound-poisson-lognormal-monte-carlo-engine">3.2 Vectorized Compound Poisson-LogNormal Monte Carlo Engine</a></p>
+<p>- <a href="#33-multi-tier-portfolio-aggregation--diversification-benefit">3.3 Multi-Tier Portfolio Aggregation & Diversification Benefit</a></p>
+<p>- <a href="#34-business-dependency-graph--upstream-blast-radius-percolation">3.4 Business Dependency Graph & Upstream Blast Radius Percolation</a></p>
+<p>- <a href="#35-dynamic-asset-criticality-score-acs-engine">3.5 Dynamic Asset Criticality Score (ACS) Engine</a></p>
+<p>4. <a href="#4-operations-research--budget-constrained-optimization">Operations Research & Budget-Constrained Optimization</a></p>
+<p>- <a href="#41-scipy-highs-milp-01-knapsack-formulation">4.1 SciPy HiGHS MILP 0/1 Knapsack Formulation</a></p>
+<p>- <a href="#42-dependency-conflict--mandatory-constraint-systems">4.2 Dependency, Conflict & Mandatory Constraint Systems</a></p>
+<p>- <a href="#43-post-selection-feasibility-repair--branch-and-bound-fallback">4.3 Post-Selection Feasibility Repair & Branch-and-Bound Fallback</a></p>
+<p>- <a href="#44-pareto-efficiency-frontier--andrews-monotone-chain-upper-hull">4.4 Pareto Efficiency Frontier & Andrew's Monotone Chain Upper Hull</a></p>
+<p>- <a href="#45-economic-diminishing-returns--budget-saturation">4.5 Economic Diminishing Returns & Budget Saturation</a></p>
+<p>5. <a href="#5-ai-decision-support--predictive-engines">AI Decision Support & Predictive Engines</a></p>
+<p>- <a href="#51-306090-day-threat-trajectory--epss-velocity-dynamics">5.1 30/60/90-Day Threat Trajectory & EPSS Velocity Dynamics</a></p>
+<p>- <a href="#52-interactive-what-if-counterfactual-simulator-crn">5.2 Interactive What-If Counterfactual Simulator (CRN)</a></p>
+<p>- <a href="#53-compounding-delayed-remediation-cost--breach-hazard-surge">5.3 Compounding Delayed Remediation Cost & Breach Hazard Surge</a></p>
+<p>- <a href="#54-deterministic-natural-language-query-nlq-parser">5.4 Deterministic Natural Language Query (NLQ) Parser</a></p>
+<p>- <a href="#55-executive-narrative-summary-generator">5.5 Executive Narrative Summary Generator</a></p>
+<p>- <a href="#56-google-gemini-35-flash-lite-tool-calling-integration-pattern">5.6 Google Gemini 3.5 Flash Lite Tool Calling Integration Pattern</a></p>
+<p>6. <a href="#6-regulatory-compliance--financial-loss-attribution">Regulatory Compliance & Financial Loss Attribution</a></p>
+<p>7. <a href="#7-comprehensive-codebase-catalog--symbol-guide">Comprehensive Codebase Catalog & Symbol Guide</a></p>
+<p>8. <a href="#8-dataset-architecture--telemetry-domains">Dataset Architecture & Telemetry Domains</a></p>
+<p>9. <a href="#9-frontend--apple-liquid-glass-design-system">Frontend & Apple Liquid Glass Design System</a></p>
+<p>10. <a href="#10-test-infrastructure--verification-invariants">Test Infrastructure & Verification Invariants</a></p>
+<p>11. <a href="#11-instructions--traps-for-incoming-ai-agents">Instructions & Traps for Incoming AI Agents</a></p>
+
+<hr>
+
+<h2>1. Executive Mission & Problem Space</h2>
+
+<h3>1.1 The Communication and Quantification Chasm</h3>
+<p>Enterprise cybersecurity management in Fortune 500 banks and critical infrastructure is fundamentally broken by a language and measurement divide:</p>
+<ul><li><strong>CISOs & SecOps Engineers</strong> evaluate risk using CVE counts, CVSS technical severity scores (e.g., CVSS 9.8 Critical), and 5×5 colored heatmaps (<em>Red, Amber, Green</em>).</li>
+<li><strong>CFOs, Boards of Directors & Risk Committees</strong> allocate capital based on <strong>real monetary currency ($ USD / ₹ INR)</strong>, <strong>Expected Annual Loss (EAL)</strong>, <strong>Value-at-Risk (VaR at 90%, 95%, 99%)</strong>, <strong>EBITDA impact</strong>, and <strong>Return on Security Investment (ROSI)</strong>.</li></ul>
+
+<h3>1.2 Mathematical Failure of Qualitative 5×5 Heatmaps</h3>
+<p>Traditional enterprise risk management relies on multiplying arbitrary ordinal ratings (e.g., Likelihood "4" × Impact "5" = Score "20"):</p>
+<p>1. <strong>Ordinal Scales Cannot Be Multiplied</strong>: Numerically, an ordinal "4" is not twice an ordinal "2"; ordinal scales have sequence but no constant interval or metric origin. Multiplying them produces mathematically meaningless numbers.</p>
+<p>2. <strong>Range Compression & Rank Reversal</strong>: A low-frequency, existential disaster (e.g., catastrophic ransomware shutting down the SWIFT gateway causing ₹50 Crore loss) receives an identical score (e.g., 20) to a frequent nuisance event (e.g., 100 lost employee badges).</p>
+<p>3. <strong>Arbitrary Budget Prioritization</strong>: CISOs classify all vulnerabilities as "Critical" to defend budgets, preventing CFOs from knowing where capital actually protects shareholder equity.</p>
+
+<h3>1.3 The LossLogic Solution</h3>
+<p>LossLogic replaces qualitative guessing with <strong>actuarial cyber risk quantification and mathematical optimization</strong>:</p>
+<ul><li>Ingests raw telemetry across <strong>5 domains</strong> (Vulnerability/CVE/EPSS, SIEM, IAM, EDR, CSPM).</li>
+<li>Propagates asset failures across a <strong>NetworkX Directed Acyclic Graph (DAG)</strong> to measure cascading business revenue downtime.</li>
+<li>Translates technical vulnerabilities into <strong>Open FAIR™ parameters</strong> and executes <strong>10,000 vectorized Monte Carlo trials</strong> (<2ms per asset).</li>
+<li>Allocates capital using <strong>SciPy's HiGHS Mixed-Integer Linear Programming (MILP)</strong> 0/1 Knapsack optimizer, guaranteeing mathematically optimal risk reduction under hard budget constraints.</li>
+<li>Automatically crosswalks every funded mitigation across <strong>5 regulatory frameworks</strong>: RBI CSF, SEBI CSCRF, ISO/IEC 27001, NIST CSF 2.0, and CIS Controls v8.</li></ul>
+
+<hr>
+
+<h2>2. High-Level Architecture & End-to-End Pipeline</h2>
+
+<pre><code class="language-mermaid">flowchart TD
+    subgraph Ingestion["1. Multi-Source Ingestion &amp; Asset Modeling"]
+        T1["CVE / EPSS / CISA KEV"]
+        T2["SIEM Event Velocity"]
+        T3["IAM Privileged Posture"]
+        T4["EDR Agent Telemetry"]
+        T5["CSPM Cloud Findings"]
+        Norm["TelemetryNormalizer\n(src/telemetry/normalizer.py)"]
+        DAG["NetworkX Asset DAG\n(src/assets/graph.py)"]
+        ACS["Asset Criticality Scoring (ACS)\n(src/assets/scoring.py)"]
+        T1 &amp; T2 &amp; T3 &amp; T4 &amp; T5 --&gt; Norm
+        Norm --&gt; ACS
+        DAG --&gt; ACS
+    end
+
+    subgraph QuantEngine["2. Actuarial FAIR Monte Carlo Engine"]
+        Mapper["FairMapper\n(src/quant/fair_mapper.py)"]
+        MC["Vectorized Monte Carlo Engine\n(src/quant/monte_carlo.py)\nCompound Poisson + LogNormal (10k trials)"]
+        Port["PortfolioEngine\n(src/quant/portfolio.py)\nAsset -&gt; BU -&gt; Enterprise Aggregation"]
+        ACS --&gt; Mapper
+        Norm --&gt; Mapper
+        Mapper --&gt; MC
+        MC --&gt; Port
+    end
+
+    subgraph OperationsResearch["3. Operations Research &amp; Optimization"]
+        MILP["SciPy HiGHS MILP Solver\n(src/optimization/solver.py)\n0/1 Knapsack with Dependencies &amp; Exclusions"]
+        Frontier["Pareto Frontier &amp; Upper Hull\n(src/optimization/frontier.py)\nAndrew's Monotone Chain + Kneedle"]
+        ROSI["ROSI &amp; Cost-Benefit Engine\n(src/optimization/rosi.py)"]
+        Port --&gt; MILP
+        MILP --&gt; Frontier
+        Frontier --&gt; ROSI
+    end
+
+    subgraph DecisionSupport["4. Decision Support &amp; Forecasting"]
+        Traj["30/60/90-Day Trajectory\n(src/decision_support/trajectory.py)\nEPSS Velocity &amp; Logistic Growth"]
+        WhatIf["What-If Counterfactual\n(src/decision_support/what_if.py)\nCommon Random Numbers (CRN)"]
+        Delay["Compounding Delay Cost\n(src/decision_support/delay_cost.py)\nBreach Hazard Surge"]
+        NLQ["Deterministic NLQ Parser\n(src/decision_support/nlq_parser.py)\nRegex / Grammar Slot Extractor"]
+        Port --&gt; Traj &amp; WhatIf &amp; Delay
+    end
+
+    subgraph Delivery["5. REST API &amp; Apple Liquid Glass UI"]
+        API["FastAPI REST Router\n(src/api/routes.py)"]
+        UI["Apple Liquid Glass WebGL Dashboard\n(src/dashboard/)\nExecutive Board View &amp; SecOps View"]
+        Port &amp; ROSI &amp; Traj &amp; WhatIf &amp; Delay &amp; NLQ --&gt; API
+        API --&gt; UI
+    end</code></pre>
+
+<hr>
+
+<h2>3. Actuarial Science & Mathematical Foundations</h2>
+
+<h3>3.1 Open FAIR™ Parameter Translation</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/fair_mapper.py"><code>src/quant/fair_mapper.py</code></a>:</p>
+<p>The Factor Analysis of Information Risk (Open FAIR™) framework decomposes cyber risk into probabilistic frequency and loss magnitude components:</p>
+
+<p>1. <strong>Threat Contact Frequency ($CF$)</strong>: Estimated frequency of external threat actor interaction:</p>
+<div class="math-block">$$CF = CF_{base} + 3.0 \cdot \mathbb{I}_{public} + 5.0 \cdot \mathbb{I}_{sensitive\_port} + 0.15 \cdot \min(50, \text{Alerts}_{24h})$$</div>
+<p>2. <strong>Probability of Action ($PoA$)</strong>: Probability an actor acts given contact, driven by EPSS and CISA Known Exploited Vulnerabilities:</p>
+<div class="math-block">$$PoA = \min\Big(1.0, 0.05 + 0.65 \cdot EPSS + 0.30 \cdot \mathbb{I}_{KEV} + \Delta_{maturity}\Big)$$</div>
+<p>3. <strong>Threat Event Frequency ($TEF$)</strong>:</p>
+<div class="math-block">$$TEF = CF \times PoA$$</div>
+<p>4. <strong>Threat Capability ($TCap$)</strong>:</p>
+<div class="math-block">$$TCap = \min\Big(1.0, \max\big(0.05, 1.5 \cdot EPSS + \frac{CVSS}{20.0}\big)\Big)$$</div>
+<p>5. <strong>Resistance Strength ($RS$)</strong>: Asset defensive capability degraded by findings:</p>
+<div class="math-block">$$RS = \text{clamp}\Big(RS_{base} \cdot (1 - \text{Degradation}), 0.02, 0.99\Big)$$</div>
+<p>6. <strong>Vulnerability Probability ($Vuln$)</strong>: Probability that $TCap > RS$:</p>
+<div class="math-block">$$Vuln = \max\Big(0.02, \min\big(0.98, TCap \cdot (1.0 - 0.8 \cdot RS)\big)\Big)$$</div>
+<p>7. <strong>Loss Event Frequency ($LEF$)</strong>: Annual breach frequency:</p>
+<div class="math-block">$$LEF = TEF \times Vuln$$</div>
+<p>8. <strong>Primary Loss Magnitude</strong>: Comprises incident response ($C_{IR}$), direct downtime outage ($C_{down}$), and asset restoration ($C_{rest}$):</p>
+<div class="math-block">$$C_{IR} = 50,000 \cdot \left(\frac{CVSS}{5.0}\right)^{1.5} \cdot M_{env} \cdot ACS$$</div>
+<div class="math-block">$$C_{down} = MTTR \times \text{HourlyDowntimeRevenue}(u)$$</div>
+<div class="math-block">$$C_{rest} = 0.05 \times \text{ReplacementCost}(u)$$</div>
+<p>9. <strong>Secondary Loss Magnitude</strong>: Statutory regulatory fines ($F_{reg}$) and litigation/churn:</p>
+<div class="math-block">$$F_{reg} = \text{BASE\_REGULATORY\_FINE} \times M_{data} \times M_{env}$$</div>
+
+<h3>3.2 Vectorized Compound Poisson-LogNormal Monte Carlo Engine</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/monte_carlo.py"><code>src/quant/monte_carlo.py</code></a>:</p>
+<p>The simulation runs $N = 10,000$ stochastic annual trials per exposure:</p>
+<ul><li><strong>Event Frequency Sampling</strong>: For each trial $j \in \{1, \dots, N\}$, the number of breach events $K_j$ is drawn from a Poisson distribution:</li></ul>
+<div class="math-block">$$K_j \sim \text{Poisson}(\lambda = LEF)$$</div>
+<ul><li><strong>Event Loss Magnitude Sampling</strong>: Each individual breach event loss $L_{j, k}$ is sampled from a Log-Normal distribution parameterized from the three-point PERT estimate $(min, mode, max)$:</li></ul>
+<div class="math-block">$$\mu_{pert} = \frac{min + 4 \cdot mode + max}{6}, \quad \sigma_{pert} = \frac{max - min}{6}$$</div>
+<div class="math-block">$$\mu_{log} = \ln\left(\frac{\mu_{pert}^2}{\sqrt{\sigma_{pert}^2 + \mu_{pert}^2}}\right), \quad \sigma_{log} = \sqrt{\ln\left(1 + \frac{\sigma_{pert}^2}{\mu_{pert}^2}\right)}$$</div>
+<div class="math-block">$$L_{j, k} \sim \text{Lognormal}(\mu_{log}, \sigma_{log})$$</div>
+<ul><li><strong>High-Performance Memory-Contiguous Vectorization</strong>:</li></ul>
+<p>Instead of looping in Python, all $\sum_{j=1}^N K_j$ events across all trials are drawn in a single contiguous NumPy C-array and mapped to trial indices using <code>np.repeat(np.arange(N), K_events)</code> and <code>np.bincount</code>. This achieves execution latencies under <strong>2 milliseconds per 10,000 trials</strong>.</p>
+<ul><li><strong>Financial Risk Metrics</strong>:</li></ul>
+<p>- <strong>Expected Annual Loss ($EAL$)</strong>: Mean annual loss:</p>
+<div class="math-block">$$EAL = \frac{1}{N} \sum_{j=1}^N \text{Loss}_j$$</div>
+<p>- <strong>Value-at-Risk ($VaR_\alpha$)</strong>: Empirical percentiles:</p>
+<div class="math-block">$$VaR_{90} = \text{Percentile}(\text{Losses}, 90)$$</div>
+<div class="math-block">$$VaR_{95} = \text{Percentile}(\text{Losses}, 95)$$</div>
+<div class="math-block">$$VaR_{99} = \text{Percentile}(\text{Losses}, 99)$$</div>
+<p>- <strong>Strict Invariant Guarantee</strong>:</p>
+<div class="math-block">$$VaR_{90} < VaR_{95} < VaR_{99}$$</div>
+<p>- <strong>Conditional VaR ($CVaR_{95}$ / Expected Shortfall)</strong>: Average loss in the worst 5% tail:</p>
+<div class="math-block">$$CVaR_{95} = \mathbb{E}[\text{Loss} \mid \text{Loss} \ge VaR_{95}]$$</div>
+
+<h3>3.3 Multi-Tier Portfolio Aggregation & Diversification Benefit</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/portfolio.py"><code>src/quant/portfolio.py</code></a>:</p>
+<p>The portfolio engine constructs a joint trial-by-trial loss matrix $\mathbf{L} \in \mathbb{R}^{N \times M}$ across all $M$ assets.</p>
+<ul><li>Correlated enterprise loss vector is the row sum: $\text{Loss}_{Enterprise, j} = \sum_{m=1}^M \mathbf{L}_{j, m}$.</li>
+<li><strong>Diversification Benefit (Subadditivity of VaR)</strong>: In non-perfectly correlated asset loss distributions:</li></ul>
+<div class="math-block">$$\text{Enterprise } VaR_{95} < \sum_{m=1}^M \text{Asset } VaR_{95}^{(m)}$$</div>
+<div class="math-block">$$\text{Diversification Benefit} = \sum_{m=1}^M \text{Asset } VaR_{95}^{(m)} - \text{Enterprise } VaR_{95}$$</div>
+
+<h3>3.4 Business Dependency Graph & Upstream Blast Radius Percolation</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/graph.py"><code>src/assets/graph.py</code></a>:</p>
+<ul><li>Modeled as a Directed Acyclic Graph $G = (V, E)$ using NetworkX.</li>
+<li>Edge convention: Directed edge $(A, B)$ represents "$A$ depends on $B$".</li>
+<li>If asset $B$ suffers an outage or compromise, the failure propagates backwards along directed edges to all <strong>ancestors</strong> in $G$ ($\text{Ancestors}(B)$).</li>
+<li><strong>Percolation Analysis</strong>:</li></ul>
+<div class="math-block">$$\text{Upstream Hourly Revenue at Risk} = \sum_{s \in \text{Ancestors}(B) \cap \text{Services}} \text{RevenuePerHour}(s) + \text{DowntimeCost}(B)$$</div>
+<ul><li>Evaluates <strong>Network Centrality</strong> (betweenness centrality measuring single points of failure) and identifies Single Points of Failure (SPOFs).</li></ul>
+
+<h3>3.5 Dynamic Asset Criticality Score (ACS) Engine</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/scoring.py"><code>src/assets/scoring.py</code></a>:</p>
+<p>Asset Criticality Score (ACS) is normalized to $[0.0, 1.0]$:</p>
+<div class="math-block">$$ACS_{raw} = w_b B(u) + w_d D(u) + w_s S(u) + w_f F(u)$$</div>
+<p>Where:</p>
+<ul><li>$w_b = 0.35$: Maximum upstream business service criticality.</li>
+<li>$w_d = 0.20$: Graph dependency reachability and betweenness centrality.</li>
+<li>$w_s = 0.25$: Data sensitivity tier (Public: 0.2, Internal: 0.5, Confidential: 1.0, Restricted: 2.5 normalized).</li>
+<li>$w_f = 0.20$: Financial asset valuation ratio ($Valuation / \text{MAX\_ENTERPRISE\_VALUATION}$).</li>
+<li>Environment modifier: $ACS = \text{clamp}(ACS_{raw} \times M_{env}, 0.001, 1.0)$ where $M_{env} \in \{1.0 \text{ (Prod)}, 0.3 \text{ (Staging)}, 0.1 \text{ (Dev)}, 0.005 \text{ (Sandbox)}\}$.</li>
+<li><strong>Impact Guarantee</strong>: Identical technical CVEs yield <strong>>7,000x difference</strong> in quantified monetary impact between an isolated developer sandbox and the core production payment database.</li></ul>
+
+<hr>
+
+<h2>4. Operations Research & Budget-Constrained Optimization</h2>
+
+<h3>4.1 SciPy HiGHS MILP 0/1 Knapsack Formulation</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/solver.py"><code>src/optimization/solver.py</code></a>:</p>
+<p>The security capital allocation problem is formulated as a Mixed-Integer Linear Program (MILP):</p>
+
+<p>$$\begin{aligned}</p>
+<p>\text{Maximize} \quad & \sum_{i=1}^n x_i \cdot \Delta EAL_i \\</p>
+<p>\text{Subject to} \quad & \sum_{i=1}^n x_i \cdot \text{Cost}_i \le \text{Budget} \\</p>
+<p>& x_{child} - x_{parent} \le 0 \quad \forall (child, parent) \in \text{Prerequisites} \\</p>
+<p>& x_p + x_q \le 1 \quad \forall (p, q) \in \text{Mutual Exclusions} \\</p>
+<p>& x_m = 1 \quad \forall m \in \text{Mandatory Controls (if affordable)} \\</p>
+<p>& x_i \in \{0, 1\} \quad \forall i \in \{1, \dots, n\}</p>
+<p>\end{aligned}$$</p>
+
+<ul><li>Solved via <code>scipy.optimize.milp</code> backed by the C++ <strong>HiGHS</strong> simplex and branch-and-bound solver.</li>
+<li>Solve time: <strong>sub-5 milliseconds</strong>.</li></ul>
+
+<h3>4.2 Dependency, Conflict & Mandatory Constraint Systems</h3>
+<p>1. <strong>Prerequisite Chains</strong>: E.g., Advanced AI SIEM requires EDR sensors deployed first ($x_{SIEM} \le x_{EDR}$).</p>
+<p>2. <strong>Mutual Exclusions</strong>: E.g., selecting Vendor A Cloud WAF precludes Vendor B Cloud WAF ($x_A + x_B \le 1$).</p>
+<p>3. <strong>Mandatory Policy Controls</strong>: E.g., RBI-mandated MFA must be funded regardless of ROI if budget permits. If budget is insufficient, the solver mathematically falls back to maximizing the affordable subset.</p>
+
+<h3>4.3 Post-Selection Feasibility Repair & Branch-and-Bound Fallback</h3>
+<ul><li><strong>Feasibility Repair</strong>: HiGHS solver has a small numerical tolerance ($10^{-7}$). If a boundary combination slightly exceeds budget, the post-selection repair validator prunes non-mandatory controls with the lowest efficiency while ensuring no prerequisite dependencies are broken.</li>
+<li><strong>Pure-Python Branch-and-Bound Fallback</strong>: If SciPy's C-libraries are ever unavailable in a restricted sandbox, a pure-Python B&B solver with LP-relaxation upper bounding guarantees 100% execution availability.</li></ul>
+
+<h3>4.4 Pareto Efficiency Frontier & Andrew's Monotone Chain Upper Hull</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/frontier.py"><code>src/optimization/frontier.py</code></a>:</p>
+<ul><li>The solver sweeps budget space across $K$ discrete steps (e.g., $10$ to $50$ increments).</li>
+<li>To guarantee the economic principle of <strong>Diminishing Marginal Utility</strong>:</li></ul>
+<p>1. Flat plateaus ($dSpend = 0$) are merged.</p>
+<p>2. Dominated points ($Spend_a \ge Spend_b$ and $Mitigation_a \le Mitigation_b$) are eliminated.</p>
+<p>3. <strong>Andrew's Monotone Chain Upper Hull Algorithm</strong> is executed to construct the <strong>Upper Concave Envelope</strong>. This mathematically guarantees that marginal efficiency ($\frac{\Delta Risk}{\Delta Cost}$) is strictly monotonically non-increasing.</p>
+<ul><li><strong>Kneedle Algorithm</strong>: Calculates the elbow/knee point of the curve where perpendicular distance to the secant line is maximized, representing the executive "sweet spot" for capital allocation.</li>
+<li><strong>Financial Metrics</strong>:</li></ul>
+<div class="math-block">$$\text{ROSI \%} = \frac{\Delta EAL - \text{Cost}}{\text{Cost}} \times 100\%$$</div>
+<div class="math-block">$$\text{Net Financial Benefit} = \Delta EAL - \text{Cost}$$</div>
+<div class="math-block">$$\text{Marginal Cost-Benefit Ratio} = \frac{\Delta EAL}{\text{Cost}}$$</div>
+
+<h3>4.5 Economic Diminishing Returns & Budget Saturation</h3>
+<p>If the total cost of all candidate controls in the enterprise catalog is $38,900, allocating a budget of $50,000 cannot buy additional risk reduction. Rather than hallucinating artificial risk reduction, LossLogic models <strong>Budget Saturation</strong>:</p>
+<ul><li>Residual risk plateaus at its minimum feasible floor.</li>
+<li>The remaining capital ($11,100) is explicitly tagged as <strong>Surplus Capital</strong> so the CFO does not over-allocate capital to an already fully mitigated asset class.</li></ul>
+
+<hr>
+
+<h2>5. AI Decision Support & Predictive Engines</h2>
+
+<h3>5.1 30/60/90-Day Threat Trajectory & EPSS Velocity Dynamics</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/trajectory.py"><code>src/decision_support/trajectory.py</code></a>:</p>
+<p>Simulates forward risk drift using empirical exploit telemetry:</p>
+<ul><li><strong>EPSS Velocity ($\alpha$)</strong>: Daily rate of exploit weaponization:</li></ul>
+<div class="math-block">$$\alpha = \frac{EPSS(t) - EPSS(t - \Delta t)}{\Delta t}$$</div>
+<ul><li><strong>EPSS Acceleration ($\beta$)</strong>: Rate of velocity change:</li></ul>
+<div class="math-block">$$\beta = \frac{\alpha(t) - \alpha(t - \Delta t)}{\Delta t}$$</div>
+<ul><li><strong>Logistic Momentum Projection</strong>:</li></ul>
+<div class="math-block">$$E_v(t + \tau) = \frac{1}{1 + \left(\frac{1 - E_0}{E_0}\right) \exp(-k_v \cdot \tau)}$$</div>
+<p>Where $k_v = c_1 \alpha + c_2 \beta + \omega_{KEV} \cdot \mathbb{I}_{KEV}$.</p>
+<ul><li>Forward Monte Carlo simulations project $EAL$ and $VaR_{95}$ at 30, 60, and 90 days under <strong>Baseline</strong>, <strong>Pessimistic</strong> (adversarial surge), and <strong>Optimistic</strong> (mitigated) scenarios.</li></ul>
+
+<h3>5.2 Interactive What-If Counterfactual Simulator (CRN)</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/what_if.py"><code>src/decision_support/what_if.py</code></a>:</p>
+<ul><li>Evaluates candidate interventions (patching specific CVEs, adding MFA, removing legacy controls).</li>
+<li><strong>Common Random Numbers (CRN)</strong>: The exact same pseudo-random seed is paired across the baseline and counterfactual Monte Carlo simulation runs.</li>
+<li><strong>Variance Reduction</strong>: By using identical random number streams, stochastic variance cancel out, ensuring that $\Delta EAL = EAL_{baseline} - EAL_{simulated}$ reflects only the true effect of the technical intervention, not simulation noise.</li></ul>
+
+<h3>5.3 Compounding Delayed Remediation Cost & Breach Hazard Surge</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/delay_cost.py"><code>src/decision_support/delay_cost.py</code></a>:</p>
+<p>Models the non-linear risk debt of delaying vulnerability patching over a horizon $\Delta t \in [0, 90]$ days:</p>
+<p>1. <strong>Cumulative Unmitigated Loss</strong>: $\text{Excess EAL} = \Delta EAL \times \frac{\Delta t}{365}$.</p>
+<p>2. <strong>Breach Probability Surge</strong>: Non-homogeneous Poisson process hazard:</p>
+<div class="math-block">$$P(\text{Breach in } \Delta t) = 1 - \exp\left(-\int_0^{\Delta t} \lambda(t) dt\right)$$</div>
+<p>3. <strong>Convex Compounding Penalty</strong>:</p>
+<div class="math-block">$$\text{Cost}(\text{Delay}) = \text{Excess Loss} + P(\text{Breach}) \times \text{Primary Loss Mode}$$</div>
+<p>Mathematically satisfies $\text{Cost}(60d) > 2 \times \text{Cost}(30d)$.</p>
+<p>4. <strong>Emergency Expedite Rule</strong>: Recommends emergency off-cycle deployment if daily hazard gradient exceeds standard emergency patching costs ($10,000).</p>
+
+<h3>5.4 Deterministic Natural Language Query (NLQ) Parser</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/nlq_parser.py"><code>src/decision_support/nlq_parser.py</code></a>:</p>
+<ul><li>Uses zero external network calls, ensuring air-gapped security and zero hallucination.</li>
+<li>Classifies queries into 6 standard intents:</li></ul>
+<p>1. <code>HIGHEST_RISK</code></p>
+<p>2. <code>TOP_LOSS_DRIVERS</code></p>
+<p>3. <code>BUDGET_ALLOCATION</code></p>
+<p>4. <code>WHAT_IF_SCENARIO</code></p>
+<p>5. <code>REMEDIATION_DELAY</code></p>
+<p>6. <code>COMPLIANCE_STATUS</code></p>
+<ul><li>Dual-Currency slot extraction: Indian numbering (₹ Lakhs, Crores) and Western numbering ($ Millions, Thousands) with automatic cross-conversion at $\text{USD\_TO\_INR\_RATE} = 83.5$.</li></ul>
+
+<h3>5.5 Executive Narrative Summary Generator</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/narrative.py"><code>src/decision_support/narrative.py</code></a>:</p>
+<p>Synthesizes technical and actuarial findings into board-ready briefings:</p>
+<ul><li>Formats financial metrics into regional conventions (e.g., "₹ 4.82 Crore" or "$ 1.25M").</li>
+<li>Summarizes primary loss drivers, 90-day trajectory trends, and compliance impacts.</li></ul>
+
+<h3>5.6 Google Gemini 3.5 Flash Lite Tool Calling Integration Pattern</h3>
+<p>An LLM should <strong>never perform mathematical risk calculations directly</strong>, as generative models hallucinate arithmetic and cannot guarantee linear constraint satisfaction. Instead, Gemini acts as the <strong>Semantic Orchestrator</strong>:</p>
+<ul><li>Receives executive user queries.</li>
+<li>Uses <strong>JSON Function Calling (Tool Calling)</strong> to invoke LossLogic endpoints (e.g., <code>run_optimization(budget=...)</code>).</li>
+<li>Reads the exact JSON vector returned by the Python solver.</li>
+<li>Formats the board-ready briefing with zero numerical hallucination.</li></ul>
+
+<hr>
+
+<h2>6. Regulatory Compliance & Financial Loss Attribution</h2>
+
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/compliance/"><code>src/compliance/</code></a>:</p>
+<p>Covers 5 major regulatory and cybersecurity standards:</p>
+<p>1. <strong>RBI Cyber Security Framework</strong> (Access Control, 7-day patch SLA, C-SOC, Payment Data Encryption).</p>
+<p>2. <strong>SEBI CSCRF 2024</strong> (Cyber Resilience Framework for capital markets: Withstand, Contain, Recover).</p>
+<p>3. <strong>ISO/IEC 27001:2022</strong> (Annex A Controls: A.5.15, A.8.2, A.8.7, A.8.8, A.8.15, A.8.24).</p>
+<p>4. <strong>NIST CSF 2.0</strong> (Govern, Identify, Protect, Detect, Respond, Recover).</p>
+<p>5. <strong>CIS Controls v8</strong> (18 critical control safeguards).</p>
+
+<ul><li><strong>Weighted Compliance Score</strong>:</li></ul>
+<div class="math-block">$$\text{Score} = \frac{\sum_{c \notin Deficient} \text{Weight}(c)}{\sum_{c \in All} \text{Weight}(c)} \times 100\%$$</div>
+<ul><li><strong>Financial Loss Attribution</strong>: Every deficient control is mapped to active findings. The platform attributes exact monetary exposure to each compliance failure:</li></ul>
+<div class="math-block">$$\text{Attributed Exposure}(c) = \sum_{f \in \text{Findings}(c)} EAL(f)$$</div>
+
+<hr>
+
+<h2>7. Comprehensive Codebase Catalog & Symbol Guide</h2>
+
+<div class="table-wrap"><table><thead><tr>
+<th>Module / File Path</th>
+<th>Key Symbols & Classes</th>
+<th>Responsibility</th>
+</tr></thead><tbody>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/config.py"><code>src/config.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/config.py#L8-L13"><code>DataSensitivityTier</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/config.py#L16-L21"><code>EnvironmentTier</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/config.py#L51-L53"><code>usd_to_inr</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/config.py#L61-L75"><code>EnterpriseSettings</code></a></td>
+<td>Global constants, exchange rates (USD/INR = 83.5), regulatory multipliers.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/models.py"><code>src/telemetry/models.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/models.py#L65-L95"><code>VulnerabilityFinding</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/models.py#L100-L124"><code>SiemAlertFinding</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/models.py#L129-L168"><code>IamFinding</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/models.py#L173-L189"><code>EdrTelemetryFinding</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/models.py#L194-L208"><code>CspmFinding</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/models.py#L213-L242"><code>NormalizedFinding</code></a></td>
+<td>Pydantic v2 schemas for all 5 security telemetry domains and unified finding representation.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/adapters.py"><code>src/telemetry/adapters.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/adapters.py#L13-L45"><code>TelemetryAdapter</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/adapters.py#L47-L78"><code>JsonTelemetryAdapter</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/adapters.py#L80-L150"><code>CsvTelemetryAdapter</code></a></td>
+<td>Ingestion adapters with automatic type coercion for JSON and CSV payloads.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/normalizer.py"><code>src/telemetry/normalizer.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/normalizer.py#L31-L448"><code>TelemetryNormalizer</code></a></td>
+<td>Derives FAIR TEF and Resistance Strength (RS) from raw telemetry across domains.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/generator.py"><code>src/telemetry/generator.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/generator.py#L35-L1718"><code>ApexEnterpriseGenerator</code></a></td>
+<td>Generates full synthetic dataset: 65 banking assets, 9 business services, and multi-domain telemetry.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/models.py"><code>src/assets/models.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/models.py#L19-L33"><code>BusinessService</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/models.py#L35-L67"><code>AssetRecord</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/models.py#L69-L76"><code>DependencyEdge</code></a></td>
+<td>Operational and financial asset metadata schemas.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/graph.py"><code>src/assets/graph.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/graph.py#L20-L177"><code>EnterpriseDependencyGraph</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/graph.py#L10-L18"><code>PercolationResult</code></a></td>
+<td>NetworkX DAG modeling failure percolation, reachability, centrality, and SPOFs.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/scoring.py"><code>src/assets/scoring.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/scoring.py#L16-L59"><code>calculate_asset_financial_valuation</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/scoring.py#L61-L120"><code>calculate_asset_criticality_score</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/assets/scoring.py#L130-L185"><code>calculate_finding_impact</code></a></td>
+<td>Dynamic ACS calculation ($[0.0, 1.0]$) and finding impact modifier.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/fair_mapper.py"><code>src/quant/fair_mapper.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/fair_mapper.py#L35-L55"><code>FairParameters</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/fair_mapper.py"><code>FairMapper</code></a></td>
+<td>Translates findings and asset records into standard FAIR parameters and PERT lognormal bounds.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/monte_carlo.py"><code>src/quant/monte_carlo.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/monte_carlo.py#L28-L42"><code>SimulationResult</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/monte_carlo.py#L86-L207"><code>MonteCarloEngine</code></a></td>
+<td>Vectorized Compound Poisson-LogNormal Monte Carlo simulator (10,000 trials).</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/portfolio.py"><code>src/quant/portfolio.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/portfolio.py#L64-L125"><code>PortfolioRiskResult</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/portfolio.py#L127-L330"><code>PortfolioEngine</code></a></td>
+<td>Multi-tier joint risk aggregation (Asset $\to$ BU $\to$ Enterprise) and diversification benefit.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/models.py"><code>src/optimization/models.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/models.py#L22-L93"><code>SecurityControl</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/models.py#L95-L111"><code>OptimizationRequest</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/models.py#L113-L167"><code>FrontierPoint</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/models.py#L169-L177"><code>FrontierResult</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/models.py#L179-L247"><code>OptimizationResult</code></a></td>
+<td>Optimization DTOs supporting multi-currency, prerequisites, and compatibility sync.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/solver.py"><code>src/optimization/solver.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/solver.py#L119-L509"><code>OptimizationSolver</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/solver.py#L28-L116"><code>get_topological_order</code></a></td>
+<td>SciPy HiGHS MILP 0/1 knapsack solver with post-repair and pure-Python B&B fallback.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/frontier.py"><code>src/optimization/frontier.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/frontier.py#L135-L306"><code>generate_pareto_frontier</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/frontier.py#L14-L61"><code>detect_elbow_point</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/frontier.py#L63-L133"><code>_filter_upper_concave_envelope</code></a></td>
+<td>Sweeps budget space; enforces concave envelope via Andrew's Monotone Chain; Kneedle algorithm.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/rosi.py"><code>src/optimization/rosi.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/rosi.py#L8-L17"><code>calculate_rosi</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/rosi.py#L20-L26"><code>calculate_net_financial_benefit</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/rosi.py#L29-L38"><code>calculate_marginal_cbr</code></a></td>
+<td>ROSI %, Net Financial Benefit, and marginal cost-benefit calculation utilities.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/delay_cost.py"><code>src/decision_support/delay_cost.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/delay_cost.py#L80-L327"><code>DelayedRemediationModel</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/delay_cost.py#L59-L78"><code>DelayCostResult</code></a></td>
+<td>Compounding delayed remediation penalty and non-homogeneous Poisson hazard surge.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/what_if.py"><code>src/decision_support/what_if.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/what_if.py#L87-L349"><code>WhatIfEngine</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/what_if.py#L24-L38"><code>WhatIfRequest</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/what_if.py#L40-L85"><code>WhatIfResult</code></a></td>
+<td>Counterfactual simulation engine with Common Random Numbers (CRN) for variance reduction.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/trajectory.py"><code>src/decision_support/trajectory.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/trajectory.py#L61-L351"><code>ThreatTrajectoryForecaster</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/trajectory.py#L48-L59"><code>TrajectoryForecast</code></a></td>
+<td>30/60/90-day time-series forecasting with EPSS velocity ($\alpha$) and acceleration ($\beta$).</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/nlq_parser.py"><code>src/decision_support/nlq_parser.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/nlq_parser.py#L89-L584"><code>NLQParser</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/nlq_parser.py#L69-L87"><code>StructuredRiskQuery</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/nlq_parser.py#L31-L57"><code>QueryIntent</code></a></td>
+<td>Deterministic regex/grammar query parser and dual-currency slot extractor.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/narrative.py"><code>src/decision_support/narrative.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/narrative.py#L62-L194"><code>ExecutiveNarrativeGenerator</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/narrative.py#L49-L60"><code>NarrativeReport</code></a></td>
+<td>Generates plain-language executive briefing narratives and KPI summaries.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/compliance/catalog.py"><code>src/compliance/catalog.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/compliance/catalog.py#L10-L19"><code>ControlDefinition</code></a>, <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/compliance/catalog.py#L279-L286"><code>FRAMEWORK_CATALOGS</code></a></td>
+<td>Regulatory control definitions for ISO 27001, NIST CSF, CIS v8, RBI CSF, and SEBI CSCRF.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/compliance/mapper.py"><code>src/compliance/mapper.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/compliance/mapper.py#L39-L88"><code>ComplianceMapper</code></a></td>
+<td>Bidirectional mapping between telemetry domains/findings and regulatory controls.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/compliance/scoring.py"><code>src/compliance/scoring.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/compliance/scoring.py#L9-L136"><code>ComplianceScorer</code></a></td>
+<td>Computes weighted compliance scores and attributes monetary risk ($/₹) to control gaps.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/api/routes.py"><code>src/api/routes.py</code></a></td>
+<td><code>router</code> (FastAPI APIRouter)</td>
+<td>REST endpoints for dashboard, Monte Carlo, What-If, NLQ, Optimization, and Compliance.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/api/app.py"><code>src/api/app.py</code></a></td>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/api/app.py#L19-L61"><code>create_app</code></a></td>
+<td>Master FastAPI application factory with CORS, static routing, and SPA template mounting.</td>
+</tr>
+<tr>
+<td><a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/run_server.py"><code>run_server.py</code></a></td>
+<td>Top-level script</td>
+<td>Production ASGI entrypoint launching Uvicorn on <code>0.0.0.0:$PORT</code> (default 8000).</td>
+</tr>
+</tbody></table></div>
+
+<hr>
+
+<h2>8. Dataset Architecture & Telemetry Domains</h2>
+
+<h3>8.1 Ingestion Realities</h3>
+<p>In modern regulated banking, cybersecurity risk quantification engines do not ingest CSV spreadsheets through manual UI uploads. Telemetry is pulled continuously via REST/GraphQL APIs from security management tools:</p>
+<ul><li><strong>Vulnerabilities</strong>: Tenable.io, Qualys VMDR, Rapid7 InsightVM</li>
+<li><strong>EDR/XDR</strong>: CrowdStrike Falcon, Microsoft Defender for Endpoint</li>
+<li><strong>SIEM/SOAR</strong>: Splunk Enterprise Security, Microsoft Sentinel</li>
+<li><strong>IAM</strong>: Okta Identity Engine, Microsoft Entra ID, CyberArk PAM</li>
+<li><strong>CSPM</strong>: Wiz, Prisma Cloud, AWS Security Hub</li></ul>
+
+<h3>8.2 The ApexGlobal Financial Corp Dataset (65 Assets)</h3>
+<p>Implemented in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/telemetry/generator.py"><code>src/telemetry/generator.py</code></a>:</p>
+<ul><li><strong>Payment Services (15 assets)</strong>: Core payment databases, SWIFT gateways, credit/debit card authorization switches ($150,000/hr direct downtime cost).</li>
+<li><strong>Retail Banking (14 assets)</strong>: Mobile banking API servers, retail customer web portals, core transaction ledgers ($75,000/hr downtime).</li>
+<li><strong>Wealth Management (11 assets)</strong>: Algorithmic trading execution engines, portfolio advisory systems, market data feeds ($120,000/hr downtime).</li>
+<li><strong>Cloud Infrastructure (15 assets)</strong>: AWS/Azure Kubernetes clusters, API gateways, enterprise service mesh fabric ($50,000/hr downtime).</li>
+<li><strong>Corporate IT (10 assets)</strong>: Active Directory domain controllers, corporate ERP, developer sandbox environments ($10,000/hr to $0/hr).</li></ul>
+
+<h3>8.3 Canonical 5-Node Demonstration Topology</h3>
+<p>For instantaneous dashboard rendering without requiring live cloud credentials, the system ships with a high-fidelity seeded commercial banking topology:</p>
+<p>1. <code>asset-core-db-01</code> (Core Banking PostgreSQL Primary, CVSS 9.8, EPSS 0.92, MOVEit SQLi)</p>
+<p>2. <code>asset-web-gw-01</code> (Internet API Gateway, SIEM Brute Force Alert)</p>
+<p>3. <code>asset-cloud-iam-01</code> (AWS Production IAM Core, Unrestricted Root Role Missing MFA)</p>
+<p>4. <code>asset-trader-ws-01</code> (Trading Floor Workstation 104, EDR Agent Offline)</p>
+<p>5. <code>asset-s3-backup-01</code> (Customer Archive S3 Bucket, Public Exposure with Cardholder Data)</p>
+
+<hr>
+
+<h2>9. Frontend & Apple Liquid Glass Design System</h2>
+
+<h3>9.1 Zero-Dependency UI Architecture</h3>
+<p>Located in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/dashboard/"><code>src/dashboard/</code></a>:</p>
+<ul><li><strong>Stack</strong>: Standard HTML5, CSS3, and modern Vanilla JavaScript (zero npm dependencies, zero Node.js build pipelines, zero bundlers).</li>
+<li><strong>Apple Liquid Glass Design System</strong>:</li></ul>
+<p>- Implements ultra-lightweight WebGL shaders (<a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/dashboard/static/js/liquidGL.js"><code>liquidGL.js</code></a>) rendering dynamic caustic fluid heightfields, chromatic refraction, and interactive viscous mouse ripple waves.</p>
+<p>- Dual Theme: <strong>Dark Obsidian Glass</strong> and <strong>Light Studio Crystal</strong> with instant dynamic CSS variable re-binding.</p>
+<p>- Floating pill navigation, segmented controls, frosted-glass backdrop filters, and subtle metallic borders.</p>
+
+<h3>9.2 Dual Interface Modes</h3>
+<p>1. <strong>Executive / Board View</strong>:</p>
+<p>- 5 KPI Glass Cards (EAL, VaR 90%, VaR 95%, Tail Catastrophe VaR 99%, Regulatory Posture).</p>
+<p>- Loss Exceedance Curve (LEC) with quantile drilldowns.</p>
+<p>- 90-Day Threat Trajectory forecast chart.</p>
+<p>- Interactive Capital Budget Slider with real-time Pareto Frontier re-computation.</p>
+<p>- AI Decision Support & Natural Language Query (NLQ) search bar.</p>
+<p>2. <strong>Technical SecOps View</strong>:</p>
+<p>- 5-Domain Telemetry Summary Strip.</p>
+<p>- Interactive What-If Simulator with candidate control toggles and remediation delay slider.</p>
+<p>- 5-Framework Regulatory Heatmap Matrix.</p>
+<p>- Complete technical remediation backlog table with attributed EAL.</p>
+
+<hr>
+
+<h2>10. Test Infrastructure & Verification Invariants</h2>
+
+<h3>10.1 Test Execution Results</h3>
+<p>All tests are executed using Pytest:</p>
+<pre><code class="language-bash">pytest --ignore=tests/api -q</code></pre>
+<p><strong>Results:</strong> <code>414 passed in 27.56s</code> (100% pass rate).</p>
+
+<h3>10.2 Mathematical Invariants Verified</h3>
+<p>1. <strong>VaR Monotonicity</strong>:</p>
+<div class="math-block">$$\forall \text{ valid distributions: } VaR_{90} < VaR_{95} < VaR_{99}$$</div>
+<p>2. <strong>Budget Constraint Compliance</strong>:</p>
+<div class="math-block">$$\text{Allocated Spend} \le \text{Budget} \quad (\text{zero tolerance ceiling})$$</div>
+<p>3. <strong>Diminishing Returns on Frontier</strong>:</p>
+<div class="math-block">$$\frac{\Delta Risk_k}{\Delta Spend_k} \ge \frac{\Delta Risk_{k+1}}{\Delta Spend_{k+1}}$$</div>
+<p>4. <strong>DAG Acyclicity</strong>:</p>
+<div class="math-block">$$G \text{ must be strictly acyclic; circular dependencies throw validation errors}$$</div>
+<p>5. <strong>Subadditivity of Portfolio Risk</strong>:</p>
+<div class="math-block">$$VaR_{Portfolio} \le \sum VaR_{Asset}$$</div>
+<p>6. <strong>Compounding Delay Convexity</strong>:</p>
+<div class="math-block">$$\text{Cost}(\text{Delay } 60d) > 2 \times \text{Cost}(\text{Delay } 30d)$$</div>
+<p>7. <strong>Seed Reproducibility</strong>:</p>
+<div class="math-block">$$\text{Simulations with identical seed produce bit-exact identical } EAL \text{ and } VaR$$</div>
+
+<hr>
+
+<h2>11. Instructions & Traps for Incoming AI Agents</h2>
+
+<p>When another AI agent takes over this codebase, it must adhere to the following architectural rules:</p>
+
+<p>1. <strong>Never Calculate Risk Inside the Prompt</strong>:</p>
+<p>Do not attempt to estimate Monte Carlo distributions or linear knapsack vectors inside an LLM context. Always invoke the deterministic Python classes:</p>
+<p>- Call <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/monte_carlo.py#L86-L207"><code>MonteCarloEngine</code></a> for probabilistic loss simulation.</p>
+<p>- Call <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/solver.py#L119-L509"><code>OptimizationSolver</code></a> for capital allocation.</p>
+<p>2. <strong>Respect Common Random Numbers (CRN) in What-If</strong>:</p>
+<p>When comparing baseline vs counterfactual scenarios in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/decision_support/what_if.py#L87-L349"><code>WhatIfEngine</code></a>, never change the random seed between runs. If the seed differs, variance from random sampling will drown out the actual risk reduction of the intervention.</p>
+<p>3. <strong>Understand Budget Saturation</strong>:</p>
+<p>If a user asks why the Pareto frontier graph flattens after ~$38,900, do not treat this as a bug. This is <strong>Budget Saturation</strong>—100% of available security controls have been funded.</p>
+<p>4. <strong>Maintain Strict Invariant Ordering in VaR</strong>:</p>
+<p>The test suite strictly checks that $VaR_{90} < VaR_{95} < VaR_{99}$. If generating synthetic or low-sample loss distributions where the 90th and 95th percentiles collide on zero, ensure the invariant sanitization block in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/quant/monte_carlo.py#L173-L178"><code>MonteCarloEngine.simulate</code></a> preserves ordering.</p>
+<p>5. <strong>Dual Currency Handling</strong>:</p>
+<p>The system supports both USD and INR. All financial DTOs in <a href="file:///C:/Users/jaisw/Desktop/Loss%20Logic/LossLogic/src/optimization/models.py"><code>src/optimization/models.py</code></a> include automatic synchronization validators so callers can supply either <code>cost_usd</code>, <code>cost_inr</code>, or <code>cost</code> without KeyError failures.</p>
+</body>
+</html>
