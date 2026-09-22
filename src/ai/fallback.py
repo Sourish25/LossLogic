@@ -144,7 +144,7 @@ def fallback_navigate(
 
 
 def fallback_executive_summary(
-    target_audience: str = "jury",
+    target_audience: str = "executive",
     currency: str = "INR",
     focus_domain: Optional[str] = None,
     execution_time_ms: float = 2.0,

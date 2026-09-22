@@ -99,7 +99,8 @@ def test_gemini_api_key_and_direct_connectivity():
     # 1. Inspect key file directly
     project_root = Path(__file__).resolve().parent.parent.parent
     key_file = project_root / "geminiAPI.txt"
-    assert key_file.is_file(), f"Expected geminiAPI.txt at project root: {key_file}"
+    if not key_file.is_file():
+        pytest.skip(f"geminiAPI.txt not present at project root: {key_file}")
 
     raw_key = key_file.read_text(encoding="utf-8").strip()
     assert len(raw_key) >= 30, f"geminiAPI.txt key too short ({len(raw_key)} chars)"
@@ -232,9 +233,9 @@ def test_ai_navigate_endpoint_and_action_payloads():
         assert r_blast.status_code == 200
         d_blast = r_blast.json()
         AINavigateResponse.model_validate(d_blast)
-        assert d_blast["target_tab"] == "demo"
+        assert d_blast["target_tab"] == "technical"
         assert d_blast["action_type"] in ("switch_tab", "tab_switch")
-        assert any(a["target_tab"] == "demo" for a in d_blast["actions"])
+        assert any(a["target_tab"] == "technical" for a in d_blast["actions"])
 
         # Command B: Zero-day attack simulation
         r_cve = client.post("/api/v1/ai/navigate", json={"command": "Simulate a zero-day exploit"})
@@ -300,14 +301,21 @@ def test_ai_executive_summary_endpoint():
       6. Supports audience alias field.
     """
     with TestClient(app) as client:
-        # 1. Jury briefing (INR)
+        # 1. Executive briefing (INR)
+        r_exec = client.post(
+            "/api/v1/ai/executive-summary",
+            json={"target_audience": "executive", "currency": "INR"},
+        )
+        assert r_exec.status_code == 200, f"Executive summary failed: {r_exec.text}"
+        data_exec = r_exec.json()
+        summary_obj = AIExecutiveSummaryResponse.model_validate(data_exec)
+
+        # Backwards compatibility check for "jury" audience
         r_jury = client.post(
             "/api/v1/ai/executive-summary",
             json={"target_audience": "jury", "currency": "INR"},
         )
-        assert r_jury.status_code == 200, f"Executive summary failed: {r_jury.text}"
-        data_jury = r_jury.json()
-        summary_obj = AIExecutiveSummaryResponse.model_validate(data_jury)
+        assert r_jury.status_code == 200
 
         assert len(summary_obj.headline.strip()) > 0
         assert summary_obj.board_headline == summary_obj.headline
@@ -378,7 +386,7 @@ def test_ai_offline_and_rate_limit_fallback_resilience():
             assert len(d_429["response"]) > 0
 
             # Executive summary under 429
-            res_sum_429 = client.post("/api/v1/ai/executive-summary", json={"target_audience": "jury"})
+            res_sum_429 = client.post("/api/v1/ai/executive-summary", json={"target_audience": "executive"})
             assert res_sum_429.status_code == 200
             d_sum_429 = res_sum_429.json()
             assert d_sum_429["offline_fallback"] is True
@@ -410,7 +418,7 @@ def test_ai_offline_and_rate_limit_fallback_resilience():
             r_air_nav = client.post("/api/v1/ai/navigate", json={"command": "Take me to BharatCart blast radius"})
             assert r_air_nav.status_code == 200
             d_air_nav = r_air_nav.json()
-            assert d_air_nav["target_tab"] == "demo"
+            assert d_air_nav["target_tab"] == "technical"
             assert d_air_nav["offline_fallback"] is True
 
             # Executive Summary
@@ -430,7 +438,7 @@ def test_ai_offline_and_rate_limit_fallback_resilience():
         assert fb_n["target_tab"] == "optimize"
         assert fb_n["parameters"]["budget"] == 5_000_000.0
 
-        fb_e = fallback_executive_summary(target_audience="jury", currency="INR")
+        fb_e = fallback_executive_summary(target_audience="executive", currency="INR")
         assert fb_e["offline_fallback"] is True
         assert "LossLogic" in fb_e["elevator_pitch_30s"]
 
@@ -549,7 +557,7 @@ def test_mathematical_invariants_under_nominal_and_surges():
                     "attack_type": attack_type,
                     "target_node": target_node,
                     "intensity": 5.0,
-                    "source_device": "Jury-Automated-Verifier",
+                    "source_device": "Enterprise-Automated-Verifier",
                 },
             )
             assert res_inj.status_code == 200, f"Injection failed for {attack_type}: {res_inj.text}"

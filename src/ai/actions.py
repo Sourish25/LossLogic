@@ -54,14 +54,14 @@ def interpret_navigation_command(command: str, currency: str = "INR") -> Dict[st
 
     # 1. Reset / Normalize commands (must precede attack check so "clear attack" is not intercepted)
     if any(k in text for k in ("reset", "restore", "normalize", "clear attack", "clear")):
-        target_tab = "demo"
+        target_tab = "technical"
         action_type = "reset_simulation"
         explanation = "Restoring BharatCart demonstration environment to nominal baseline state."
         actions.append(
             ActionPayload(
                 action_type="reset_simulation",
-                target_tab="demo",
-                target="demo",
+                target_tab="technical",
+                target="technical",
                 parameters={},
                 explanation=explanation,
             )
@@ -148,7 +148,7 @@ def interpret_navigation_command(command: str, currency: str = "INR") -> Dict[st
         "simulate", "inject", "attack", "exploit", "surge", "outage", "leak",
         "ransomware", "ddos", "zero-day", "0-day", "stuffing", "brute", "password", "credential"
     )):
-        target_tab = "demo"
+        target_tab = "technical"
         action_type = "inject_attack"
 
         # Determine attack vector
@@ -198,21 +198,21 @@ def interpret_navigation_command(command: str, currency: str = "INR") -> Dict[st
         }
         explanation = f"Injecting {name} against {tgt_node} on the BharatCart topology."
 
-        # Switch to demo tab first
+        # Switch to technical tab first
         actions.append(
             ActionPayload(
                 action_type="switch_tab",
-                target_tab="demo",
-                target="demo",
-                parameters={"tab": "demo"},
-                explanation="Navigating to BharatCart Live Jury Demo view",
+                target_tab="technical",
+                target="technical",
+                parameters={"tab": "technical"},
+                explanation="Navigating to Technical SecOps view (BharatCart Cyber Threat Simulator)",
             )
         )
         # Trigger attack
         actions.append(
             ActionPayload(
                 action_type="inject_attack",
-                target_tab="demo",
+                target_tab="technical",
                 target=atk_type,
                 parameters=parameters,
                 explanation=explanation,
@@ -244,17 +244,14 @@ def interpret_navigation_command(command: str, currency: str = "INR") -> Dict[st
             target_tab = "technical"
             action_type = "tab_switch"
             explanation = "Navigating to Technical SecOps view (CVE findings & asset drilldowns)."
-        elif any(k in text for k in ("vendor", "benchmarking", "cldf", "crwd", "okta", "wiz")):
-            target_tab = "demo"
+        elif any(k in text for k in ("vendor", "benchmarking", "matrix", "procurement", "cldf", "crwd", "okta", "wiz")):
+            target_tab = "executive"
             action_type = "tab_switch"
-            explanation = "Navigating to CEO Vendor Benchmarking Matrix on Live Jury Demo view."
-        elif any(k in text for k in ("blast radius", "topology", "dag", "bharatcart", "demo", "jury")):
-            if "technical" in text:
-                target_tab = "technical"
-            else:
-                target_tab = "demo"
+            explanation = "Navigating to CEO Vendor Benchmarking Matrix on Executive view."
+        elif any(k in text for k in ("blast radius", "topology", "dag", "bharatcart", "threat simulator", "attack injection", "demo")) or "jur" in text:
+            target_tab = "technical"
             action_type = "tab_switch"
-            explanation = f"Navigating to {target_tab.title()} view (BharatCart service topology & blast radius)."
+            explanation = "Navigating to Technical SecOps view (BharatCart service topology & blast radius)."
         elif any(k in text for k in ("compliance", "rbi", "sebi", "iso", "nist", "framework")):
             target_tab = "executive"
             action_type = "tab_switch"

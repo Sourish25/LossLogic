@@ -510,7 +510,7 @@ class TestTier1FeatureCoverage:
             "attack_type": "ddos_surge",
             "target_node": "BC-FLASH-SALE-01",
             "intensity": 5.0,
-            "source_device": "Jury iPhone 15 Pro"
+            "source_device": "SecOps iPhone 15 Pro"
         }
         resp = api_client.post("/api/v1/demo/inject-attack", json=payload)
         assert resp.status_code == 200
@@ -1119,7 +1119,7 @@ class TestTier3CrossFeatureCombinations:
 @pytest.mark.e2e
 @pytest.mark.tier4
 class TestTier4RealWorldScenarios:
-    """Tier 4: Holistic end-to-end hackathon jury demonstration scenarios."""
+    """Tier 4: Holistic end-to-end hackathon demonstration scenarios."""
 
     def test_t4_01_bharatcart_festive_sale_ddos_and_cloudflare_mitigation(self, api_client: OpaqueBoxTestClient):
         """
@@ -1138,7 +1138,7 @@ class TestTier4RealWorldScenarios:
             "attack_type": "ddos_surge",
             "target_node": BharatCartNode.FLASH_SALE.value,
             "intensity": intensity,
-            "source_device": "Jury iPad Pro"
+            "source_device": "SecOps iPad Pro"
         }
         resp = api_client.post("/api/v1/demo/inject-attack", json=payload)
         assert resp.status_code == 200
@@ -1242,7 +1242,7 @@ class TestTier4RealWorldScenarios:
         budget = 2500000.0
         assert total_dual_cost <= budget
 
-    def test_t4_05_full_jury_demo_lifecycle_invariants_preserved(self, invariant_assertions: InvariantAssertions):
+    def test_t4_05_full_executive_demo_lifecycle_invariants_preserved(self, invariant_assertions: InvariantAssertions):
         """
         Scenario 4.5: Complete Hackathon Live Presentation Flow
         1. Initialize dashboard at ₹4.82 Cr baseline EAL and 42.5% posture.

@@ -8,7 +8,7 @@ import uvicorn
 
 
 def get_local_ip() -> str:
-    """Detect LAN / Wi-Fi IP for multi-device jury demonstrations."""
+    """Detect LAN / Wi-Fi IP for multi-device enterprise demonstrations."""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
@@ -70,16 +70,14 @@ if __name__ == "__main__":
     print("=" * 72)
     print(f"  Chrome / Browser:       {browser_url}")
     print(f"  Local Loopback:         http://127.0.0.1:{port}/")
-    print(f"  Jury / 2nd Laptop Wi-Fi: {wifi_url}")
+    print(f"  Executive / 2nd Laptop Wi-Fi: {wifi_url}")
     print(f"  API Docs (Swagger):     http://localhost:{port}/docs")
     print(f"  API Health Probe:       http://localhost:{port}/api/v1/health")
+    # Launch browser automatically only in desktop environments (skip on Render/cloud)
+    if not os.environ.get("RENDER") and not os.environ.get("CI"):
+        print("  Launching Chrome browser automatically...")
+        auto_open_browser(browser_url)
     print("=" * 72)
-    print("  TIP: In Windows Chrome, use 'http://localhost:8000/' (not 0.0.0.0).")
-    print("  Launching Chrome browser automatically...")
-    print("=" * 72)
-
-    # Launch browser automatically
-    auto_open_browser(browser_url)
 
     # Start FastAPI server
     uvicorn.run("src.api.app:app", host=bind_host, port=port, reload=False)

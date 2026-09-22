@@ -1,6 +1,6 @@
 /**
- * LossLogic — Apple Liquid Glass & Monochrome Design System
- * Real WebGL Shader Engine + Dual Theme (Light Studio Crystal & Dark Obsidian Glass)
+ * LossLogic — Apple Liquid Glass Design System
+ * Real WebGL Shader Engine + multi-theme gallery (sharp animated backgrounds)
  */
 (function() {
   "use strict";
@@ -8,11 +8,32 @@
   // =========================================================================
   // 1. Application State & Persistent Theme Manager
   // =========================================================================
+  const THEMES = {
+    dark:      { id: "dark",      name: "Obsidian",    mode: 0,  light: false, accent: "#4ef0a7", swatch: ["#05060a", "#4ef0a7", "#a78bfa"] },
+    light:     { id: "light",     name: "Studio",      mode: 1,  light: true,  accent: "#0b9e63", swatch: ["#f3f5f6", "#0b9e63", "#7c5cfc"] },
+    aurora:    { id: "aurora",    name: "Aurora",      mode: 2,  light: false, accent: "#5eead4", swatch: ["#041520", "#5eead4", "#a78bfa"] },
+    nebula:    { id: "nebula",    name: "Nebula",      mode: 3,  light: false, accent: "#e879f9", swatch: ["#0b0618", "#e879f9", "#38bdf8"] },
+    abyss:     { id: "abyss",     name: "Abyss",       mode: 4,  light: false, accent: "#38bdf8", swatch: ["#021018", "#38bdf8", "#22d3ee"] },
+    grid:      { id: "grid",      name: "Synthwave",   mode: 5,  light: false, accent: "#ff2d95", swatch: ["#0a0014", "#ff2d95", "#00f0ff"] },
+    ember:     { id: "ember",     name: "Ember",       mode: 6,  light: false, accent: "#fb923c", swatch: ["#120608", "#fb923c", "#fbbf24"] },
+    prism:     { id: "prism",     name: "Prism",       mode: 7,  light: false, accent: "#c084fc", swatch: ["#080810", "#c084fc", "#67e8f9"] },
+    meadow:    { id: "meadow",    name: "Meadow",      mode: 8,  light: true,  accent: "#1e8756", swatch: ["#e4efe4", "#1e8756", "#10b981"] },
+    tesseract: { id: "tesseract", name: "Tesseract 3D", mode: 9,  light: false, accent: "#00f0ff", swatch: ["#03050a", "#00f0ff", "#a855f7"] },
+    apex:      { id: "apex",      name: "Apex 3D",     mode: 10, light: false, accent: "#ff2a6d", swatch: ["#050308", "#ff2a6d", "#05d9e8"] },
+    chronos:   { id: "chronos",   name: "Chronos 3D",  mode: 11, light: false, accent: "#f59e0b", swatch: ["#04050a", "#f59e0b", "#38bdf8"] },
+  };
+
+  const THEME_IDS = Object.keys(THEMES);
+  const THEME_LABELS = Object.fromEntries(THEME_IDS.map((k) => [k, THEMES[k].name]));
+
   const urlParams = new URLSearchParams(window.location.search);
   const themeParam = urlParams.get("theme");
-  const savedTheme = (themeParam === "light" || themeParam === "dark") ? themeParam : (localStorage.getItem("crq_theme") || "dark");
+  const storedTheme = localStorage.getItem("crq_theme");
+  const savedTheme =
+    themeParam && THEMES[themeParam] ? themeParam :
+    storedTheme && THEMES[storedTheme] ? storedTheme : "dark";
   const tabParam = urlParams.get("tab");
-  const initialTab = (tabParam === "technical" || tabParam === "executive" || tabParam === "demo") ? tabParam : "executive";
+  const initialTab = (tabParam === "technical" || tabParam === "executive") ? tabParam : "executive";
 
   const state = {
     theme: savedTheme,
@@ -44,6 +65,7 @@
 
   // Set theme immediately on root
   document.documentElement.setAttribute("data-theme", state.theme);
+  document.documentElement.setAttribute("data-theme-mode", (THEMES[state.theme] && THEMES[state.theme].light) ? "light" : "dark");
 
   // Canonical High-Fidelity Dataset
   const defaultData = {
@@ -120,16 +142,62 @@
       }
     `,
 
-    // Fragment Shader (Aggressive Liquid Glass Caustics, Prismatic Refraction & Dynamic Fluid Optics)
+    // Fragment Shader: multi-theme sharp animated backgrounds (no soft blur mush)
     fsSource: `
       precision highp float;
       varying vec2 v_uv;
       uniform vec2 u_resolution;
       uniform vec2 u_mouse;
       uniform float u_time;
-      uniform float u_is_light;
+      uniform float u_mode;
 
-      // High-energy multi-harmonic fluid heightfield with domain warping
+      float hash21(vec2 p) {
+        p = fract(p * vec2(123.34, 456.21));
+        p += dot(p, p + 45.32);
+        return fract(p.x * p.y);
+      }
+
+      float noise2(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        float a = hash21(i);
+        float b = hash21(i + vec2(1.0, 0.0));
+        float c = hash21(i + vec2(0.0, 1.0));
+        float d = hash21(i + vec2(1.0, 1.0));
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+      }
+
+      float fbm(vec2 p) {
+        float v = 0.0;
+        float a = 0.5;
+        mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+        for (int i = 0; i < 5; i++) {
+          v += a * noise2(p);
+          p = m * p;
+          a *= 0.5;
+        }
+        return v;
+      }
+
+      vec3 starField(vec2 p, float scale, float seed, float t) {
+        vec2 g = p * scale;
+        vec2 id = floor(g);
+        vec2 f = fract(g) - 0.5;
+        float h = hash21(id + seed);
+        vec2 off = (vec2(hash21(id + seed + 11.3), hash21(id + seed + 27.7)) - 0.5) * 0.55;
+        float d = length(f - off);
+        float present = smoothstep(0.6, 0.78, h);
+        float sz = 0.03 + 0.08 * hash21(id + seed + 53.1);
+        float tw = 0.45 + 0.55 * sin(t * (1.5 + 3.5 * hash21(id + seed + 71.9)) + h * 62.0);
+        float core = 1.0 - smoothstep(0.0, sz, d);
+        float halo = exp(-(d * d) / (sz * sz * 3.0)) * 0.35;
+        float bright = 0.3 + 0.7 * hash21(id + seed + 91.0);
+        vec3 tint = mix(vec3(1.0, 0.97, 0.93), vec3(0.78, 0.87, 1.0), hash21(id + seed + 13.0));
+        tint = mix(tint, vec3(1.0, 0.88, 0.82), step(0.85, hash21(id + seed + 17.0)) * 0.5);
+        return tint * present * bright * tw * (core + halo);
+      }
+
       float liquidHeight(vec2 p, float t) {
         vec2 q = vec2(
           sin(p.x * 1.35 + t * 0.85) + cos(p.y * 1.65 - t * 0.65),
@@ -146,85 +214,479 @@
         return (h1 + h2 + h3 + h4) * 0.22;
       }
 
-      void main() {
-        vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-        float aspect = u_resolution.x / u_resolution.y;
+      vec3 monoColor(vec2 uv, float aspect, float t, float mode) {
         vec2 p = vec2(uv.x * aspect, uv.y) * 2.6;
-        float t = u_time * 0.255;
-
-        // Base liquid height (pure ambient fluid flow without cursor-following wave)
         float h = liquidHeight(p, t);
-
-        // Finite-difference surface normals
         float eps = 0.018;
         float hR = liquidHeight(vec2(p.x + eps, p.y), t);
         float hU = liquidHeight(vec2(p.x, p.y + eps), t);
         vec2 norm = vec2(hR - h, hU - h) / eps;
-
-        // Refraction & subtle dispersion
         float refr = 0.040;
         float aber = 0.012;
-
-        float cR = liquidHeight((p + norm * (refr - aber)), t * 1.15);
-        float cG = liquidHeight((p + norm * refr), t * 1.15);
-        float cB = liquidHeight((p + norm * (refr + aber)), t * 1.15);
-
-        // Balanced optical caustics
+        float cR = liquidHeight(p + norm * (refr - aber), t * 1.15);
+        float cG = liquidHeight(p + norm * refr, t * 1.15);
+        float cB = liquidHeight(p + norm * (refr + aber), t * 1.15);
         float causticR = pow(clamp(cR * 0.55 + 0.5, 0.0, 1.0), 3.8);
         float causticG = pow(clamp(cG * 0.55 + 0.5, 0.0, 1.0), 3.8);
         float causticB = pow(clamp(cB * 0.55 + 0.5, 0.0, 1.0), 3.8);
-
-        // Fresnel contour & ambient top-lit specular sheen (independent of cursor)
         float fresnel = clamp(length(norm) * 0.45, 0.0, 1.0);
-        vec2 lightRef = vec2(aspect * 1.3, 2.4);
-        float dLight = distance(p, lightRef);
+        float dLight = distance(p, vec2(aspect * 1.3, 2.4));
         float spec = pow(clamp(1.0 - dLight * 0.22 + h * 0.35, 0.0, 1.0), 3.5) * 0.20;
+        float causticAvg = (causticR + causticG + causticB) * 0.3333;
 
-        if (u_is_light > 0.5) {
-          // Apple Light Studio: Refined liquid crystal with soft silver-titanium shadows
+        if (mode > 0.5) {
           vec3 baseLight = vec3(0.95, 0.965, 0.98);
           vec3 liquidShadow = vec3(0.80, 0.84, 0.90);
-          float depthFactor = clamp(h * 0.55 + 0.5, 0.0, 1.0);
-          vec3 fluidBody = mix(liquidShadow, baseLight, depthFactor);
-
-          // Refractive valleys & edge contours
+          vec3 fluidBody = mix(liquidShadow, baseLight, clamp(h * 0.55 + 0.5, 0.0, 1.0));
           fluidBody -= vec3(fresnel * 0.08);
-
-          // Prismatic caustic crests
-          float causticAvg = (causticR + causticG + causticB) * 0.3333;
           vec3 caustics = vec3(
             mix(causticAvg, causticR, 0.20),
             mix(causticAvg, causticG, 0.20),
             mix(causticAvg, causticB, 0.20)
           ) * 0.20;
-
-          // Specular glint
-          vec3 col = fluidBody + caustics + vec3(spec * 0.16);
-          gl_FragColor = vec4(col, 1.0);
-        } else {
-          // Apple Dark Obsidian: Deep obsidian void with elegant, balanced liquid silver caustics (toned to 8)
-          vec3 baseDark = vec3(0.015, 0.018, 0.024);
-          vec3 fluidDeep = vec3(0.05, 0.058, 0.070);
-          float depthFactor = clamp(h * 0.55 + 0.5, 0.0, 1.0);
-          vec3 fluidBody = mix(baseDark, fluidDeep, depthFactor);
-
-          // Liquid silver / platinum caustics (toned to 8)
-          float causticAvg = (causticR + causticG + causticB) * 0.3333;
-          vec3 caustics = vec3(
-            mix(causticAvg, causticR, 0.25),
-            mix(causticAvg, causticG, 0.25),
-            mix(causticAvg, causticB, 0.25)
-          );
-
-          vec3 col = fluidBody + caustics * 0.70 + vec3(fresnel * 0.10) + vec3(spec * 0.22);
-          gl_FragColor = vec4(col, 1.0);
+          return fluidBody + caustics + vec3(spec * 0.16);
         }
+
+        vec3 baseDark = vec3(0.015, 0.018, 0.024);
+        vec3 fluidDeep = vec3(0.05, 0.058, 0.070);
+        vec3 fluidBody = mix(baseDark, fluidDeep, clamp(h * 0.55 + 0.5, 0.0, 1.0));
+        vec3 caustics = vec3(
+          mix(causticAvg, causticR, 0.25),
+          mix(causticAvg, causticG, 0.25),
+          mix(causticAvg, causticB, 0.25)
+        );
+        return fluidBody + caustics * 0.70 + vec3(fresnel * 0.10) + vec3(spec * 0.22);
+      }
+
+      vec3 auroraColor(vec2 uv, float aspect, float t) {
+        vec2 p = vec2(uv.x * aspect, uv.y);
+        vec3 col = vec3(0.01, 0.04, 0.07);
+        float bands = 0.0;
+        for (int i = 0; i < 4; i++) {
+          float fi = float(i);
+          float y = p.y + sin(p.x * (1.4 + fi * 0.55) + t * (0.55 + fi * 0.18) + fi) * (0.16 + fi * 0.04);
+          float ridge = abs(y - (0.35 + fi * 0.16));
+          float core = smoothstep(0.085, 0.0, ridge);
+          float veil = smoothstep(0.32, 0.0, ridge) * 0.35;
+          float pulse = 0.75 + 0.25 * sin(t * 1.4 + fi * 2.1);
+          bands += (core + veil) * pulse;
+          vec3 bandCol = mix(vec3(0.2, 0.95, 0.75), vec3(0.65, 0.4, 0.98), fi * 0.33);
+          col += bandCol * (core * 0.85 + veil * 0.4);
+        }
+        float grain = fbm(p * 6.0 + t * 0.4);
+        col += vec3(0.04, 0.1, 0.12) * grain;
+        col += vec3(0.15, 0.25, 0.35) * pow(clamp(1.0 - uv.y, 0.0, 1.0), 3.0) * 0.5;
+        col += vec3(0.2) * pow(clamp(bands, 0.0, 1.5), 3.0) * 0.15;
+        return col;
+      }
+
+      vec3 nebulaColor(vec2 uv, float aspect, float t) {
+        vec2 p = vec2(uv.x * aspect, uv.y);
+        float n1 = fbm(p * 2.4 + vec2(t * 0.08, -t * 0.05));
+        float n2 = fbm(p * 3.8 - vec2(t * 0.06, t * 0.09) + n1);
+        float dust = smoothstep(0.35, 0.85, n2);
+        vec3 deep = vec3(0.04, 0.01, 0.08);
+        vec3 mid = vec3(0.35, 0.08, 0.42);
+        vec3 hot = vec3(0.85, 0.35, 0.75);
+        vec3 rim = vec3(0.15, 0.55, 0.95);
+        vec3 col = mix(deep, mid, smoothstep(0.2, 0.7, n1));
+        col = mix(col, hot, smoothstep(0.55, 0.95, n2) * 0.75);
+        col = mix(col, rim, smoothstep(0.6, 1.0, n1 * n2) * 0.55);
+        col += starField(p, 90.0, 0.0, t) * 1.1;
+        col += starField(p, 42.0, 37.0, t) * 0.75;
+        col += vec3(0.4, 0.2, 0.7) * dust * 0.35;
+        return col;
+      }
+
+      vec3 abyssColor(vec2 uv, float aspect, float t) {
+        vec2 p = vec2(uv.x * aspect, uv.y);
+        float wave = sin(p.x * 3.2 + t * 0.9) * 0.08 + sin(p.x * 7.5 - t * 1.3 + p.y * 2.0) * 0.04;
+        float ridges = abs(sin((p.y + wave) * 18.0 + t * 0.7));
+        float sharp = pow(1.0 - ridges, 6.0);
+        vec3 deep = mix(vec3(0.0, 0.03, 0.06), vec3(0.0, 0.08, 0.14), uv.y);
+        vec3 col = deep;
+        float shaft = smoothstep(0.0, 0.35, noise2(vec2(p.x * 2.5 - t * 0.3, 1.0))) * smoothstep(0.2, 1.0, uv.y);
+        col += vec3(0.1, 0.45, 0.7) * shaft * 0.45;
+        col += vec3(0.2, 0.7, 0.95) * sharp * (0.25 + 0.2 * sin(t + p.x));
+        float caust = pow(abs(sin(p.x * 5.0 + t) * sin(p.y * 6.0 - t * 0.8)), 8.0);
+        col += vec3(0.3, 0.85, 1.0) * caust * 0.5;
+        col += vec3(0.05, 0.2, 0.35) * fbm(p * 3.0 + t * 0.2);
+        return col;
+      }
+
+      vec3 gridColor(vec2 uv, float aspect, float t) {
+        vec2 p = vec2(uv.x * aspect, uv.y);
+        float horizon = 0.52;
+        vec3 col = vec3(0.05, 0.0, 0.1);
+        col = mix(col, vec3(0.12, 0.0, 0.22), smoothstep(horizon, 1.0, uv.y));
+        col += vec3(1.0, 0.2, 0.55) * pow(smoothstep(horizon + 0.25, horizon, uv.y), 2.0) * 0.55;
+        float sun = smoothstep(0.18, 0.0, length((p - vec2(aspect * 0.5, horizon + 0.12)) * vec2(1.0, 1.6)));
+        col += vec3(1.0, 0.35, 0.7) * sun * 0.6;
+        if (uv.y < horizon) {
+          float depth = (horizon - uv.y) / max(horizon, 0.001);
+          float gy = 1.0 / max(depth, 0.001);
+          float gx = (p.x - aspect * 0.5) * gy;
+          float lx = abs(fract(gx * 0.55 + 0.5) - 0.5);
+          float lz = abs(fract(gy * 0.45 - t * 0.35 + 0.5) - 0.5);
+          float lineX = smoothstep(0.04, 0.0, lx) * (1.0 - depth);
+          float lineZ = smoothstep(0.05, 0.0, lz);
+          float grid = max(lineX, lineZ);
+          col += vec3(0.0, 0.95, 1.0) * grid * 0.85;
+          col = mix(col, vec3(0.04, 0.0, 0.1), smoothstep(0.0, 0.35, depth) * 0.35);
+        } else {
+          col += starField(p, 55.0, 7.0, t) * vec3(1.0, 0.55, 0.9) * ((uv.y - horizon) * 3.0);
+        }
+        float scan = sin(uv.y * 480.0) * 0.03;
+        col += scan;
+        return col;
+      }
+
+      vec3 emberColor(vec2 uv, float aspect, float t) {
+        vec2 p = vec2(uv.x * aspect, uv.y);
+        float n = fbm(p * 2.8 + vec2(0.0, -t * 0.35));
+        float n2 = fbm(p * 5.0 + vec2(t * 0.2, n * 2.0));
+        float heat = smoothstep(0.3, 0.9, n * 0.65 + n2 * 0.45);
+        vec3 coal = vec3(0.05, 0.01, 0.01);
+        vec3 rock = vec3(0.18, 0.04, 0.02);
+        vec3 magma = vec3(0.95, 0.28, 0.05);
+        vec3 core = vec3(1.0, 0.75, 0.2);
+        vec3 col = mix(coal, rock, smoothstep(0.15, 0.55, n));
+        col = mix(col, magma, smoothstep(0.5, 0.85, heat));
+        col = mix(col, core, smoothstep(0.78, 0.98, heat) * 0.85);
+        float crack = smoothstep(0.48, 0.5, abs(fract(n2 * 3.0) - 0.5));
+        col += vec3(1.0, 0.4, 0.1) * crack * heat * 0.6;
+        col += vec3(1.0, 0.7, 0.3) * starField(p - vec2(0.0, t * 0.1), 70.0, 5.0, t);
+        col += vec3(0.4, 0.08, 0.02) * pow(1.0 - uv.y, 2.0);
+        return col;
+      }
+
+      vec3 prismColor(vec2 uv, float aspect, float t) {
+        vec2 p = vec2(uv.x * aspect, uv.y);
+        float a = t * 0.15;
+        mat2 rot = mat2(cos(a), -sin(a), sin(a), cos(a));
+        vec2 q = rot * p;
+        float facets = abs(sin(q.x * 4.0 + sin(q.y * 3.0 + t * 0.5) * 1.2));
+        float facets2 = abs(cos(q.y * 5.0 - t * 0.4 + q.x * 2.0));
+        float edge = smoothstep(0.12, 0.0, facets) + smoothstep(0.1, 0.0, facets2);
+        float plane = fract((q.x + q.y) * 0.5 + fbm(p * 1.5) * 0.4);
+        vec3 c1 = vec3(0.55, 0.3, 0.95);
+        vec3 c2 = vec3(0.2, 0.85, 0.95);
+        vec3 c3 = vec3(0.95, 0.4, 0.75);
+        vec3 col = mix(c1, c2, smoothstep(0.0, 0.5, plane));
+        col = mix(col, c3, smoothstep(0.5, 1.0, plane));
+        col *= 0.22 + 0.25 * fbm(p * 2.0 + t * 0.2);
+        col += vec3(edge) * mix(c2, c3, plane) * 0.7;
+        float glint = pow(facets * facets2, 4.0);
+        col += vec3(1.0) * glint * 0.35;
+        col += vec3(0.1, 0.05, 0.2) * (1.0 - length(uv - 0.5));
+        return col;
+      }
+
+      vec3 meadowColor(vec2 uv, float aspect, float t) {
+        vec2 p = vec2(uv.x * aspect, uv.y);
+        
+        // Crisp, luminous porcelain base with delicate morning botanical tint
+        vec3 col = vec3(0.965, 0.982, 0.972);
+        
+        // Gentle sun aura in top-left
+        float sunDist = length(p - vec2(0.25 * aspect, 1.1));
+        float sunGlow = exp(-sunDist * 1.8);
+        col = mix(col, vec3(1.0, 0.985, 0.92), sunGlow * 0.45);
+        
+        // Ultra-soft, organic spring mint ambient waves (smooth 2D diffusion, zero vertical stripes)
+        float w1 = sin(p.x * 1.8 + p.y * 1.2 + t * 0.25) * 0.5 + 0.5;
+        float w2 = cos(p.x * 1.4 - p.y * 1.6 - t * 0.20) * 0.5 + 0.5;
+        float wave = w1 * w2;
+        col = mix(col, vec3(0.91, 0.965, 0.925), wave * 0.35);
+        
+        // Microscopic crystalline dew glints (very subtle)
+        float dew = pow(clamp(noise2(p * 12.0 + vec2(t * 0.1, -t * 0.08)) * 1.8 - 1.1, 0.0, 1.0), 5.0);
+        col += vec3(0.4, 0.85, 0.6) * dew * 0.25;
+        
+        return col;
+      }
+
+      mat3 rotMatX(float a) {
+        float c = cos(a), s = sin(a);
+        return mat3(1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c);
+      }
+      mat3 rotMatY(float a) {
+        float c = cos(a), s = sin(a);
+        return mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c);
+      }
+      mat3 rotMatZ(float a) {
+        float c = cos(a), s = sin(a);
+        return mat3(c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0);
+      }
+
+      float sdBoxFrame(vec3 p, vec3 b, float e) {
+        p = abs(p) - b;
+        vec3 q = abs(p + e) - e;
+        return min(min(
+          length(max(vec3(p.x, q.y, q.z), 0.0)) + min(max(p.x, max(q.y, q.z)), 0.0),
+          length(max(vec3(q.x, p.y, q.z), 0.0)) + min(max(q.x, max(p.y, q.z)), 0.0)),
+          length(max(vec3(q.x, q.y, p.z), 0.0)) + min(max(q.x, max(q.y, p.z)), 0.0)
+        );
+      }
+
+      vec3 tesseractColor(vec2 uv, float aspect, float t, vec2 mouse) {
+        vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
+        vec3 col = vec3(0.015, 0.025, 0.045);
+
+        vec3 ro = vec3((mouse.x - 0.5) * 1.8, (mouse.y - 0.5) * 1.2, -4.2);
+        vec3 rd = normalize(vec3(p, 1.8));
+
+        if (rd.y < -0.06) {
+          float dFloor = -(ro.y + 1.85) / rd.y;
+          if (dFloor > 0.0 && dFloor < 35.0) {
+            vec3 hit = ro + rd * dFloor;
+            vec2 g = abs(fract(hit.xz * 0.8) - 0.5);
+            float lineX = smoothstep(0.045, 0.0, g.x);
+            float lineZ = smoothstep(0.045, 0.0, g.y);
+            float grid = max(lineX, lineZ);
+            float fog = exp(-dFloor * 0.09);
+            float pulse = sin(hit.z * 1.5 - t * 4.0) * 0.5 + 0.5;
+            vec3 gridCol = mix(vec3(0.0, 0.94, 1.0), vec3(0.65, 0.25, 1.0), pulse);
+            col += gridCol * grid * (0.45 + 0.45 * pulse) * fog;
+          }
+        }
+
+        mat3 rot = rotMatY(t * 0.35 + (mouse.x - 0.5) * 1.2) * 
+                   rotMatX(t * 0.28 + (mouse.y - 0.5) * 0.8) * 
+                   rotMatZ(t * 0.18);
+
+        float d = 0.0;
+        float minD = 1e5;
+        float minDInner = 1e5;
+        float minDVert = 1e5;
+        vec3 pos;
+
+        vec3 bOuter = vec3(1.25);
+        vec3 bInner = vec3(0.62) * (0.88 + 0.12 * sin(t * 1.4));
+        float edgeThick = 0.035;
+
+        for (int i = 0; i < 38; i++) {
+          pos = ro + rd * d;
+          vec3 localP = rot * (pos - vec3(0.0, 0.05, 0.0));
+          
+          float dOut = sdBoxFrame(localP, bOuter, edgeThick);
+          float dIn = sdBoxFrame(localP, bInner, edgeThick * 0.85);
+
+          vec3 cornP = abs(localP) - bOuter;
+          float dCorners = length(cornP) - 0.065;
+
+          minD = min(minD, dOut);
+          minDInner = min(minDInner, dIn);
+          minDVert = min(minDVert, dCorners);
+
+          float stepD = min(dOut, min(dIn, dCorners));
+          if (stepD < 0.005 || d > 12.0) break;
+          d += max(stepD * 0.85, 0.02);
+        }
+
+        float laserOuter = smoothstep(0.08, 0.0, minD);
+        float laserInner = smoothstep(0.065, 0.0, minDInner);
+        float laserVert = smoothstep(0.09, 0.0, minDVert);
+
+        float coreOuter = smoothstep(0.02, 0.0, minD);
+        float coreInner = smoothstep(0.015, 0.0, minDInner);
+        float coreVert = smoothstep(0.03, 0.0, minDVert);
+
+        vec3 cCyan = vec3(0.0, 0.95, 1.0);
+        vec3 cMagenta = vec3(0.9, 0.2, 0.95);
+        vec3 cWhite = vec3(1.0);
+
+        col += cCyan * laserOuter * 0.75 + cWhite * coreOuter * 0.9;
+        col += cMagenta * laserInner * 0.85 + cWhite * coreInner * 0.95;
+        col += mix(cCyan, cMagenta, 0.5) * laserVert * 1.1 + cWhite * coreVert * 1.2;
+
+        col += starField(p, 80.0, 42.0, t) * 0.85;
+
+        float horizon = abs(rd.y + 0.06);
+        col += cCyan * smoothstep(0.015, 0.0, horizon) * 0.35;
+        return col;
+      }
+
+      vec4 hexCoords(vec2 uv) {
+        vec2 r = vec2(1.0, 1.7320508);
+        vec2 h = r * 0.5;
+        vec2 a = mod(uv, r) - h;
+        vec2 b = mod(uv - h, r) - h;
+        vec2 gv = dot(a, a) < dot(b, b) ? a : b;
+        vec2 id = uv - gv;
+        return vec4(gv, id);
+      }
+
+      vec3 apexColor(vec2 uv, float aspect, float t, vec2 mouse) {
+        vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
+        vec3 col = vec3(0.03, 0.015, 0.04);
+
+        vec3 ro = vec3((mouse.x - 0.5) * 2.5, 3.2 + (mouse.y - 0.5) * 1.5, t * 0.65);
+        vec3 rd = normalize(vec3(p.x, p.y - 0.42, 1.35));
+
+        float d = 0.0;
+        float hitHeight = 0.0;
+        vec4 hitHex = vec4(0.0);
+        float edgeDist = 0.0;
+
+        for (int i = 0; i < 40; i++) {
+          vec3 pos = ro + rd * d;
+          vec4 hx = hexCoords(pos.xz * 1.15);
+          float colHeight = (0.7 + 0.55 * sin(dot(hx.zw, vec2(1.1, 0.7)) + t * 0.5)) * 1.2;
+          float distToTop = pos.y - colHeight;
+
+          float hexD = max(abs(hx.x) * 1.7320508 + abs(hx.y), abs(hx.y) * 2.0);
+          float distToEdge = 1.0 - hexD * 1.15;
+
+          float stepD = max(distToTop * 0.7, 0.02);
+          if (distToTop < 0.02 || d > 28.0) {
+            hitHeight = colHeight;
+            hitHex = hx;
+            edgeDist = distToEdge;
+            break;
+          }
+          d += stepD;
+        }
+
+        if (d < 28.0) {
+          vec3 hit = ro + rd * d;
+          float fog = exp(-d * 0.08);
+
+          vec3 basePillar = mix(vec3(0.05, 0.03, 0.08), vec3(0.12, 0.06, 0.16), hitHeight * 0.6);
+          
+          float laserCrevice = smoothstep(0.09, 0.0, abs(edgeDist));
+          float sharpBevel = smoothstep(0.025, 0.0, abs(edgeDist));
+
+          float circuitPulse = sin(dot(hitHex.zw, vec2(2.1, 1.8)) - t * 3.5) * 0.5 + 0.5;
+          vec3 emissive = mix(vec3(1.0, 0.16, 0.43), vec3(0.05, 0.85, 0.95), circuitPulse);
+
+          vec3 normal = vec3(0.0, 1.0, 0.0);
+          vec3 lightDir = normalize(vec3(0.5, 1.0, -0.4));
+          vec3 halfV = normalize(lightDir - rd);
+          float spec = pow(max(dot(normal, halfV), 0.0), 48.0);
+
+          col = basePillar + vec3(spec * 0.4);
+          col += emissive * laserCrevice * 0.75 + vec3(1.0) * sharpBevel * 0.85;
+          col *= fog;
+
+          float scan = smoothstep(0.15, 0.0, abs(hit.z - ro.z - mod(t * 4.0, 24.0) + 12.0));
+          col += vec3(1.0, 0.16, 0.43) * scan * 0.65 * fog;
+        } else {
+          col += starField(p, 65.0, 19.0, t) * vec3(1.0, 0.7, 0.9) * 0.75;
+          col += vec3(0.2, 0.05, 0.25) * pow(clamp(1.0 - uv.y, 0.0, 1.0), 3.0);
+        }
+        return col;
+      }
+
+      float sdTorus(vec3 p, float R, float r) {
+        vec2 q = vec2(length(p.xz) - R, p.y);
+        return length(q) - r;
+      }
+
+      vec3 chronosColor(vec2 uv, float aspect, float t, vec2 mouse) {
+        vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
+        vec3 col = vec3(0.015, 0.02, 0.035);
+
+        vec3 ro = vec3((mouse.x - 0.5) * 1.5, (mouse.y - 0.5) * 1.2, -4.0);
+        vec3 rd = normalize(vec3(p, 1.75));
+
+        mat3 rot1 = rotMatY(t * 0.4) * rotMatX(0.785);
+        mat3 rot2 = rotMatZ(-t * 0.5) * rotMatY(-0.6);
+        mat3 rot3 = rotMatX(t * 0.65) * rotMatZ(0.9);
+
+        float d = 0.0;
+        float minD1 = 1e5;
+        float minD2 = 1e5;
+        float minD3 = 1e5;
+        float minCore = 1e5;
+
+        for (int i = 0; i < 36; i++) {
+          vec3 pos = ro + rd * d;
+
+          vec3 p1 = rot1 * pos;
+          vec3 p2 = rot2 * pos;
+          vec3 p3 = rot3 * pos;
+
+          float t1 = sdTorus(p1, 1.6, 0.025);
+          float t2 = sdTorus(p2, 1.15, 0.022);
+          float t3 = sdTorus(p3, 0.72, 0.018);
+          float core = length(pos) - 0.22;
+
+          minD1 = min(minD1, t1);
+          minD2 = min(minD2, t2);
+          minD3 = min(minD3, t3);
+          minCore = min(minCore, core);
+
+          float stepD = min(min(t1, t2), min(t3, core));
+          if (stepD < 0.005 || d > 10.0) break;
+          d += max(stepD * 0.85, 0.02);
+        }
+
+        vec3 hit1 = rot1 * (ro + rd * d);
+        float angle1 = atan(hit1.z, hit1.x);
+        float ticks = abs(fract(angle1 * 36.0 / 6.28318) - 0.5);
+        float sharpTicks = smoothstep(0.08, 0.0, ticks);
+
+        float ring1Glow = smoothstep(0.06, 0.0, minD1);
+        float ring2Glow = smoothstep(0.05, 0.0, minD2);
+        float ring3Glow = smoothstep(0.045, 0.0, minD3);
+        float coreGlow = smoothstep(0.28, 0.0, minCore);
+
+        float coreSharp = smoothstep(0.015, 0.0, minD1);
+
+        vec3 cGold = vec3(0.98, 0.68, 0.12);
+        vec3 cBlue = vec3(0.22, 0.75, 0.98);
+        vec3 cWhite = vec3(1.0);
+
+        col += cGold * (ring1Glow * 0.7 + sharpTicks * 0.5) + cWhite * coreSharp * 0.8;
+        col += cBlue * ring2Glow * 0.85 + cWhite * smoothstep(0.012, 0.0, minD2) * 0.9;
+        col += mix(cGold, cBlue, 0.5) * ring3Glow * 0.9;
+        col += cGold * coreGlow * 0.65 + cWhite * smoothstep(0.08, 0.0, minCore) * 1.1;
+
+        col += starField(p, 75.0, 11.0, t) * 0.75;
+        return col;
+      }
+
+      void main() {
+        vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+        float aspect = u_resolution.x / u_resolution.y;
+        float t = u_time * 0.255;
+        vec3 col;
+
+        if (u_mode < 1.5) {
+          col = monoColor(uv, aspect, t, u_mode);
+        } else if (u_mode < 2.5) {
+          col = auroraColor(uv, aspect, u_time);
+        } else if (u_mode < 3.5) {
+          col = nebulaColor(uv, aspect, u_time);
+        } else if (u_mode < 4.5) {
+          col = abyssColor(uv, aspect, u_time);
+        } else if (u_mode < 5.5) {
+          col = gridColor(uv, aspect, u_time);
+        } else if (u_mode < 6.5) {
+          col = emberColor(uv, aspect, u_time);
+        } else if (u_mode < 7.5) {
+          col = prismColor(uv, aspect, u_time);
+        } else if (u_mode < 8.5) {
+          col = meadowColor(uv, aspect, u_time);
+        } else if (u_mode < 9.5) {
+          col = tesseractColor(uv, aspect, u_time, u_mouse);
+        } else if (u_mode < 10.5) {
+          col = apexColor(uv, aspect, u_time, u_mouse);
+        } else {
+          col = chronosColor(uv, aspect, u_time, u_mouse);
+        }
+
+        float md = distance(uv, u_mouse);
+        col += col * smoothstep(0.45, 0.0, md) * 0.12;
+        gl_FragColor = vec4(col, 1.0);
       }
     `,
 
-
     init() {
-      this.canvas = document.getElementById("liquid-canvas");
+      if (!this.canvas) {
+        this.canvas = document.getElementById("liquid-canvas");
+      }
       if (!this.canvas) return;
 
       const gl = this.canvas.getContext("webgl", { alpha: false, antialias: true }) ||
@@ -276,6 +738,7 @@
         mouse: gl.getUniformLocation(program, "u_mouse"),
         time: gl.getUniformLocation(program, "u_time"),
         isLight: gl.getUniformLocation(program, "u_is_light"),
+        mode: gl.getUniformLocation(program, "u_mode"),
       };
 
       this.resize();
@@ -287,10 +750,12 @@
         this.mouse.targetY = 1.0 - (e.clientY / window.innerHeight);
       });
 
+      this.updateTheme(THEMES[state.theme] ? THEMES[state.theme].mode : 0);
+
       // Start Render Loop
       this.render();
 
-      // Bind Apple 3D Tilt & Specular Light Tracking on Glass Cards
+      // Bind Specular Light Tracking on Glass Cards (no 3D tilt)
       this.initInteractiveTilt();
     },
 
@@ -316,10 +781,11 @@
       this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     },
 
-    updateTheme(isLight) {
+    updateTheme(mode) {
+      this.themeMode = mode;
       if (!this.gl || !this.program) return;
       this.gl.useProgram(this.program);
-      this.gl.uniform1f(this.uniforms.isLight, isLight ? 1.0 : 0.0);
+      this.gl.uniform1f(this.uniforms.mode, mode);
     },
 
     render() {
@@ -336,7 +802,7 @@
       gl.uniform2f(this.uniforms.resolution, this.canvas.width, this.canvas.height);
       gl.uniform2f(this.uniforms.mouse, this.mouse.x, this.mouse.y);
       gl.uniform1f(this.uniforms.time, elapsed);
-      gl.uniform1f(this.uniforms.isLight, state.theme === "light" ? 1.0 : 0.0);
+      gl.uniform1f(this.uniforms.mode, THEMES[state.theme] ? THEMES[state.theme].mode : 0);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -350,19 +816,9 @@
           const rect = el.getBoundingClientRect();
           const x = e.clientX - rect.left;
           const y = e.clientY - rect.top;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const rotateX = ((y - centerY) / centerY) * -3.5;
-          const rotateY = ((x - centerX) / centerX) * 3.5;
-
-          el.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
           el.style.setProperty("--mouse-x", `${(x / rect.width) * 100}%`);
           el.style.setProperty("--mouse-y", `${(y / rect.height) * 100}%`);
-        });
-
-        el.addEventListener("mouseleave", () => {
-          el.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
-        });
+        }, { passive: true });
       });
     }
   };
@@ -395,10 +851,21 @@
     }
 
     let time = 0;
+    const fallbackAccents = {
+      dark: [255, 255, 255], light: [0, 0, 0],
+      aurora: [94, 234, 212], nebula: [232, 121, 249],
+      abyss: [56, 189, 248], grid: [255, 45, 149],
+      ember: [251, 146, 60], prism: [192, 132, 252],
+      meadow: [30, 135, 86], tesseract: [0, 240, 255],
+      apex: [255, 42, 109], chronos: [245, 158, 11],
+    };
     function renderFallback() {
       time += 0.00375;
       ctx.clearRect(0, 0, width, height);
-      const isLight = state.theme === "light";
+      const theme = THEMES[state.theme] || THEMES.dark;
+      const isLight = theme.light;
+      const accent = fallbackAccents[state.theme] || [255, 255, 255];
+      const intensity = isLight ? 0.06 : 0.08;
 
       particles.forEach((p, idx) => {
         p.x += p.vx + Math.sin(time + idx) * 0.08;
@@ -411,10 +878,10 @@
 
         const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
         if (isLight) {
-          grad.addColorStop(0, `rgba(0, 0, 0, ${p.intensity * 0.35})`);
+          grad.addColorStop(0, `rgba(0, 0, 0, ${intensity * 0.35})`);
           grad.addColorStop(1, "rgba(255, 255, 255, 0)");
         } else {
-          grad.addColorStop(0, `rgba(255, 255, 255, ${p.intensity})`);
+          grad.addColorStop(0, `rgba(${accent[0]}, ${accent[1]}, ${accent[2]}, ${intensity})`);
           grad.addColorStop(1, "rgba(0, 0, 0, 0)");
         }
         ctx.fillStyle = grad;
@@ -436,6 +903,7 @@
     tabContents: document.querySelectorAll(".tab-content"),
     btnCurrency: document.getElementById("btn-currency"),
     btnTheme: document.getElementById("btn-theme"),
+    themeMenu: document.getElementById("theme-menu"),
     btnExport: document.getElementById("btn-export"),
 
     // Executive Elements
@@ -494,7 +962,7 @@
     btnAlertReset: document.getElementById("btn-alert-reset"),
     btnAlertDismiss: document.getElementById("btn-alert-dismiss"),
 
-    // Live Jury Demo Dials & Metrics
+    // Live Analytics HUD Dials & Metrics
     demoPostureBadge: document.getElementById("demo-posture-badge"),
     postureMeterBar: document.getElementById("posture-meter-bar"),
     demoPostureVal: document.getElementById("demo-posture-val"),
@@ -550,6 +1018,7 @@
 
   // Switch Active View Tab
   function setTab(tabName) {
+    if (tabName === "demo") tabName = "technical";
     state.activeTab = tabName;
     els.tabBtns.forEach(b => {
       const target = b.dataset.tab;
@@ -560,22 +1029,78 @@
     });
   }
 
-  // Toggle Theme (Dark / Light)
-  function toggleTheme() {
-    state.theme = state.theme === "dark" ? "light" : "dark";
-    localStorage.setItem("crq_theme", state.theme);
-    document.documentElement.setAttribute("data-theme", state.theme);
+  function updateThemeButton() {
+    if (!els.btnTheme) return;
+    const theme = THEMES[state.theme] || THEMES.dark;
+    const icon = theme.light
+      ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`
+      : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+    const gradient = `linear-gradient(135deg, ${theme.swatch[1]} 0%, ${theme.swatch[2]} 100%)`;
+    els.btnTheme.innerHTML = `${icon}<span class="theme-swatch" style="background:${gradient}"></span><span class="theme-btn-label">${theme.name}</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>`;
+    els.btnTheme.setAttribute("aria-label", `Theme: ${theme.name}. Click to switch.`);
+    els.btnTheme.setAttribute("title", `Theme: ${theme.name} — switch theme`);
 
-    if (els.btnTheme) {
-      els.btnTheme.innerHTML = state.theme === "dark"
-        ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> Dark`
-        : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg> Light`;
+    if (els.themeMenu) {
+      els.themeMenu.querySelectorAll(".theme-option").forEach((opt) => {
+        const active = opt.dataset.themeId === state.theme;
+        opt.classList.toggle("active", active);
+        opt.setAttribute("aria-checked", active ? "true" : "false");
+      });
     }
+  }
 
-    LiquidGLEngine.updateTheme(state.theme === "light");
+  function applyTheme(id) {
+    if (!THEMES[id]) id = "dark";
+    state.theme = id;
+    localStorage.setItem("crq_theme", id);
+    document.documentElement.setAttribute("data-theme", id);
+    document.documentElement.setAttribute("data-theme-mode", (THEMES[id] && THEMES[id].light) ? "light" : "dark");
+    LiquidGLEngine.updateTheme(THEMES[id].mode);
+    updateThemeButton();
     renderLEC();
     renderTrajectory();
     updateOptimization();
+    if (typeof updateDemoViews === "function") updateDemoViews();
+  }
+
+  function buildThemeMenu() {
+    if (!els.themeMenu) return;
+    els.themeMenu.innerHTML = "";
+    THEME_IDS.forEach((id) => {
+      const theme = THEMES[id];
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "theme-option" + (id === state.theme ? " active" : "");
+      btn.dataset.themeId = id;
+      btn.setAttribute("role", "menuitemradio");
+      btn.setAttribute("aria-checked", id === state.theme ? "true" : "false");
+      btn.innerHTML = `
+        <span class="theme-option-swatch" style="background:linear-gradient(135deg, ${theme.swatch.join(", ")})"></span>
+        <span class="theme-option-meta">
+          <span class="theme-option-name">${theme.name}</span>
+          <span class="theme-option-id">${id}</span>
+        </span>
+        <span class="theme-option-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>`;
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        applyTheme(id);
+        setThemeMenuOpen(false);
+      });
+      els.themeMenu.appendChild(btn);
+    });
+  }
+
+  function setThemeMenuOpen(open) {
+    if (!els.themeMenu) return;
+    els.themeMenu.classList.toggle("hidden", !open);
+    if (els.btnTheme) els.btnTheme.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  // Toggle Theme Picker Menu
+  function toggleThemeMenu(e) {
+    if (e) e.stopPropagation();
+    if (!els.themeMenu) return;
+    setThemeMenuOpen(els.themeMenu.classList.contains("hidden"));
   }
 
   // Toggle Currency (INR / USD)
@@ -598,20 +1123,48 @@
 
   function getThemeColors() {
     const isPrinting = document.body.classList.contains("printing") || (window.matchMedia && window.matchMedia("print").matches);
-    const isLight = state.theme === "light" || isPrinting;
+    const theme = THEMES[state.theme] || THEMES.dark;
+    const isLight = theme.light || isPrinting;
+    const accent = isPrinting ? "#0b9e63" : theme.accent;
     return {
       isLight: isLight,
-      curveColor: isLight ? "#09090b" : "#ffffff",
+      curveColor: accent,
       glowAttr: isLight ? "" : 'filter="url(#liquidGlow)"',
-      gridColor: isLight ? "rgba(0, 0, 0, 0.12)" : "rgba(255, 255, 255, 0.16)",
-      gridSubtle: isLight ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.08)",
-      textColor: isLight ? "#18181b" : "#f4f4f6",
-      nodeRingFill: isLight ? "rgba(0, 0, 0, 0.08)" : "rgba(255, 255, 255, 0.16)",
-      nodeRingStroke: isLight ? "rgba(0, 0, 0, 0.40)" : "rgba(255, 255, 255, 0.60)",
-      nodeFill: isLight ? "#09090b" : "#ffffff",
-      nodeStroke: isLight ? "#ffffff" : "#000000",
-      frontierCurve: isLight ? "#18181b" : "#f4f4f6",
+      gridColor: isLight ? "rgba(0, 0, 0, 0.12)" : "rgba(255, 255, 255, 0.14)",
+      gridSubtle: isLight ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.07)",
+      textColor: isLight ? "#3a4450" : "#b8c2cc",
+      nodeRingFill: isLight ? "rgba(11, 158, 99, 0.12)" : `${accent}22`,
+      nodeRingStroke: isLight ? "rgba(11, 158, 99, 0.45)" : `${accent}88`,
+      nodeFill: accent,
+      nodeStroke: isLight ? "#ffffff" : "#06120c",
+      frontierCurve: accent,
     };
+  }
+
+  /**
+   * Catmull-Rom cubic bezier spline generator for ultra-smooth analytical curves
+   */
+  function generateSplinePath(coords) {
+    if (!coords || coords.length === 0) return "";
+    if (coords.length === 1) return `M ${coords[0].x.toFixed(1)} ${coords[0].y.toFixed(1)}`;
+    if (coords.length === 2) {
+      return `M ${coords[0].x.toFixed(1)} ${coords[0].y.toFixed(1)} L ${coords[1].x.toFixed(1)} ${coords[1].y.toFixed(1)}`;
+    }
+    let pathD = `M ${coords[0].x.toFixed(1)} ${coords[0].y.toFixed(1)}`;
+    for (let i = 0; i < coords.length - 1; i++) {
+      const p0 = coords[Math.max(i - 1, 0)];
+      const p1 = coords[i];
+      const p2 = coords[i + 1];
+      const p3 = coords[Math.min(i + 2, coords.length - 1)];
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      pathD += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+    }
+    return pathD;
   }
 
   /**
@@ -636,19 +1189,17 @@
       { p: 0.99, loss: defaultData.var99Inr, label: "VaR 99%" },
     ];
 
-    let pathD = "";
     const coords = [];
-
-    points.forEach((pt, i) => {
+    points.forEach((pt) => {
       const x = padX + (pt.p) * (width - 2 * padX);
       const y = height - padY - (pt.loss / maxLoss) * (height - 2 * padY);
       coords.push({ x, y, ...pt });
-      pathD += (i === 0 ? "M " : "L ") + `${x.toFixed(1)} ${y.toFixed(1)} `;
     });
 
+    const pathD = generateSplinePath(coords);
     const first = coords[0];
     const last = coords[coords.length - 1];
-    const areaD = pathD + `L ${last.x.toFixed(1)} ${(height - padY).toFixed(1)} L ${first.x.toFixed(1)} ${(height - padY).toFixed(1)} Z`;
+    const areaD = pathD + ` L ${last.x.toFixed(1)} ${(height - padY).toFixed(1)} L ${first.x.toFixed(1)} ${(height - padY).toFixed(1)} Z`;
 
     let dotsSvg = "";
     coords.forEach(pt => {
@@ -711,9 +1262,9 @@
     ];
     const maxVal = eal * 1.45;
 
-    let pathD = "";
-    let coneUpper = "";
-    let coneLower = "";
+    const coords = [];
+    const upperCoords = [];
+    const lowerCoords = [];
     let nodesSvg = "";
 
     days.forEach((pt, i) => {
@@ -722,9 +1273,9 @@
       const yHigh = height - padY - (pt.high / maxVal) * (height - 2 * padY);
       const yLow = height - padY - (pt.low / maxVal) * (height - 2 * padY);
 
-      pathD += (i === 0 ? "M " : "L ") + `${x.toFixed(1)} ${y.toFixed(1)} `;
-      coneUpper += (i === 0 ? "M " : "L ") + `${x.toFixed(1)} ${yHigh.toFixed(1)} `;
-      coneLower = `L ${x.toFixed(1)} ${yLow.toFixed(1)} ` + coneLower;
+      coords.push({ x, y, ...pt });
+      upperCoords.push({ x, y: yHigh });
+      lowerCoords.push({ x, y: yLow });
 
       nodesSvg += `
         <g class="trajectory-node" style="cursor:pointer;" data-tooltip="${pt.d} Forecast: ${formatMoney(pt.val)} • Compounding Threat Aging">
@@ -735,7 +1286,14 @@
       `;
     });
 
-    const coneD = coneUpper + coneLower + " Z";
+    const pathD = generateSplinePath(coords);
+    const upperPath = generateSplinePath(upperCoords);
+    let coneD = upperPath;
+    for (let i = lowerCoords.length - 1; i >= 0; i--) {
+      coneD += ` L ${lowerCoords[i].x.toFixed(1)} ${lowerCoords[i].y.toFixed(1)}`;
+    }
+    coneD += " Z";
+
     const coneStartOpacity = c.isLight ? 0.02 : 0.04;
     const coneEndOpacity = c.isLight ? 0.08 : 0.16;
 
@@ -884,6 +1442,15 @@
     if (els.optReduction) els.optReduction.textContent = formatMoney(mitigated);
     if (els.optResidual) els.optResidual.textContent = formatMoney(residual);
     if (els.optRosi) els.optRosi.textContent = `${rosi.toFixed(1)}%`;
+
+    document.querySelectorAll(".budget-preset-pill").forEach(p => {
+      const pVal = parseFloat(p.getAttribute("data-budget"));
+      if (Math.abs(pVal - budget) < 1000) {
+        p.classList.add("active");
+      } else {
+        p.classList.remove("active");
+      }
+    });
 
     renderFrontier(spend, mitigated);
   }
@@ -1073,7 +1640,7 @@
   }
 
   // =========================================================================
-  // 9.5 Live Jury Demo, BharatCart Simulator & CEO Vendor Procurement (R1-R5)
+  // 9.5 Live Simulation HUD, BharatCart Simulator & CEO Vendor Procurement (R1-R5)
   // =========================================================================
 
   // Update Dynamic Posture Dial SVG
@@ -1083,16 +1650,29 @@
     if (els.demoPostureVal) {
       els.demoPostureVal.textContent = clamped.toFixed(1);
     }
+    if (els.kpiCompliance) {
+      els.kpiCompliance.textContent = `${clamped.toFixed(1)}%`;
+    }
     if (els.postureMeterBar) {
       const circ = 2 * Math.PI * 50; // 314.159
       const offset = circ - (clamped / 100.0) * circ;
       els.postureMeterBar.style.strokeDashoffset = offset;
       if (clamped >= 80) {
-        els.postureMeterBar.style.stroke = "#22c55e";
+        els.postureMeterBar.style.stroke = "#4ef0a7";
       } else if (clamped >= 60) {
-        els.postureMeterBar.style.stroke = "#eab308";
+        els.postureMeterBar.style.stroke = "#fbbf24";
       } else {
-        els.postureMeterBar.style.stroke = "#ef4444";
+        els.postureMeterBar.style.stroke = "#ff5c5c";
+      }
+    }
+    const ambientGlow = document.querySelector(".dial-ambient-glow");
+    if (ambientGlow) {
+      if (clamped >= 80) {
+        ambientGlow.style.background = "radial-gradient(circle, rgba(78, 240, 167, 0.28) 0%, rgba(78, 240, 167, 0) 70%)";
+      } else if (clamped >= 60) {
+        ambientGlow.style.background = "radial-gradient(circle, rgba(251, 191, 36, 0.28) 0%, rgba(251, 191, 36, 0) 70%)";
+      } else {
+        ambientGlow.style.background = "radial-gradient(circle, rgba(255, 92, 92, 0.35) 0%, rgba(255, 92, 92, 0) 70%)";
       }
     }
     if (els.demoPostureBadge) {
@@ -1123,6 +1703,20 @@
       const pct = (clamped / 10.0) * 100;
       els.demoRfIndicator.style.width = `${pct}%`;
     }
+    const segContainer = document.getElementById("rf-segments");
+    if (segContainer) {
+      const segs = segContainer.querySelectorAll(".rf-seg");
+      const activeCount = Math.round(clamped);
+      segs.forEach((seg, idx) => {
+        seg.className = "rf-seg";
+        if (idx < activeCount) {
+          if (idx < 3) seg.classList.add("active-green");
+          else if (idx < 6) seg.classList.add("active-yellow");
+          else if (idx < 8) seg.classList.add("active-orange");
+          else seg.classList.add("active-red");
+        }
+      });
+    }
     if (els.demoRiskBadge) {
       if (clamped < 3.0) {
         els.demoRiskBadge.textContent = `Low (${clamped.toFixed(1)})`;
@@ -1151,6 +1745,13 @@
     if (els.demoSupVal) {
       els.demoSupVal.textContent = supPct > 0 ? `+${supPct.toFixed(1)}%` : `0.0%`;
     }
+    const supRing = document.getElementById("sup-ring-fill");
+    if (supRing) {
+      const maxCirc = 100.53;
+      const clampedSup = Math.min(100, Math.max(0, supPct));
+      const offset = maxCirc - (clampedSup / 100.0) * maxCirc;
+      supRing.style.strokeDashoffset = offset;
+    }
     if (els.demoSupBadge) {
       if (supPct > 0) {
         els.demoSupBadge.textContent = `+${supPct.toFixed(1)}% Gain`;
@@ -1178,6 +1779,29 @@
     if (els.kpiEal) {
       els.kpiEal.textContent = formatMoney(currentEalInr);
     }
+    const ealPath = document.getElementById("eal-sparkline-path");
+    const ealDot = document.getElementById("eal-sparkline-dot");
+    if (ealPath && ealDot) {
+      if (isAttack) {
+        ealPath.setAttribute("d", "M 0 20 Q 35 18, 70 8 T 140 3");
+        ealPath.style.stroke = "#ff5c5c";
+        ealDot.setAttribute("cx", "140");
+        ealDot.setAttribute("cy", "3");
+        ealDot.style.fill = "#ff5c5c";
+      } else if (currentEalInr < baselineEalInr) {
+        ealPath.setAttribute("d", "M 0 4 Q 35 8, 70 16 T 140 20");
+        ealPath.style.stroke = "#4ef0a7";
+        ealDot.setAttribute("cx", "140");
+        ealDot.setAttribute("cy", "20");
+        ealDot.style.fill = "#4ef0a7";
+      } else {
+        ealPath.setAttribute("d", "M 0 16 Q 35 12, 70 14 T 140 12");
+        ealPath.style.stroke = "var(--text-muted)";
+        ealDot.setAttribute("cx", "140");
+        ealDot.setAttribute("cy", "12");
+        ealDot.style.fill = "var(--text-muted)";
+      }
+    }
     if (els.demoEalBadge) {
       if (isAttack) {
         els.demoEalBadge.textContent = "ATTACK SURGE";
@@ -1194,11 +1818,11 @@
       if (isAttack) {
         const diff = currentEalInr - baselineEalInr;
         els.demoEalDelta.textContent = `Surge Delta: +${formatMoney(diff)}`;
-        els.demoEalDelta.style.color = "#ef4444";
+        els.demoEalDelta.style.color = "#ff5c5c";
       } else if (currentEalInr < baselineEalInr) {
         const diff = baselineEalInr - currentEalInr;
         els.demoEalDelta.textContent = `Capital Exposure Reduction: -${formatMoney(diff)}`;
-        els.demoEalDelta.style.color = "#22c55e";
+        els.demoEalDelta.style.color = "#4ef0a7";
       } else {
         els.demoEalDelta.textContent = `Baseline: ${formatMoney(baselineEalInr)}`;
         els.demoEalDelta.style.color = "var(--text-muted)";
@@ -1216,6 +1840,18 @@
 
     if (els.demoShieldsVal) {
       els.demoShieldsVal.textContent = `${state.demoStats.activeShields} Active`;
+    }
+    const glyphStrip = document.getElementById("shields-glyph-strip");
+    if (glyphStrip) {
+      const glyphs = glyphStrip.querySelectorAll(".shield-glyph");
+      const activeShields = state.demoStats.activeShields || 0;
+      glyphs.forEach((g, idx) => {
+        if (idx < activeShields) {
+          g.classList.add("active");
+        } else {
+          g.classList.remove("active");
+        }
+      });
     }
     if (els.demoVendorsFunded) {
       els.demoVendorsFunded.textContent = `${state.purchasedVendors.size} Commercial Solutions Funded`;
@@ -1250,7 +1886,7 @@
     const type = attackType || (state.activeAttack || "DDOS_TRAFFIC_SURGE");
     const target = els.demoTargetNode ? els.demoTargetNode.value : "gateway-01";
     const host = window.location.host || "localhost:8000";
-    const cmd = `curl -X POST http://${host}/api/v1/demo/inject-attack -H "Content-Type: application/json" -d '{"attack_type":"${type}","target_node":"${target}","source_device":"Jury-Laptop"}'`;
+    const cmd = `curl -X POST http://${host}/api/v1/demo/inject-attack -H "Content-Type: application/json" -d '{"attack_type":"${type}","target_node":"${target}","source_device":"Executive-Laptop"}'`;
     els.curlCommandDisplay.textContent = cmd;
   }
 
@@ -1357,11 +1993,11 @@
             if (badge) {
               badge.textContent = n.status;
               if (n.status === "ONLINE") {
-                badge.style.color = "#22c55e";
+                badge.style.color = "#4ef0a7";
                 el.style.borderColor = "rgba(255,255,255,0.08)";
               } else {
-                badge.style.color = "#ef4444";
-                el.style.borderColor = "rgba(239, 68, 68, 0.6)";
+                badge.style.color = "#ff5c5c";
+                el.style.borderColor = "rgba(255, 92, 92, 0.6)";
               }
             }
           }
@@ -1424,6 +2060,36 @@
     }
   }
 
+  // Update BharatCart Topology DAG Visual Status
+  function updateDagAttackVisual(targetNode, isAttack) {
+    const nodeMap = {
+      "gateway-01": "topo-BC-API-GW-01",
+      "BC-API-GW-01": "topo-BC-API-GW-01",
+      "k8s-order-service": "topo-BC-FLASH-SALE-01",
+      "BC-FLASH-SALE-01": "topo-BC-FLASH-SALE-01",
+      "auth-vault-01": "topo-BC-PAY-GW-01",
+      "BC-PAY-GW-01": "topo-BC-PAY-GW-01",
+      "db-cluster-01": "topo-BC-PII-VAULT-01",
+      "BC-PII-VAULT-01": "topo-BC-PII-VAULT-01"
+    };
+
+    const targetElemId = targetNode ? (nodeMap[targetNode] || "topo-BC-API-GW-01") : null;
+    const allIds = ["topo-BC-API-GW-01", "topo-BC-FLASH-SALE-01", "topo-BC-PAY-GW-01", "topo-BC-PII-VAULT-01"];
+
+    allIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const badge = el.querySelector(".topo-badge");
+      if (isAttack && id === targetElemId) {
+        el.classList.add("node-compromised");
+        if (badge) badge.innerHTML = `<span class="sbh-dot" style="background:#ff5c5c; box-shadow:0 0 8px #ff5c5c;"></span>COMPROMISED`;
+      } else {
+        el.classList.remove("node-compromised");
+        if (badge) badge.innerHTML = `<span class="sbh-dot"></span>ONLINE`;
+      }
+    });
+  }
+
   // Inject Simulated Cyber Attack (R3 - Flipkart Demo)
   async function injectAttack(attackType, overrideTargetNode) {
     const targetNode = overrideTargetNode || (els.demoTargetNode ? els.demoTargetNode.value : "gateway-01");
@@ -1440,7 +2106,7 @@
           attack_type: attackType,
           target_node: targetNode,
           intensity: 5.0,
-          source_device: "Jury-Dashboard-UI"
+          source_device: "Executive-Dashboard-UI"
         })
       });
 
@@ -1456,6 +2122,9 @@
           const rfSpike = Math.min(9.8, (res.spiked_eal_inr / res.baseline_eal_inr) * 4.8);
           state.demoStats.riskFactor = rfSpike;
         }
+
+        // Highlight compromised node on DAG
+        updateDagAttackVisual(res.target_node || targetNode, true);
 
         // Show Attack Alert Banner
         if (els.attackAlertBanner) {
@@ -1506,6 +2175,9 @@
       state.demoStats.riskFactor = 9.4;
     }
 
+    // Highlight compromised node on DAG fallback
+    updateDagAttackVisual(targetNode, true);
+
     if (els.attackAlertBanner) {
       els.attackAlertBanner.style.display = "flex";
       if (els.aabVector) els.aabVector.textContent = attackType;
@@ -1521,6 +2193,9 @@
   // Reset Attack Simulation
   async function resetAttack() {
     appendTerminalLog("[RESTORING] Restoring BharatCart infrastructure to nominal baseline...");
+
+    // Reset DAG node visuals
+    updateDagAttackVisual(null, false);
 
     try {
       const resp = await fetch("/api/v1/demo/reset-attack", { method: "POST" });
@@ -1672,7 +2347,7 @@
     els.vendorBenchmarkCards.innerHTML = "";
 
     const icons = {
-      "EDR": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+      "EDR": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ef0a7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
       "WAF": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`,
       "IAM": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>`,
       "CSPM": `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`,
@@ -1683,7 +2358,7 @@
     state.vendorCatalog.forEach(v => {
       const isFunded = state.purchasedVendors.has(v.vendor_id);
       const card = document.createElement("div");
-      card.className = `vendor-card ${isFunded ? "procured" : ""}`;
+      card.className = `vendor-card ${isFunded ? "vendor-procured procured" : ""}`;
 
       const icon = icons[v.category] || defaultIcon;
       const tagsHtml = (v.recommendation_tags || []).map(t => `<span class="vc-tag">${t}</span>`).join("");
@@ -1705,7 +2380,7 @@
           <div class="vc-cost">${formatMoney(v.annual_cost)} / yr</div>
         </div>
         <div class="vc-actions">
-          <button class="btn-procure ${isFunded ? "btn-procured-done" : "btn-procure-active"}" data-vendor="${v.vendor_id}">
+          <button class="btn-procure ${isFunded ? "btn-procured-done btn-procured-active" : "btn-procure-active"}" data-vendor="${v.vendor_id}">
             ${isFunded ? "Procured & Active" : "Procure Solution"}
           </button>
           <button class="btn-shields-view" data-vendor="${v.vendor_id}">
@@ -1813,7 +2488,7 @@
         sc.innerHTML = `
           <div>
             <div class="sc-header">
-              <span class="sc-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>${s.threat_vector}</span>
+              <span class="sc-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ef0a7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>${s.threat_vector}</span>
               <span class="sc-efficacy">${s.neutralization_rate_pct}% Reduction</span>
             </div>
             <div class="sc-desc" style="margin-top:0.4rem;">${s.description}</div>
@@ -1864,6 +2539,19 @@
         updateCurlCommandSnippet();
       });
     }
+
+    // BharatCart Topology DAG Click-to-Target Handlers
+    document.querySelectorAll(".topo-node").forEach(node => {
+      node.addEventListener("click", () => {
+        const target = node.getAttribute("data-target");
+        if (target && els.demoTargetNode) {
+          els.demoTargetNode.value = target;
+          updateCurlCommandSnippet();
+          const nodeName = node.querySelector(".topo-node-name") ? node.querySelector(".topo-node-name").textContent : target;
+          appendTerminalLog(`[DAG] Switched active vector target to [${nodeName}] (${target})`);
+        }
+      });
+    });
 
     // Reset Simulation Buttons
     if (els.btnResetDemo) {
@@ -1943,13 +2631,30 @@
     });
     setTab(state.activeTab);
 
-    // Theme Switcher (Dark / Light)
+    // Theme Picker (multi-theme gallery)
+    buildThemeMenu();
+    updateThemeButton();
     if (els.btnTheme) {
-      els.btnTheme.innerHTML = state.theme === "dark"
-        ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> Dark`
-        : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg> Light`;
-      els.btnTheme.addEventListener("click", toggleTheme);
+      els.btnTheme.addEventListener("click", toggleThemeMenu);
     }
+    if (urlParams.get("menu") === "open") {
+      setThemeMenuOpen(true);
+    }
+    if (els.themeMenu) {
+      els.themeMenu.addEventListener("click", (e) => e.stopPropagation());
+    }
+    document.addEventListener("click", (e) => {
+      if (!els.themeMenu) return;
+      if (!els.themeMenu.classList.contains("hidden") && !els.themeMenu.contains(e.target) && e.target !== els.btnTheme && !(els.btnTheme && els.btnTheme.contains(e.target))) {
+        setThemeMenuOpen(false);
+      }
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && els.themeMenu && !els.themeMenu.classList.contains("hidden")) {
+        setThemeMenuOpen(false);
+        if (els.btnTheme) els.btnTheme.focus();
+      }
+    });
 
     // Currency Switcher (INR / USD)
     if (els.btnCurrency) {
@@ -1986,6 +2691,17 @@
       els.sliderBudget.addEventListener("input", updateOptimization);
     }
 
+    // Quick Budget Preset Pills
+    document.querySelectorAll(".budget-preset-pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        const bVal = pill.getAttribute("data-budget");
+        if (bVal && els.sliderBudget) {
+          els.sliderBudget.value = bVal;
+          updateOptimization();
+        }
+      });
+    });
+
     if (els.sliderDelay) {
       els.sliderDelay.addEventListener("input", (e) => {
         state.delayDays = parseInt(e.target.value, 10);
@@ -2016,6 +2732,7 @@
 
     // Initial render
     updateAllViews();
+    updateDemoViews();
 
     // Initialize BharatCart Live Threat Defense Sandbox
     initDemoSandbox();
@@ -2203,14 +2920,18 @@
     switch (actionType) {
       case "switch_tab":
       case "tab_switch":
-        if (targetTab === "executive" || targetTab === "technical" || targetTab === "demo") {
-          setTab(targetTab);
-          feedback = `Switched to ${targetTab.toUpperCase()} tab`;
-        } else if (targetTab === "optimize" || targetTab === "frontier" || targetTab === "allocation") {
+        let resolvedTab = targetTab;
+        if (resolvedTab === "demo") {
+          resolvedTab = (action.target_element === "#vendor-benchmark-cards" || (action.explanation && action.explanation.toLowerCase().includes("vendor"))) ? "executive" : "technical";
+        }
+        if (resolvedTab === "executive" || resolvedTab === "technical") {
+          setTab(resolvedTab);
+          feedback = `Switched to ${resolvedTab.toUpperCase()} tab`;
+        } else if (resolvedTab === "optimize" || resolvedTab === "frontier" || resolvedTab === "allocation" || resolvedTab === "vendor" || resolvedTab === "benchmarking") {
           setTab("executive");
-          const optSec = document.getElementById("opt-controls-grid") || document.getElementById("chart-frontier");
+          const optSec = document.getElementById("opt-controls-grid") || document.getElementById("chart-frontier") || document.getElementById("vendor-benchmark-cards");
           if (optSec) optSec.scrollIntoView({ behavior: "smooth" });
-          feedback = `Focused Optimization Engine`;
+          feedback = `Focused ${resolvedTab.toUpperCase()}`;
         }
         break;
 
@@ -2236,7 +2957,7 @@
 
       case "inject_attack":
       case "simulate_attack":
-        setTab("demo");
+        setTab("technical");
         const atkType = params.attack_type || action.target || "zero_day_cve";
         const tgtNode = params.target_node || "BC-FLASH-SALE-01";
         injectAttack(atkType, tgtNode);
@@ -2393,15 +3114,15 @@
   async function triggerQuickAction(actionType) {
     openCopilot();
 
-    if (actionType === "jury-pitch") {
-      appendChatMessage("You", "Give me a 30-second jury pitch and executive summary of LossLogic.", "user");
+    if (actionType === "executive-pitch" || actionType.endsWith("-pitch")) {
+      appendChatMessage("You", "Give me a 30-second executive pitch and board summary of LossLogic.", "user");
       copilotState.isStreaming = true;
 
       const typingId = `typing-${Date.now()}`;
       const typingEl = document.createElement("div");
       typingEl.id = typingId;
       typingEl.className = "chat-msg chat-msg-assistant";
-      typingEl.innerHTML = `<div class="chat-msg-header"><span class="chat-sender">LossLogic Copilot</span><span class="chat-time">Synthesizing Jury Pitch...</span></div><div class="chat-msg-body" style="font-style:italic;">Generating 30-second briefing from live telemetry...</div>`;
+      typingEl.innerHTML = `<div class="chat-msg-header"><span class="chat-sender">LossLogic Copilot</span><span class="chat-time">Synthesizing Executive Pitch...</span></div><div class="chat-msg-body" style="font-style:italic;">Generating 30-second briefing from live telemetry...</div>`;
       els.copilotChatStream.appendChild(typingEl);
       els.copilotChatStream.scrollTop = els.copilotChatStream.scrollHeight;
 
@@ -2409,7 +3130,7 @@
         const resp = await fetch("/api/v1/ai/executive-summary", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ target_audience: "jury", currency: state.currency })
+          body: JSON.stringify({ target_audience: "executive", currency: state.currency })
         });
         const el = document.getElementById(typingId);
         if (el) el.remove();
@@ -2420,7 +3141,7 @@
           const pitch = data.elevator_pitch_30s || data.elevator_pitch || data.summary_30s || "";
           const bullets = (data.bulleted_insights || []).map(b => `* ${b}`).join("\n");
           const msg = `**${headline}**\n\n${pitch}\n\n**Executive Key Takeaways:**\n${bullets}`;
-          appendChatMessage("LossLogic Copilot", msg, "assistant", "Jury Briefing Synthesized", [
+          appendChatMessage("LossLogic Copilot", msg, "assistant", "Executive Briefing Synthesized", [
             "What is our maximum probable loss (VaR 99%)?",
             "How does HiGHS MILP optimize our cybersecurity budget?",
             "Show live threat defense against zero-day exploits"
@@ -2437,7 +3158,7 @@
       }
 
     } else if (actionType === "blast-radius") {
-      setTab("demo");
+      setTab("technical");
       appendChatMessage("You", "Analyze blast radius of critical vulnerabilities and multi-cloud attack propagation.", "user");
       copilotState.isStreaming = true;
 
@@ -2448,7 +3169,7 @@
           body: JSON.stringify({
             message: "Analyze blast radius of critical vulnerabilities and multi-cloud attack propagation across BharatCart.",
             currency: state.currency,
-            context: { activeTab: "demo" }
+            context: { activeTab: "technical" }
           })
         });
 

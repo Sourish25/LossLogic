@@ -59,7 +59,7 @@ def test_zero_day_cve_attack_injection():
             "attack_type": "zero_day_cve",
             "target_node": "BC-FLASH-SALE-01",
             "intensity": 5.0,
-            "source_device": "Jury-Tester",
+            "source_device": "SecOps-Tester",
         }
         res = client.post("/api/v1/demo/inject-attack", json=payload)
         assert res.status_code == 200
@@ -81,7 +81,7 @@ def test_cloud_iam_compromise_attack_injection():
             "attack_type": "cloud_iam_compromise",
             "target_node": "BC-API-GW-01",
             "intensity": 5.0,
-            "source_device": "Jury-Tester",
+            "source_device": "SecOps-Tester",
         }
         res = client.post("/api/v1/demo/inject-attack", json=payload)
         assert res.status_code == 200

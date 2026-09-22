@@ -16,43 +16,87 @@ GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 _CACHED_API_KEY: Optional[str] = None
 
 
+def _parse_and_inject_env(filepath: Path) -> None:
+    """Parse key=value pairs from a .env file and inject into os.environ if not already present."""
+    try:
+        if not filepath.is_file():
+            return
+        lines = filepath.read_text(encoding="utf-8").splitlines()
+        for line in lines:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("export "):
+                line = line[7:].strip()
+            if "=" in line:
+                key, val = line.split("=", 1)
+                key = key.strip()
+                val = val.strip().strip("'\"")
+                if key and key not in os.environ:
+                    os.environ[key] = val
+    except Exception:
+        pass
+
+
 def resolve_api_key(project_root: Optional[Path] = None) -> Optional[str]:
     """
     Resolves the Gemini API key by checking:
-    1. geminiAPI.txt at the project root or current working directory.
-    2. GEMINI_API_KEY environment variable.
+    1. Direct environment variables: GEMINI_API_KEY, GOOGLE_API_KEY, GEMINI_KEY.
+    2. .env files (cwd, project root, or Render secret path /etc/secrets/.env).
+    3. geminiAPI.txt files (cwd, project root, or Render secret path /etc/secrets/geminiAPI.txt).
     Returns the stripped key string, or None if unavailable.
     """
     global _CACHED_API_KEY
     if _CACHED_API_KEY:
         return _CACHED_API_KEY
 
-    candidate_paths = []
-    if project_root:
-        candidate_paths.append(project_root / "geminiAPI.txt")
+    # 1. Check existing environment variables first
+    for env_var in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "GEMINI_KEY"):
+        val = os.environ.get(env_var, "").strip().strip("'\"")
+        if len(val) >= 20:
+            _CACHED_API_KEY = val
+            return _CACHED_API_KEY
 
-    # Current working directory
-    candidate_paths.append(Path.cwd() / "geminiAPI.txt")
-
-    # Path relative to this file: src/ai/config.py -> 3 levels up is project root
+    # 2. Check and parse potential .env files
     this_file = Path(__file__).resolve()
-    candidate_paths.append(this_file.parent.parent.parent / "geminiAPI.txt")
-    candidate_paths.append(this_file.parent.parent / "geminiAPI.txt")
+    repo_root = this_file.parent.parent.parent
+    dotenv_candidates = [
+        Path.cwd() / ".env",
+        repo_root / ".env",
+        Path("/etc/secrets/.env"),
+    ]
+    if project_root:
+        dotenv_candidates.insert(0, project_root / ".env")
 
-    for p in candidate_paths:
+    for dotenv_path in dotenv_candidates:
+        _parse_and_inject_env(dotenv_path)
+
+    # Check env vars again after parsing .env
+    for env_var in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "GEMINI_KEY"):
+        val = os.environ.get(env_var, "").strip().strip("'\"")
+        if len(val) >= 20:
+            _CACHED_API_KEY = val
+            return _CACHED_API_KEY
+
+    # 3. Check raw geminiAPI.txt secret files
+    secret_txt_candidates = [
+        Path.cwd() / "geminiAPI.txt",
+        repo_root / "geminiAPI.txt",
+        this_file.parent.parent / "geminiAPI.txt",
+        Path("/etc/secrets/geminiAPI.txt"),
+    ]
+    if project_root:
+        secret_txt_candidates.insert(0, project_root / "geminiAPI.txt")
+
+    for p in secret_txt_candidates:
         try:
             if p.is_file():
-                raw = p.read_text(encoding="utf-8").strip()
+                raw = p.read_text(encoding="utf-8").strip().strip("'\"")
                 if len(raw) >= 20:
                     _CACHED_API_KEY = raw
                     return _CACHED_API_KEY
         except Exception:
             continue
-
-    env_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if len(env_key) >= 20:
-        _CACHED_API_KEY = env_key
-        return _CACHED_API_KEY
 
     return None
 

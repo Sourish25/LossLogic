@@ -185,7 +185,7 @@ class AttackInjectionRequest(BaseModel):
     )
     source_device: Optional[str] = Field(
         default="Remote Network Device",
-        description="Identifying label for the injecting client (e.g. 'Jury iPhone 15 Pro', 'External SecOps Laptop')"
+        description="Identifying label for the injecting client (e.g. 'Executive iPhone 15 Pro', 'External SecOps Laptop')"
     )
 
     @field_validator("attack_type")
@@ -337,7 +337,7 @@ class ResetAttackResponse(BaseModel):
     success: bool = True
     status: str = "RESET_COMPLETED"
     active_attack: bool = False
-    message: str = "BharatCart demonstration environment successfully restored to nominal baseline."
+    message: str = "BharatCart simulation environment successfully restored to nominal baseline."
     baseline_eal_inr: float = 48_200_000.0
     baseline_eal: float = 48_200_000.0
     current_eal: float = 48_200_000.0
@@ -472,7 +472,7 @@ class AIExecutiveSummaryRequest(BaseModel):
     """Payload for POST /api/v1/ai/executive-summary."""
     model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
-    target_audience: Optional[str] = Field(default="jury", description="'jury', 'board', 'ciso', or 'ceo'")
+    target_audience: Optional[str] = Field(default="executive", description="'executive', 'board', 'ciso', or 'ceo'")
     audience: Optional[str] = Field(default=None, description="Alias for target_audience")
     currency: str = Field(default="INR", description="'INR' or 'USD'")
     focus_domain: Optional[str] = Field(default=None, description="Optional domain focus")

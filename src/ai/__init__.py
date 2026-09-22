@@ -153,12 +153,12 @@ class GeminiCopilot:
 
     async def executive_summary(
         self,
-        target_audience: str = "jury",
+        target_audience: str = "executive",
         currency: str = "INR",
         focus_domain: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Generates 30-second jury & board elevator briefing.
+        Generates 30-second executive & board elevator briefing.
         """
         start_t = time.perf_counter()
         curr = currency.upper().strip()

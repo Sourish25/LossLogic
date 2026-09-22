@@ -142,7 +142,7 @@ class TestDemoApiRoutes:
                 "attack_type": "ddos_surge",
                 "target_node": "BC-API-GW-01",
                 "intensity": 5.0,
-                "source_device": "Jury iPhone 15 Pro",
+                "source_device": "SecOps iPhone 15 Pro",
             },
         )
         assert resp.status_code == 200

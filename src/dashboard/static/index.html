@@ -4,13 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LossLogic — AI-Powered Continuous Cyber Risk Quantification & Investment Optimization</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 38' fill='none'%3E%3Cpath d='M 7 11 V 30 A 3 3 0 0 0 10 33 H 23' stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M 25 27 V 8 A 3 3 0 0 0 22 5 H 9' stroke='%2394a3b8' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 38' fill='none'%3E%3Cpath d='M 7 11 V 30 A 3 3 0 0 0 10 33 H 23' stroke='%234ef0a7' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M 25 27 V 8 A 3 3 0 0 0 22 5 H 9' stroke='%23a78bfa' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/dashboard.css">
+  <script>
+    (function() {
+      var known = ["dark","light","aurora","nebula","abyss","grid","ember","prism","meadow","tesseract","apex","chronos"];
+      var p = new URLSearchParams(window.location.search);
+      var t = p.get("theme") || localStorage.getItem("crq_theme") || "dark";
+      if (known.indexOf(t) === -1) t = "dark";
+      document.documentElement.setAttribute("data-theme", t);
+      var lightThemes = ["light", "meadow"];
+      document.documentElement.setAttribute("data-theme-mode", lightThemes.indexOf(t) !== -1 ? "light" : "dark");
+    })();
+  </script>
 </head>
 <body>
 
   <!-- Background LiquidGL Canvas Layer -->
   <canvas id="liquid-canvas"></canvas>
+
   <div class="ambient-vignette"></div>
 
   <!-- Main Viewport Wrapper -->
@@ -41,10 +56,6 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg>
             Technical
           </button>
-          <button class="tab-pill" data-tab="demo" id="tab-pill-demo">
-            <span class="live-radar-dot"></span>
-            Live Jury Demo
-          </button>
         </div>
 
         <!-- Currency Switcher (INR / USD) -->
@@ -52,11 +63,14 @@
           <span style="font-size:0.9rem;">₹</span> INR
         </button>
 
-        <!-- Theme Toggle (Dark / Light) -->
-        <button id="btn-theme" class="glass-btn" title="Toggle Theme (Dark / Light)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-          Dark
-        </button>
+        <!-- Theme Picker (multi-theme gallery) -->
+        <div class="theme-picker-wrap">
+          <button id="btn-theme" class="glass-btn" title="Switch Theme" aria-haspopup="menu" aria-expanded="false">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            Dark
+          </button>
+          <div id="theme-menu" class="theme-menu hidden" role="menu" aria-label="Theme gallery"></div>
+        </div>
 
         <!-- Export Report -->
         <button id="btn-export" class="glass-btn" title="Export Executive Summary (PDF / Print)">
@@ -206,58 +220,191 @@
       <!-- ================================================================= -->
       <div id="tab-executive" class="tab-content active">
 
-        <!-- Executive 5-KPI Glass Card Strip -->
-        <div class="kpi-grid">
-          <!-- KPI 1: EAL -->
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Expected Annual Loss</span>
-              <span class="kpi-badge badge-high">-12.4% MoM</span>
+        <!-- Section Header for Actuarial Solvency Matrix -->
+        <div class="section-badge-header">
+          <div class="sbh-left">
+            <div class="sbh-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
             </div>
-            <div id="kpi-eal" class="kpi-value">₹ 4.82 Cr</div>
-            <div class="kpi-subtext">Annualized financial risk exposure</div>
+            <span class="sbh-title">Executive Risk Posture & Actuarial Solvency Matrix</span>
+            <span class="sbh-badge">10,000 Monte Carlo Iterations &bull; Basel III / NIST 800-30</span>
           </div>
-
-          <!-- KPI 2: VaR 90% -->
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Value-at-Risk (90%)</span>
-              <span class="kpi-badge badge-med">1-in-10 Year</span>
-            </div>
-            <div id="kpi-var90" class="kpi-value">₹ 8.20 Cr</div>
-            <div class="kpi-subtext">10% annual exceedance threshold</div>
-          </div>
-
-          <!-- KPI 3: VaR 95% -->
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Value-at-Risk (95%)</span>
-              <span class="kpi-badge badge-high">1-in-20 Year</span>
-            </div>
-            <div id="kpi-var95" class="kpi-value">₹ 12.40 Cr</div>
-            <div class="kpi-subtext">95th percentile loss tail</div>
-          </div>
-
-          <!-- KPI 4: Solvency VaR 99% -->
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Tail Catastrophe (99%)</span>
-              <span class="kpi-badge badge-crit">Solvency Risk</span>
-            </div>
-            <div id="kpi-var99" class="kpi-value">₹ 24.10 Cr</div>
-            <div class="kpi-subtext">1-in-100 year capital solvency exposure</div>
-          </div>
-
-          <!-- KPI 5: Compliance -->
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Regulatory Posture</span>
-              <span class="kpi-badge badge-spec">5 Frameworks</span>
-            </div>
-            <div id="kpi-compliance" class="kpi-value">84.6%</div>
-            <div class="kpi-subtext">Unified compliance posture</div>
+          <div class="sbh-right">
+            <span class="sbh-indicator"><span class="sbh-dot"></span>Calibrated FAIR Model</span>
           </div>
         </div>
+
+        <!-- Executive Dynamic Risk & Security Posture HUD Strip (Single Unified 5-Card Row) -->
+        <section id="persistent-risk-hud" class="kpi-grid live-hud-grid persistent-hud-strip">
+          <!-- Dial 1: Real-Time Security Posture (0-100%) -->
+          <div class="kpi-card live-dial-card card-posture">
+            <div class="kpi-header">
+              <span class="kpi-title">
+                <svg class="kpi-icon-mini" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Live Security Posture
+              </span>
+              <span id="demo-posture-badge" class="kpi-badge badge-high">Resilient</span>
+            </div>
+            <div class="dial-display-container">
+              <div class="dial-meter-wrapper">
+                <div class="dial-ambient-glow"></div>
+                <svg class="posture-dial-svg" viewBox="0 0 120 120">
+                  <circle class="dial-track" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
+                  <circle id="posture-meter-bar" class="dial-bar" cx="60" cy="60" r="50" fill="none" stroke="#22c55e" stroke-width="10" stroke-dasharray="314.159" stroke-dashoffset="48.3"/>
+                </svg>
+                <div class="dial-meter-value">
+                  <span id="demo-posture-val">84.6</span><span class="dial-unit">%</span>
+                </div>
+              </div>
+            </div>
+            <span id="kpi-compliance" style="display:none;">84.6%</span>
+            <div class="kpi-subtext" id="demo-posture-subtext">Composite defense efficiency across active controls</div>
+            <div class="kpi-micro-indicator">
+              <span class="micro-dot green"></span> 24 Controls &bull; Zero Drift
+            </div>
+          </div>
+
+          <!-- Dial 2: Real-Time Risk Factor Gauge (0.0 - 10.0) -->
+          <div class="kpi-card live-dial-card card-risk">
+            <div class="kpi-header">
+              <span class="kpi-title">
+                <svg class="kpi-icon-mini" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Real-Time Risk Factor
+              </span>
+              <span id="demo-risk-badge" class="kpi-badge badge-med">Moderate (4.8)</span>
+            </div>
+            <div class="dial-display-container">
+              <div class="risk-factor-bar-wrapper">
+                <div class="rf-value-display">
+                  <span id="demo-rf-val">4.8</span><span class="rf-scale">/ 10.0</span>
+                </div>
+                <!-- 10-Segment LED Meter -->
+                <div class="rf-segment-meter" id="rf-segments">
+                  <span class="rf-seg active-green"></span>
+                  <span class="rf-seg active-green"></span>
+                  <span class="rf-seg active-green"></span>
+                  <span class="rf-seg active-yellow"></span>
+                  <span class="rf-seg active-yellow"></span>
+                  <span class="rf-seg"></span>
+                  <span class="rf-seg"></span>
+                  <span class="rf-seg"></span>
+                  <span class="rf-seg"></span>
+                  <span class="rf-seg"></span>
+                </div>
+                <div class="rf-bar-track">
+                  <div id="demo-rf-indicator" class="rf-bar-fill" style="width: 48%;"></div>
+                </div>
+                <div class="rf-zone-labels">
+                  <span>0 Low</span>
+                  <span>4 Mod</span>
+                  <span>7 High</span>
+                  <span>10 Crit</span>
+                </div>
+              </div>
+            </div>
+            <div class="kpi-subtext" id="demo-rf-subtext">Calibrated actuarial risk multiplier (spikes under attack)</div>
+            <div class="kpi-micro-indicator">
+              <span class="micro-dot yellow"></span> Nominal Baseline State
+            </div>
+          </div>
+
+          <!-- Metric 3: Security Upgrade Percentage (SUP %) -->
+          <div class="kpi-card live-dial-card card-sup">
+            <div class="kpi-header">
+              <span class="kpi-title">
+                <svg class="kpi-icon-mini" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                Security Upgrade % (SUP)
+              </span>
+              <span id="demo-sup-badge" class="kpi-badge badge-spec">Baseline</span>
+            </div>
+            <div class="sup-hero-row">
+              <div id="demo-sup-val" class="kpi-value">0.0%</div>
+              <div class="sup-spark-ring">
+                <svg width="34" height="34" viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="16" fill="none" stroke="var(--glass-border-subtle)" stroke-width="4"/>
+                  <circle id="sup-ring-fill" cx="20" cy="20" r="16" fill="none" stroke="#a855f7" stroke-width="4" stroke-dasharray="100.53" stroke-dashoffset="100.53" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="sup-formula-container">
+              <div class="sup-formula-text">SUP = (Risk Mitigated / Baseline EAL) &times; 100</div>
+              <div id="demo-sup-detail" class="sup-detail-text">Invest in vendors below to unlock defense upgrade</div>
+            </div>
+            <div class="kpi-subtext">Quantified security upgrade delivered per capital invested</div>
+            <div class="kpi-micro-indicator">
+              <span class="micro-dot purple"></span> Actuarial Return on Investment
+            </div>
+          </div>
+
+          <!-- Metric 4: Dynamic Loss Exposure (Live EAL) -->
+          <div class="kpi-card live-dial-card card-eal">
+            <div class="kpi-header">
+              <span class="kpi-title">
+                <svg class="kpi-icon-mini" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Current Annual Loss (EAL)
+              </span>
+              <span id="demo-eal-badge" class="kpi-badge badge-high">Nominal State</span>
+            </div>
+            <div id="demo-eal-val" class="kpi-value">₹ 4.82 Cr</div>
+            <span id="kpi-eal" style="display:none;">₹ 4.82 Cr</span>
+            
+            <!-- Mini Inline 30-Day Trend Sparkline -->
+            <div class="eal-sparkline-container">
+              <svg id="eal-sparkline-svg" class="eal-mini-sparkline" viewBox="0 0 140 24">
+                <path id="eal-sparkline-path" d="M 0 16 Q 35 12, 70 14 T 140 12" fill="none" stroke="#22c55e" stroke-width="2"/>
+                <circle id="eal-sparkline-dot" cx="140" cy="12" r="3" fill="#22c55e"/>
+              </svg>
+            </div>
+
+            <div id="demo-eal-delta" class="opt-tile-label" style="margin-top:0.2rem; color:var(--text-muted);">Baseline: ₹ 4.82 Cr</div>
+            <div class="kpi-subtext" id="demo-eal-subtext">Annualized financial cyber loss across BharatCart nodes</div>
+            <div class="kpi-micro-indicator">
+              <span class="micro-dot green"></span> Monte Carlo 100k Iterations
+            </div>
+          </div>
+
+          <!-- Metric 5: Future Immunity Shields -->
+          <div class="kpi-card live-dial-card card-shields">
+            <div class="kpi-header">
+              <span class="kpi-title">
+                <svg class="kpi-icon-mini" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Threat Shields Active
+              </span>
+              <span id="demo-shields-badge" class="kpi-badge badge-spec">Proactive</span>
+            </div>
+            <div id="demo-shields-val" class="kpi-value">5 Active</div>
+            
+            <!-- 5 Mini Interactive Shield Glyphs -->
+            <div class="shields-glyph-row" id="shields-glyph-strip">
+              <span class="shield-glyph active" title="DDoS L7 Flood Shield: Active">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                DDoS
+              </span>
+              <span class="shield-glyph active" title="Ransomware Outage Shield: Active">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Ransom
+              </span>
+              <span class="shield-glyph active" title="SQLi Data Exfil Shield: Active">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Exfil
+              </span>
+              <span class="shield-glyph active" title="Credential Stuffing Shield: Active">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Auth
+              </span>
+              <span class="shield-glyph active" title="Zero-Day Exploit Shield: Active">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Zero-Day
+              </span>
+            </div>
+
+            <div id="demo-vendors-funded" class="opt-tile-label" style="margin-top:0.3rem; color:var(--text-muted);">0 Commercial Solutions Funded</div>
+            <div class="kpi-subtext">Multi-vector shields neutralizing future cyber catastrophes</div>
+            <div class="kpi-micro-indicator">
+              <span class="micro-dot cyan"></span> Zero-Trust Defense Perimeter
+            </div>
+          </div>
+        </section>
 
         <!-- Executive Analytics Panels (2-Column Grid) -->
         <div class="analytics-grid">
@@ -271,6 +418,23 @@
                 Loss Exceedance Curve
               </div>
             </div>
+
+            <!-- Tail Exceedance Value-at-Risk Ribbon -->
+            <div class="var-tail-ribbon">
+              <div class="var-ribbon-tile">
+                <span class="var-ribbon-label">VaR (90%) 1-in-10 Yr</span>
+                <span id="kpi-var90" class="var-ribbon-val">₹ 8.20 Cr</span>
+              </div>
+              <div class="var-ribbon-tile">
+                <span class="var-ribbon-label">VaR (95%) 1-in-20 Yr</span>
+                <span id="kpi-var95" class="var-ribbon-val">₹ 12.40 Cr</span>
+              </div>
+              <div class="var-ribbon-tile tile-crit">
+                <span class="var-ribbon-label">VaR (99%) Solvency</span>
+                <span id="kpi-var99" class="var-ribbon-val">₹ 24.10 Cr</span>
+              </div>
+            </div>
+
             <div id="chart-lec" class="chart-container"></div>
           </div>
 
@@ -308,6 +472,12 @@
                 <span id="budget-display" style="color:var(--text-heading); font-weight:800;">₹ 45.00 L</span>
               </div>
               <input type="range" id="slider-budget" class="slider-input" min="500000" max="10000000" step="250000" value="4500000">
+              <div class="budget-presets-bar">
+                <button type="button" class="budget-preset-pill" data-budget="2500000">Lean ₹25L</button>
+                <button type="button" class="budget-preset-pill active" data-budget="4500000">Balanced ₹45L</button>
+                <button type="button" class="budget-preset-pill" data-budget="7500000">Growth ₹75L</button>
+                <button type="button" class="budget-preset-pill" data-budget="10000000">Fortress ₹1.0Cr</button>
+              </div>
             </div>
 
             <!-- Optimization 4-Tile Metric Strip -->
@@ -371,12 +541,66 @@
           </div>
         </div>
 
+        <!-- Column 2: CEO Vendor Selection & Benchmarking Matrix -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg>
+                </div>
+                CEO Vendor Benchmarking & Virtual Procurement
+              </div>
+              <div class="vendor-filter-pills">
+                <span class="kpi-badge badge-med" style="font-size:0.7rem;">5 Enterprise Leaders</span>
+              </div>
+            </div>
+
+            <div style="font-size:0.83rem; color:var(--text-secondary); margin-bottom:1rem; line-height:1.45;">
+              Executive decision matrix comparing commercial cybersecurity products. Click <strong>"Procure Solution"</strong> to simulate instant virtual investment, update the real-time risk factor, and unlock future threat shields.
+            </div>
+
+            <!-- Total Vendor Spend Bar -->
+            <div class="vendor-spend-summary">
+              <div class="vss-item">
+                <span class="vss-label">Virtually Allocated Spend:</span>
+                <span id="vss-total-spend" class="vss-value">₹ 0.00</span>
+              </div>
+              <div class="vss-item">
+                <span class="vss-label">Procured Solutions:</span>
+                <span id="vss-count" class="vss-value">0 / 5</span>
+              </div>
+              <div class="vss-item">
+                <span class="vss-label">Net Capital Saved:</span>
+                <span id="vss-capital-saved" class="vss-value">₹ 0.00</span>
+              </div>
+            </div>
+
+            <!-- Vendor Cards List -->
+            <div id="vendor-benchmark-cards" class="vendor-cards-list">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+
       </div>
 
       <!-- ================================================================= -->
       <!-- TAB 2: TECHNICAL SECOPS VIEW -->
       <!-- ================================================================= -->
       <div id="tab-technical" class="tab-content">
+
+        <!-- Section Header for Technical SecOps Strip -->
+        <div class="section-badge-header">
+          <div class="sbh-left">
+            <div class="sbh-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <span class="sbh-title">Cross-Domain Telemetry & Active Threat Indicators</span>
+            <span class="sbh-badge">Real-Time Sensor Feeds &bull; SIEM / EDR / CSPM / CVE / IAM</span>
+          </div>
+          <div class="sbh-right">
+            <span class="sbh-indicator"><span class="sbh-dot"></span>Live Agent Fabric</span>
+          </div>
+        </div>
 
         <!-- 5-Domain Telemetry Summary Strip -->
         <div class="kpi-grid">
@@ -516,107 +740,14 @@
           </div>
         </div>
 
-      </div>
-
-      <!-- ================================================================= -->
-      <!-- TAB 3: LIVE JURY DEMO & BHARATCART THREAT DEFENSE -->
-      <!-- ================================================================= -->
-      <div id="tab-demo" class="tab-content">
-
-        <!-- 5-Metric Strip: Live Posture Dial, Risk Factor Gauge, SUP %, Live EAL, Immunity Shields -->
-        <div class="kpi-grid">
-          <!-- Dial 1: Real-Time Security Posture (0-100%) -->
-          <div class="kpi-card live-dial-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Live Security Posture</span>
-              <span id="demo-posture-badge" class="kpi-badge badge-high">Resilient</span>
-            </div>
-            <div class="dial-display-container">
-              <div class="dial-meter-wrapper">
-                <svg class="posture-dial-svg" viewBox="0 0 120 120">
-                  <circle class="dial-track" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
-                  <circle id="posture-meter-bar" class="dial-bar" cx="60" cy="60" r="50" fill="none" stroke-width="10" stroke-dasharray="314.159" stroke-dashoffset="48.3"/>
-                </svg>
-                <div class="dial-meter-value">
-                  <span id="demo-posture-val">84.6</span><span class="dial-unit">%</span>
-                </div>
-              </div>
-            </div>
-            <div class="kpi-subtext" id="demo-posture-subtext">Composite defense efficiency across active controls</div>
-          </div>
-
-          <!-- Dial 2: Real-Time Risk Factor Gauge (0.0 - 10.0) -->
-          <div class="kpi-card live-dial-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Real-Time Risk Factor</span>
-              <span id="demo-risk-badge" class="kpi-badge badge-med">Moderate (4.8)</span>
-            </div>
-            <div class="dial-display-container">
-              <div class="risk-factor-bar-wrapper">
-                <div class="rf-value-display">
-                  <span id="demo-rf-val">4.8</span><span class="rf-scale">/ 10.0</span>
-                </div>
-                <div class="rf-bar-track">
-                  <div id="demo-rf-indicator" class="rf-bar-fill" style="width: 48%;"></div>
-                </div>
-                <div class="rf-zone-labels">
-                  <span>0 Low</span>
-                  <span>4 Mod</span>
-                  <span>7 High</span>
-                  <span>10 Crit</span>
-                </div>
-              </div>
-            </div>
-            <div class="kpi-subtext" id="demo-rf-subtext">Calibrated actuarial risk multiplier (spikes under attack)</div>
-          </div>
-
-          <!-- Metric 3: Security Upgrade Percentage (SUP %) -->
-          <div class="kpi-card live-dial-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Security Upgrade % (SUP)</span>
-              <span id="demo-sup-badge" class="kpi-badge badge-spec">Baseline</span>
-            </div>
-            <div id="demo-sup-val" class="kpi-value" style="font-size: 2.1rem; color: var(--text-heading);">0.0%</div>
-            <div class="sup-formula-container">
-              <div class="sup-formula-text">SUP = (Risk Mitigated / Baseline EAL) &times; 100</div>
-              <div id="demo-sup-detail" class="sup-detail-text">Invest in vendors below to unlock defense upgrade</div>
-            </div>
-            <div class="kpi-subtext">Quantified security upgrade delivered per capital invested</div>
-          </div>
-
-          <!-- Metric 4: Dynamic Loss Exposure (Live EAL) -->
-          <div class="kpi-card live-dial-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Current Annual Loss (EAL)</span>
-              <span id="demo-eal-badge" class="kpi-badge badge-high">Nominal State</span>
-            </div>
-            <div id="demo-eal-val" class="kpi-value">₹ 4.82 Cr</div>
-            <div id="demo-eal-delta" class="opt-tile-label" style="margin-top:0.2rem; color:var(--text-muted);">Baseline: ₹ 4.82 Cr</div>
-            <div class="kpi-subtext" id="demo-eal-subtext">Annualized financial cyber loss across BharatCart nodes</div>
-          </div>
-
-          <!-- Metric 5: Future Immunity Shields -->
-          <div class="kpi-card live-dial-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Threat Shields Active</span>
-              <span id="demo-shields-badge" class="kpi-badge badge-spec">Proactive</span>
-            </div>
-            <div id="demo-shields-val" class="kpi-value">5 Active</div>
-            <div id="demo-vendors-funded" class="opt-tile-label" style="margin-top:0.2rem; color:var(--text-muted);">0 Commercial Vendors Procured</div>
-            <div class="kpi-subtext">Multi-vector shields neutralizing future cyber catastrophes</div>
-          </div>
-        </div>
-
-        <!-- 2-Column Live Demo Sandbox Grid -->
-        <div class="analytics-grid">
-          <!-- Column 1: BharatCart Attack Simulator & Remote 2nd-Laptop Trigger -->
+        <!-- Column 1: BharatCart Attack Simulator & Remote 2nd-Laptop Trigger -->
           <div class="glass-panel">
             <div class="panel-header">
               <div class="panel-title">
                 <div class="panel-title-icon">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 </div>
-                BharatCart Multi-Laptop Attack Simulator
+                BharatCart Cyber Threat Simulator & Incident Control
               </div>
               <button id="btn-reset-demo" class="glass-btn" title="Reset BharatCart to Nominal State">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -625,29 +756,29 @@
             </div>
 
             <div style="font-size:0.83rem; color:var(--text-secondary); margin-bottom:1rem; line-height:1.45;">
-              Simulate high-impact attacks against <strong>BharatCart E-Commerce</strong> (Flipkart-scale architecture). Trigger directly from this screen or remotely from any jury laptop / mobile device via the network cURL API.
+              Simulate high-impact attacks against <strong>BharatCart E-Commerce</strong> (Flipkart-scale architecture). Trigger directly from this screen or remotely from any external workstation or mobile device via the network cURL API.
             </div>
 
             <!-- BharatCart Architecture DAG Dependency Pipeline -->
-            <div class="topology-dag-strip" style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:1rem; padding:0.75rem; background:var(--glass-bg-primary); border:1px solid var(--glass-border); border-radius:12px; font-size:0.75rem;">
-              <div class="topo-node" id="topo-BC-API-GW-01" style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.2);">
-                <span style="font-weight:600; color:var(--text-heading);">API Gateway</span>
-                <span class="topo-badge" style="font-size:0.65rem; color:#22c55e;">ONLINE</span>
+            <div class="topology-dag-strip">
+              <div class="topo-node" id="topo-BC-API-GW-01" data-target="gateway-01" title="Click to target API Gateway">
+                <span class="topo-node-name">API Gateway</span>
+                <span class="topo-badge"><span class="sbh-dot"></span>ONLINE</span>
               </div>
-              <span style="color:var(--text-muted); font-weight:700;">&rarr;</span>
-              <div class="topo-node" id="topo-BC-FLASH-SALE-01" style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.2);">
-                <span style="font-weight:600; color:var(--text-heading);">Flash Sale K8s</span>
-                <span class="topo-badge" style="font-size:0.65rem; color:#22c55e;">ONLINE</span>
+              <span class="topo-arrow">&rarr;</span>
+              <div class="topo-node" id="topo-BC-FLASH-SALE-01" data-target="k8s-order-service" title="Click to target Flash Sale K8s">
+                <span class="topo-node-name">Flash Sale K8s</span>
+                <span class="topo-badge"><span class="sbh-dot"></span>ONLINE</span>
               </div>
-              <span style="color:var(--text-muted); font-weight:700;">&rarr;</span>
-              <div class="topo-node" id="topo-BC-PAY-GW-01" style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.2);">
-                <span style="font-weight:600; color:var(--text-heading);">Payment Switch</span>
-                <span class="topo-badge" style="font-size:0.65rem; color:#22c55e;">ONLINE</span>
+              <span class="topo-arrow">&rarr;</span>
+              <div class="topo-node" id="topo-BC-PAY-GW-01" data-target="auth-vault-01" title="Click to target Payment Switch">
+                <span class="topo-node-name">Payment Switch</span>
+                <span class="topo-badge"><span class="sbh-dot"></span>ONLINE</span>
               </div>
-              <span style="color:var(--text-muted); font-weight:700;">&rarr;</span>
-              <div class="topo-node" id="topo-BC-PII-VAULT-01" style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.2);">
-                <span style="font-weight:600; color:var(--text-heading);">PII Vault DB</span>
-                <span class="topo-badge" style="font-size:0.65rem; color:#22c55e;">ONLINE</span>
+              <span class="topo-arrow">&rarr;</span>
+              <div class="topo-node" id="topo-BC-PII-VAULT-01" data-target="db-cluster-01" title="Click to target PII Vault DB">
+                <span class="topo-node-name">PII Vault DB</span>
+                <span class="topo-badge"><span class="sbh-dot"></span>ONLINE</span>
               </div>
             </div>
 
@@ -730,7 +861,7 @@
                 <button id="btn-copy-curl" class="glass-btn btn-copy-code" title="Copy cURL to Clipboard">Copy cURL</button>
               </div>
               <div class="rcb-snippet">
-                <code id="curl-command-display">curl -X POST http://localhost:8000/api/v1/demo/inject-attack -H "Content-Type: application/json" -d '{"attack_type":"DDOS_TRAFFIC_SURGE","source_device":"Jury-Laptop"}'</code>
+                <code id="curl-command-display">curl -X POST http://localhost:8000/api/v1/demo/inject-attack -H "Content-Type: application/json" -d '{"attack_type":"DDOS_TRAFFIC_SURGE","source_device":"Executive-Laptop"}'</code>
               </div>
               <div class="rcb-caption">
                 Run this command on another laptop on the network to attack BharatCart and witness real-time loss surge on this screen!
@@ -749,47 +880,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Column 2: CEO Vendor Selection & Benchmarking Matrix -->
-          <div class="glass-panel">
-            <div class="panel-header">
-              <div class="panel-title">
-                <div class="panel-title-icon">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg>
-                </div>
-                CEO Vendor Benchmarking & Virtual Procurement
-              </div>
-              <div class="vendor-filter-pills">
-                <span class="kpi-badge badge-med" style="font-size:0.7rem;">5 Enterprise Leaders</span>
-              </div>
-            </div>
-
-            <div style="font-size:0.83rem; color:var(--text-secondary); margin-bottom:1rem; line-height:1.45;">
-              Executive decision matrix comparing commercial cybersecurity products. Click <strong>"Procure Solution"</strong> to simulate instant virtual investment, update the real-time risk factor, and unlock future threat shields.
-            </div>
-
-            <!-- Total Vendor Spend Bar -->
-            <div class="vendor-spend-summary">
-              <div class="vss-item">
-                <span class="vss-label">Virtually Allocated Spend:</span>
-                <span id="vss-total-spend" class="vss-value">₹ 0.00</span>
-              </div>
-              <div class="vss-item">
-                <span class="vss-label">Procured Solutions:</span>
-                <span id="vss-count" class="vss-value">0 / 5</span>
-              </div>
-              <div class="vss-item">
-                <span class="vss-label">Net Capital Saved:</span>
-                <span id="vss-capital-saved" class="vss-value">₹ 0.00</span>
-              </div>
-            </div>
-
-            <!-- Vendor Cards List -->
-            <div id="vendor-benchmark-cards" class="vendor-cards-list">
-              <!-- Dynamically populated via JS -->
-            </div>
-          </div>
-        </div>
 
       </div>
 
@@ -866,9 +956,9 @@
     <div class="copilot-chips-container">
       <div class="copilot-chips-label">QUICK ACTIONS</div>
       <div class="copilot-chips-row">
-        <button class="copilot-chip" data-action="jury-pitch">
+        <button class="copilot-chip" data-action="executive-pitch">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          30-Sec Jury Pitch
+          30-Sec Executive Pitch
         </button>
         <button class="copilot-chip" data-action="blast-radius">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m16 10-4 4-2-2"/></svg>
@@ -912,7 +1002,6 @@
     </svg>
   </button>
 
-  <script src="/static/js/liquidGL.js"></script>
   <script src="/static/js/dashboard.js"></script>
 </body>
 </html>

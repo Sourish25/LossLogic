@@ -11,6 +11,8 @@ env/
 venv/
 .DS_Store
 Thumbs.db
+screenshot_*.png
+*.png.bak
 
 # API Keys and Secrets
 geminiAPI.txt

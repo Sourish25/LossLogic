@@ -647,7 +647,7 @@ def get_telemetry_drilldown(domain: str) -> TelemetryDrilldownResponse:
 
 
 # =========================================================================
-# Live Hackathon Demonstration REST Endpoints (R3 & R5)
+# Live Simulation & Attack Defense REST Endpoints (R3 & R5)
 # =========================================================================
 
 @router.post(
@@ -727,7 +727,7 @@ def get_demo_telemetry_ticker() -> TelemetryTickerResponse:
 @router.post(
     "/demo/reset-attack",
     response_model=ResetAttackResponse,
-    summary="Reset Live Demo State (R3)",
+    summary="Reset Live Attack Simulation State (R3)",
     description="Restores EAL, posture score, and telemetry rates to baseline nominal conditions."
 )
 def reset_demo_attack() -> ResetAttackResponse:
@@ -870,14 +870,14 @@ async def ai_navigate(request: AINavigateRequest) -> AINavigateResponse:
 @router.post(
     "/ai/executive-summary",
     response_model=AIExecutiveSummaryResponse,
-    summary="Instant 30-Second Jury & Board Briefing (R1)",
+    summary="Instant 30-Second Executive & Board Briefing (R1)",
     description="Generates concise 30-second executive elevator summary from live telemetry and optimization state."
 )
 async def ai_executive_summary(request: AIExecutiveSummaryRequest) -> AIExecutiveSummaryResponse:
     """
     Synthesizes a 30-second elevator pitch and high-impact executive takeaway bullets for presentation.
     """
-    audience = request.target_audience or request.audience or "jury"
+    audience = request.target_audience or request.audience or "executive"
     res = await _ai_copilot.executive_summary(
         target_audience=audience,
         currency=request.currency,

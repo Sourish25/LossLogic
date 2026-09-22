@@ -210,3 +210,39 @@ Integrity mode: development
 - [ ] Attack simulations (DDoS, Ransomware, SQLi, Credential Stuffing, Zero-Day CVE, Cloud IAM) dynamically trigger visual surges and terminal logs.
 - [ ] All 393+ existing tests across unit, api, invariants, and e2e continue to pass with zero regressions.
 
+## 2026-09-21T16:37:43Z
+
+Refactor and structurally overhaul LossLogic for the official SIH26 submission by sunsetting the standalone jury demo tab, promoting the 5 dynamic risk gauge cards into a persistent top-level HUD, logically redistributing the threat simulator and vendor benchmarking matrix into Technical and Executive views, and rebranding all presentation artifacts to enterprise standards.
+
+Working directory: C:\Users\Sourish\Desktop\SIH26
+Integrity mode: development
+
+## Requirements
+
+### R1. Global Persistent Live Analytics HUD
+Elevate the 5 dynamic risk metrics (Live Security Posture dial, Real-Time Risk Factor gauge, Security Upgrade Percentage SUP %, Live Annual Loss EAL, and Active Threat Shields) into a persistent, responsive executive HUD strip positioned directly beneath the continuous SOC news ticker banner, visible across all view modes.
+
+### R2. Feature Redistribution & Navigation Streamlining
+Retire the standalone "Live Jury Demo" navigation tab. Seamlessly integrate the interactive BharatCart Threat Simulator, Topology DAG, and Attack Injection controls into the Technical SecOps view, and embed the CEO Vendor Benchmarking & Virtual Procurement matrix into the Executive / Board Decision Support view.
+
+### R3. Enterprise Terminology & Showcase Rebranding
+Systematically overhaul all "jury" specific terminology (such as "Live Jury Demo", "30-Sec Jury Pitch", "Jury-Laptop", "Jury Pick") throughout HTML templates, JavaScript event handlers, CSS styling, AI Copilot chips (rebranding to "30-Sec Executive Pitch"), and API route tags/schemas to production-ready SIH26 presentation standards.
+
+### R4. Single Source of Truth & Verification Alignment
+Synchronize and eliminate drift between `src/dashboard/templates/index.html` and `src/dashboard/static/index.html` (or establish one canonical source), and update test assertions in `tests/` so that all DOM selector checks, API schemas, and feature assertions pass cleanly under the new architecture.
+
+## Acceptance Criteria
+
+### Navigation & Layout Integrity
+- [ ] The top navigation bar presents only "Executive" and "Technical" segmented views; the "Live Jury Demo" tab is fully removed.
+- [ ] The 5 dynamic gauge cards render persistently across both tabs beneath the SOC ticker with SVG circular dials, risk bars, and live value updates.
+- [ ] The BharatCart Threat Simulator and Topology DAG render and operate correctly within the Technical SecOps tab.
+- [ ] The CEO Vendor Benchmarking Matrix renders and allows one-click virtual procurement within the Executive tab.
+
+### Terminology & AI Copilot
+- [ ] Zero user-facing "jury" labels remain in the UI, button chips, modal text, or Copilot prompts (e.g. Copilot chip displays "30-Sec Executive Pitch").
+- [ ] Fallback and Gemini AI Copilot executive briefings generate clean, professional executive summaries without jury-specific framing.
+
+### Quality & Test Suite Health
+- [ ] All automated test suites (`tests/unit/`, `tests/api/`, `tests/e2e/`, `tests/adversarial/`) pass or are appropriately updated to match the refined selectors and route tags.
+- [ ] Responsive dark/light theme styling, Liquid GL canvas background, and currency toggles remain completely intact and visually polished.

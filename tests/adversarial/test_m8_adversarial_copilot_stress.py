@@ -216,7 +216,7 @@ def test_ai_navigate_adversarial_inputs():
         assert res_ws.status_code == 200
         data_ws = res_ws.json()
         AINavigateResponse.model_validate(data_ws)
-        assert data_ws["target_tab"] in ("executive", "demo", "technical", "optimize")
+        assert data_ws["target_tab"] in ("executive", "technical", "optimize")
 
         # C. Extreme numbers in commands
         extreme_commands = [
@@ -285,7 +285,7 @@ def test_ai_executive_summary_adversarial_inputs():
 
         # B. Currency handling
         for curr in ["INR", "USD", "inr", "usd", "InR", "EUR", "JPY"]:
-            res = client.post("/api/v1/ai/executive-summary", json={"target_audience": "jury", "currency": curr})
+            res = client.post("/api/v1/ai/executive-summary", json={"target_audience": "executive", "currency": curr})
             assert res.status_code == 200
             AIExecutiveSummaryResponse.model_validate(res.json())
 
@@ -340,7 +340,7 @@ def test_offline_fallback_resilience_matrix():
                 assert d_chat["model_used"] == "local-heuristic-fallback"
 
                 # 2. Executive Summary
-                res_sum = client.post("/api/v1/ai/executive-summary", json={"target_audience": "jury"})
+                res_sum = client.post("/api/v1/ai/executive-summary", json={"target_audience": "executive"})
                 assert res_sum.status_code == 200, f"Executive summary failed under {name}: {res_sum.text}"
                 d_sum = res_sum.json()
                 AIExecutiveSummaryResponse.model_validate(d_sum)

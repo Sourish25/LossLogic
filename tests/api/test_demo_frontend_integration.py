@@ -31,8 +31,10 @@ class TestDemoFrontendIntegration:
         assert resp.status_code == 200
         html = resp.text
 
-        # 1. Navigation & Ticker
-        assert 'data-tab="demo"' in html
+        # 1. Navigation & Ticker (2-Tab Segmented Navigation)
+        assert 'data-tab="executive"' in html
+        assert 'data-tab="technical"' in html
+        assert 'data-tab="demo"' not in html
         assert 'id="soc-ticker-banner"' in html
         assert 'id="ticker-eps"' in html
         assert 'id="ticker-tef"' in html
@@ -44,10 +46,13 @@ class TestDemoFrontendIntegration:
         assert 'id="aab-loss-surge"' in html
         assert 'id="btn-alert-mitigate"' in html
 
-        # 3. Tab 3 Live Jury Demo View
-        assert 'id="tab-demo"' in html
+        # 3. Standalone Live Jury Demo Tab is Sunsetted
+        assert 'id="tab-demo"' not in html
+        assert 'id="tab-executive"' in html
+        assert 'id="tab-technical"' in html
 
-        # 4. Live Risk & Posture Dials + SUP %
+        # 4. Global Persistent Live Analytics HUD (Visible Across Views)
+        assert ('id="persistent-risk-hud"' in html or 'id="persistent-hud"' in html or 'persistent-hud-strip' in html)
         assert 'id="posture-meter-bar"' in html
         assert 'id="demo-posture-val"' in html
         assert 'id="demo-rf-val"' in html
@@ -57,8 +62,8 @@ class TestDemoFrontendIntegration:
         assert 'id="demo-eal-val"' in html
         assert 'id="demo-shields-val"' in html
 
-        # 5. BharatCart Attack Simulator & Remote cURL Box
-        assert 'BharatCart Multi-Laptop Attack Simulator' in html
+        # 5. BharatCart Attack Simulator & Remote cURL Box (Embedded in Technical SecOps View)
+        assert ('BharatCart Threat Simulator' in html or 'BharatCart Cyber Threat Simulator' in html or 'BharatCart Multi-Laptop Attack Simulator' in html)
         assert 'id="demo-target-node"' in html
         assert 'data-attack="DDOS_TRAFFIC_SURGE"' in html
         assert 'data-attack="RANSOMWARE_OUTAGE"' in html
@@ -69,7 +74,7 @@ class TestDemoFrontendIntegration:
         assert 'id="demo-terminal-feed"' in html
         assert 'id="btn-reset-demo"' in html
 
-        # 6. CEO Vendor Benchmarking Grid
+        # 6. CEO Vendor Benchmarking Grid (Embedded in Executive View)
         assert 'CEO Vendor Benchmarking & Virtual Procurement' in html
         assert 'id="vss-total-spend"' in html
         assert 'id="vss-count"' in html
@@ -80,6 +85,10 @@ class TestDemoFrontendIntegration:
         assert 'id="modal-vendor-name"' in html
         assert 'id="modal-shields-grid"' in html
         assert 'id="btn-modal-procure"' in html
+
+        # 8. Rebranded Executive Copilot Chip
+        assert '30-Sec Executive Pitch' in html
+        assert '30-Sec Jury Pitch' not in html
 
     def test_static_css_includes_live_demo_styles(self, client: TestClient):
         """Ensure dashboard.css includes styling rules for live demo components."""
@@ -124,7 +133,7 @@ class TestDemoFrontendIntegration:
             "attack_type": "DDOS_TRAFFIC_SURGE",
             "target_node": "gateway-01",
             "intensity": 1.0,
-            "source_device": "Jury-Remote-MacBook"
+            "source_device": "Remote-SecOps-Laptop"
         }
         inj_resp = client.post("/api/v1/demo/inject-attack", json=payload)
         assert inj_resp.status_code == 200

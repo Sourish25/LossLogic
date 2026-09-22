@@ -12,7 +12,7 @@
 
 LossLogic bridges the fundamental communication chasm between technical SecOps telemetry and executive fiduciary decision-making through rigorous actuarial quantification (FAIR Monte Carlo simulation) and mathematical capital allocation (SciPy HiGHS MILP 0/1 knapsack solver). 
 
-For the Live Jury Hackathon Demonstration, five mission-critical capabilities (R1 through R5) and an invariant-preserving verification track (R6) have been added:
+For the SIH26 Enterprise Showcase Demonstration, five mission-critical capabilities (R1 through R5) and an invariant-preserving verification track (R6) have been added:
 1. **R1: Live Virtual Investment Impact Visualizer & Security Factor Gauge** (<50ms latency, dual-currency ₹/$ side-by-side exposure and Net Capital Saved).
 2. **R2: Future Problem-Solving Capabilities & Multi-Threat Immunity Matrix** (5 canonical threat vectors, structured `future_threat_shields`, and protective mechanisms).
 3. **R3: Live E-Commerce ("BharatCart") Multi-Device Attack Injection & Dynamic Telemetry** (unauthenticated `POST /api/v1/demo/inject-attack`, TEF/EAL surges, posture degradation, and continuous background telemetry ticker).
@@ -79,12 +79,12 @@ The test suite is structured into four distinct, hierarchically escalating tiers
     5. **R3 + R4:** Live attack surge expands total exposure, dynamically altering the denominator for subsequent SUP % calculations.
     6. **R5 + R6:** Successive virtual purchases strictly respect the cumulative budget ceiling and maintain $\text{VaR}_{90} < \text{VaR}_{95} < \text{VaR}_{99}$.
 
-### Tier 4: Real-World Application Scenarios (End-to-End Hackathon Journey)
-- **Objective:** Simulate the complete hackathon jury presentation workflow from start to finish.
+### Tier 4: Real-World Application Scenarios (End-to-End Enterprise Showcase Journey)
+- **Objective:** Simulate the complete enterprise showcase presentation workflow from start to finish.
 - **Scenario Breakdown:**
   1. **Scenario 4.1: BharatCart Festive Sale DDoS Assault & Cloudflare Edge Mitigation**
      - Initial State: BharatCart API Gateway & Flash Sale Microservice operating under nominal baseline.
-     - Action 1: External jury mobile device triggers Layer 7 DDoS Surge at intensity 8.5 via unauthenticated REST endpoint.
+     - Action 1: External evaluator mobile device triggers Layer 7 DDoS Surge at intensity 8.5 via unauthenticated REST endpoint.
      - Verification: Threat Event Frequency quadruples, EAL surges by $> ₹3.5\text{ Cr}$, Posture score drops into Crimson ($<50\%$), and Cloudflare WAF is recommended.
      - Action 2: Executive clicks 1-Click Virtual Purchase for Cloudflare WAF.
      - Verification: DDoS immunity (99.4%) mitigates surge, Posture recovers to Guarded/Resilient ($>75\%$), SUP % increases, spend deducted correctly.

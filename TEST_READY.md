@@ -24,7 +24,7 @@ The comprehensive, opaque-box, requirement-driven automated test suite for the L
 
 ## 2. 4-Tier Test Architecture & Coverage Summary
 
-The test suite enforces a rigorous 4-tier testing hierarchy guaranteeing that every feature is tested in isolation, stressed at its boundaries, validated across pairwise interactions, and proven in holistic real-world hackathon jury demonstration scenarios.
+The test suite enforces a rigorous 4-tier testing hierarchy guaranteeing that every feature is tested in isolation, stressed at its boundaries, validated across pairwise interactions, and proven in holistic real-world enterprise showcase demonstration scenarios.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -49,7 +49,7 @@ The test suite enforces a rigorous 4-tier testing hierarchy guaranteeing that ev
 | **Tier 1** | `@pytest.mark.tier1` | **30 tests** | Isolated nominal feature verification (5 tests each for R1 through R6). Validates latency SLA (<50ms), 5 canonical threat vectors, attack injection contracts, SUP % formula, 5-vendor CEO matrix, and core mathematical invariants. | **PASSED (30/30)** |
 | **Tier 2** | `@pytest.mark.tier2` | **30 tests** | Boundary and corner cases (5 tests each for R1 through R6). Validates zero budget ($0 / ₹0), surplus budget (₹100 Cr), zero baseline exposure, over-mitigation capping (100%), intensity out-of-bounds rejection (422), invalid attack types (422), duplicate purchase idempotency, and catastrophic breach stability. | **PASSED (30/30)** |
 | **Tier 3** | `@pytest.mark.tier3` | **10 tests** | Cross-feature pairwise interactions: slider manipulation updating SUP % synchronously, attack injection immediately degrading visualizer posture gauge, attack-to-countermeasure-to-virtual-purchase workflow, vendor catalog R2 shield compliance, and Pareto diminishing returns preservation. | **PASSED (10/10)** |
-| **Tier 4** | `@pytest.mark.tier4` | **5 tests** | Real-world multi-step enterprise demonstration scenarios: BharatCart festive sale Layer-7 DDoS assault and Cloudflare mitigation, Payment Gateway ransomware infection and CrowdStrike isolation, Customer PII Vault SQL leak containment via Wiz CSPM, concurrent multi-device attack barrage, and full jury demonstration presentation lifecycle. | **PASSED (5/5)** |
+| **Tier 4** | `@pytest.mark.tier4` | **5 tests** | Real-world multi-step enterprise demonstration scenarios: BharatCart festive sale Layer-7 DDoS assault and Cloudflare mitigation, Payment Gateway ransomware infection and CrowdStrike isolation, Customer PII Vault SQL leak containment via Wiz CSPM, concurrent multi-device attack barrage, and full showcase demonstration presentation lifecycle. | **PASSED (5/5)** |
 | **Total** | `@pytest.mark.e2e` | **75 tests** | **Complete Live Hackathon Capabilities Suite** | **PASSED (75/75)** |
 
 ---
