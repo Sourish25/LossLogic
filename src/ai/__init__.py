@@ -28,6 +28,15 @@ from src.ai.fallback import (
     fallback_navigate,
 )
 from src.ai.grounding import build_grounded_system_prompt, get_live_platform_metrics
+from src.ai.xai import (
+    AISummaryResult,
+    CounterfactualExplanation,
+    DecisionTraceStep,
+    FeatureAttribution,
+    XAIEngine,
+    XAIExplanationResult,
+    get_xai_engine,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -236,4 +245,12 @@ __all__ = [
     "interpret_navigation_command",
     "is_gemini_available",
     "resolve_api_key",
+    # Explainable AI (XAI)
+    "AISummaryResult",
+    "CounterfactualExplanation",
+    "DecisionTraceStep",
+    "FeatureAttribution",
+    "XAIEngine",
+    "XAIExplanationResult",
+    "get_xai_engine",
 ]

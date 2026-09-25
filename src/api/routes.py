@@ -34,8 +34,12 @@ from src.api.schemas import (
     AINavigateResponse,
     AIExecutiveSummaryRequest,
     AIExecutiveSummaryResponse,
+    XAIExplainRequest,
+    XAIExplainResponse,
+    AISummarizeRequest,
+    AISummarizeResponse,
 )
-from src.ai import get_copilot
+from src.ai import get_copilot, get_xai_engine
 from src.compliance.catalog import get_all_frameworks, get_framework_controls_as_dicts
 from src.compliance.mapper import ComplianceMapper
 from src.compliance.scoring import ComplianceScorer
@@ -69,6 +73,7 @@ _opt_solver = OptimizationSolver()
 _quant_engine = MonteCarloEngine(iterations=3000, seed=42)
 _demo_state_manager = DemoAttackStateManager()
 _ai_copilot = get_copilot()
+_xai_engine = get_xai_engine()
 
 # Canonical enterprise mock data for immediate instant responses
 CANONICAL_CONTROLS = [
@@ -884,5 +889,65 @@ async def ai_executive_summary(request: AIExecutiveSummaryRequest) -> AIExecutiv
         focus_domain=request.focus_domain,
     )
     return AIExecutiveSummaryResponse(**res)
+
+
+@router.post(
+    "/ai/xai-explain",
+    response_model=XAIExplainResponse,
+    summary="Explainable AI (XAI) Model Transparency & Root-Cause Attribution",
+    description="Interpretive layer wrapping continuous risk quantification models (Open FAIR, MILP, DAG) using Google Gemini 3.5 Flash Lite."
+)
+async def ai_xai_explain(request: XAIExplainRequest) -> XAIExplainResponse:
+    """
+    Solves the 'black box' problem by generating human-readable explanations,
+    SHAP-style feature attributions, causal decision traces, and counterfactuals.
+    """
+    res = await _xai_engine.explain(
+        query=request.query,
+        mode=request.mode,
+        asset_id=request.asset_id,
+        currency=request.currency,
+    )
+    return XAIExplainResponse(
+        headline=res.headline,
+        plain_text_explanation=res.plain_text_explanation,
+        narrative=res.narrative,
+        executive_summary=res.executive_summary,
+        feature_attributions=[attr.model_dump() for attr in res.feature_attributions],
+        decision_trace=[step.model_dump() for step in res.decision_trace],
+        counterfactual=res.counterfactual.model_dump(),
+        transparency_score=res.transparency_score,
+        model_used=res.model_used,
+        offline_fallback=res.offline_fallback,
+        execution_time_ms=res.execution_time_ms,
+    )
+
+
+@router.post(
+    "/ai/summarize",
+    response_model=AISummarizeResponse,
+    summary="Multi-Tier AI Risk Summarizer Powered by Gemini 3.5 Flash Lite",
+    description="Synthesizes board, CISO, and executive elevator summaries grounded in live telemetry."
+)
+async def ai_summarize(request: AISummarizeRequest) -> AISummarizeResponse:
+    """
+    Generates structured executive and technical risk summaries.
+    """
+    res = await _xai_engine.summarize(
+        target_audience=request.target_audience,
+        scope=request.scope,
+        currency=request.currency,
+    )
+    return AISummarizeResponse(
+        headline=res.headline,
+        summary_30s=res.summary_30s,
+        key_findings=res.key_findings,
+        monetary_breakdown=res.monetary_breakdown,
+        prioritized_actions=res.prioritized_actions,
+        model_used=res.model_used,
+        offline_fallback=res.offline_fallback,
+        execution_time_ms=res.execution_time_ms,
+    )
+
 
 

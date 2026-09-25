@@ -1834,6 +1834,172 @@ main.main-viewport {
 }
 
 /* -----------------------------------------------------------------------------
+   Explainable AI (XAI) & Model Transparency Layer (Clean & Compact)
+   ----------------------------------------------------------------------------- */
+.xai-card {
+  background: var(--glass-bg-input);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.xai-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.55rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--glass-border-subtle);
+}
+
+.xai-card-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.xai-tab-strip {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+  margin: 0.75rem 0 0.65rem 0;
+}
+
+.xai-tab-btn {
+  all: unset;
+  flex: 1;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer !important;
+  user-select: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.xai-tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.xai-tab-btn.active {
+  color: var(--text-heading);
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.xai-tab-pane {
+  display: none !important;
+}
+
+.xai-tab-pane.active {
+  display: block !important;
+}
+
+.xai-drivers-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.5rem 0;
+}
+
+.xai-driver-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 45px;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.74rem;
+  color: var(--text-primary);
+}
+
+.xai-driver-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xai-driver-pct {
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.xai-bar-mini-track {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.xai-bar-mini-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #60a5fa, #38bdf8);
+}
+
+.xai-bar-mini-fill.fill-high {
+  background: linear-gradient(90deg, #f87171, #fb923c);
+}
+
+.xai-bar-mini-fill.fill-protective {
+  background: linear-gradient(90deg, #34d399, #10b981);
+}
+
+.xai-callout {
+  margin-top: 0.6rem;
+  padding: 0.45rem 0.65rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.xai-callout strong {
+  color: #34d399;
+}
+
+.xai-trace-list-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.5rem 0;
+}
+
+.xai-trace-item-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.74rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.xai-meta-footer {
+  margin-top: 0.7rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--glass-border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+/* -----------------------------------------------------------------------------
    Interactive What-If Control Switches & Sliders
    ----------------------------------------------------------------------------- */
 .whatif-control-list {

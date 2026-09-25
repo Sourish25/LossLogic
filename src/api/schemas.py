@@ -516,3 +516,93 @@ class AIExecutiveSummaryResponse(BaseModel):
         if self.summary is None:
             self.summary = self.elevator_pitch_30s
 
+
+# --- Explainable AI (XAI) & Model Transparency Schemas ---
+
+
+class FeatureAttributionItem(BaseModel):
+    """Normalized feature importance metric."""
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+
+    feature_name: str
+    weight_pct: float = Field(..., ge=0.0, le=100.0)
+    impact: str = Field(default="HIGH_RISK")
+    raw_value: str = Field(default="")
+    description: str = Field(default="")
+
+
+class DecisionTraceStepItem(BaseModel):
+    """Step in the causal decision trace path."""
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+
+    step_number: int
+    stage: str
+    factor: str
+    observation: str
+    formula_or_model: str
+
+
+class CounterfactualItem(BaseModel):
+    """Counterfactual sensitivity explanation."""
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+
+    intervention: str
+    target_asset_or_cve: str
+    baseline_eal: str
+    counterfactual_eal: str
+    net_risk_reduction: str
+    expected_roi_pct: float = Field(default=0.0)
+    feasibility: str = Field(default="Immediate")
+
+
+class XAIExplainRequest(BaseModel):
+    """Payload for POST /api/v1/ai/xai-explain."""
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+
+    query: str = Field(default="Explain why Core Banking DB is our highest risk", min_length=1)
+    mode: str = Field(default="xai_deep_dive", description="'xai_deep_dive', 'attribution', 'summary', or 'counterfactual'")
+    asset_id: Optional[str] = Field(default=None, description="Optional target asset identifier")
+    cve_id: Optional[str] = Field(default=None, description="Optional target CVE identifier")
+    currency: str = Field(default="INR", description="'INR' or 'USD'")
+
+
+class XAIExplainResponse(BaseModel):
+    """Response payload for POST /api/v1/ai/xai-explain."""
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+
+    headline: str = Field(...)
+    plain_text_explanation: str = Field(...)
+    narrative: str = Field(...)
+    executive_summary: str = Field(...)
+    feature_attributions: List[FeatureAttributionItem] = Field(default_factory=list)
+    decision_trace: List[DecisionTraceStepItem] = Field(default_factory=list)
+    counterfactual: Dict[str, Any] = Field(default_factory=dict)
+    transparency_score: float = Field(default=98.5)
+    model_used: str = Field(default="gemini-3.5-flash-lite")
+    offline_fallback: bool = Field(default=False)
+    execution_time_ms: float = Field(default=0.0)
+
+
+class AISummarizeRequest(BaseModel):
+    """Payload for POST /api/v1/ai/summarize."""
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+
+    target_audience: str = Field(default="board", description="'board', 'ciso', 'executive', or 'regulator'")
+    scope: str = Field(default="enterprise", description="'enterprise', 'crown_jewels', or 'compliance'")
+    currency: str = Field(default="INR", description="'INR' or 'USD'")
+
+
+class AISummarizeResponse(BaseModel):
+    """Response payload for POST /api/v1/ai/summarize."""
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+
+    headline: str = Field(...)
+    summary_30s: str = Field(...)
+    key_findings: List[str] = Field(default_factory=list)
+    monetary_breakdown: Dict[str, Any] = Field(default_factory=dict)
+    prioritized_actions: List[str] = Field(default_factory=list)
+    model_used: str = Field(default="gemini-3.5-flash-lite")
+    offline_fallback: bool = Field(default=False)
+    execution_time_ms: float = Field(default=0.0)
+
+

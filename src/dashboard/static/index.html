@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/dashboard.css?v=xai_tabs_v3">
   <script>
     (function() {
       var known = ["dark","light","aurora","nebula","abyss","grid","ember","prism","meadow","tesseract","apex","chronos"];
@@ -504,29 +504,96 @@
             <div id="chart-frontier" class="chart-container" style="height:170px;"></div>
           </div>
 
-          <!-- Panel 4: AI Decision Support & Natural Language Query (NLQ) -->
-          <div class="glass-panel">
+          <!-- Panel 4: Explainable AI (XAI) & Model Transparency -->
+          <div class="glass-panel" id="panel-xai">
             <div class="panel-header">
               <div class="panel-title">
                 <div class="panel-title-icon">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
                 </div>
-                Decision Support
+                Explainable AI (XAI)
               </div>
+              <span class="kpi-badge badge-med" style="font-size:0.7rem;">Gemini 3.5 Flash Lite</span>
             </div>
 
             <div class="nlq-container">
               <div class="nlq-input-wrapper">
                 <svg class="nlq-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" id="nlq-input" class="nlq-input" placeholder="Ask a financial cyber risk question..." value="What is our highest financial cyber risk today?">
+                <input type="text" id="nlq-input" class="nlq-input" placeholder="Ask Gemini to explain model predictions or summarize..." value="What is our highest financial cyber risk today?">
               </div>
-              <button id="btn-nlq" class="btn-primary">Ask AI</button>
+              <button id="btn-nlq" class="btn-primary" title="Query Explainable AI Engine">Ask Gemini</button>
             </div>
 
             <!-- Structured AI Result Box -->
             <div id="nlq-result" class="nlq-result">
-              <div style="margin-bottom:0.45rem;"><strong>Intent Detected:</strong> <span class="nlq-highlight">HIGHEST_RISK</span> (Confidence: 95%)</div>
-              <div>Our highest financial cyber exposure resides in <strong>Core Banking PostgreSQL Primary (asset-core-db-01)</strong>, contributing <strong>₹ 1.85 Cr</strong> in Expected Annual Loss due to critical vulnerability CVE-2023-34362. Prioritized patch deployment is urgently advised.</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem;">
+                <div><strong>Focus:</strong> <span class="nlq-highlight">Core Banking (asset-core-db-01)</span></div>
+                <span class="kpi-badge badge-low" style="font-size:0.65rem;">98% Transparent</span>
+              </div>
+              <div style="line-height:1.55; margin-bottom:0.5rem;">
+                Our highest financial cyber exposure resides in <strong>Core Banking PostgreSQL Primary</strong>, contributing <strong>₹ 1.85 Cr</strong> in Expected Annual Loss due to critical vulnerability <strong>CVE-2023-34362 (CVSS 9.8)</strong>.
+              </div>
+
+              <!-- Segmented View Switcher -->
+              <div class="xai-tab-strip">
+                <button type="button" class="xai-tab-btn active" data-tab="drivers" onclick="switchXAITab('drivers')">Risk Drivers (SHAP)</button>
+                <button type="button" class="xai-tab-btn" data-tab="trace" onclick="switchXAITab('trace')">Decision Trace</button>
+                <button type="button" class="xai-tab-btn" data-tab="summary" onclick="switchXAITab('summary')">Board Summary</button>
+              </div>
+
+              <!-- Tab: Drivers -->
+              <div id="xai-pane-drivers" class="xai-tab-pane active">
+                <div class="xai-drivers-compact">
+                  <div class="xai-driver-row">
+                    <span class="xai-driver-name" title="Vulnerability Weaponization">Exploitability (CVSS 9.8)</span>
+                    <div class="xai-bar-mini-track"><div class="xai-bar-mini-fill fill-high" style="width:38.5%;"></div></div>
+                    <span class="xai-driver-pct">38.5%</span>
+                  </div>
+                  <div class="xai-driver-row">
+                    <span class="xai-driver-name" title="Asset Criticality Tier">Asset Tier-1 PII</span>
+                    <div class="xai-bar-mini-track"><div class="xai-bar-mini-fill fill-high" style="width:28.0%;"></div></div>
+                    <span class="xai-driver-pct">28.0%</span>
+                  </div>
+                  <div class="xai-driver-row">
+                    <span class="xai-driver-name" title="Threat Event Frequency">Threat Probes (12.4/yr)</span>
+                    <div class="xai-bar-mini-track"><div class="xai-bar-mini-fill" style="width:21.5%;"></div></div>
+                    <span class="xai-driver-pct">21.5%</span>
+                  </div>
+                  <div class="xai-driver-row">
+                    <span class="xai-driver-name" title="Lateral Blast Radius">Blast Radius (4 svcs)</span>
+                    <div class="xai-bar-mini-track"><div class="xai-bar-mini-fill" style="width:12.0%;"></div></div>
+                    <span class="xai-driver-pct">12.0%</span>
+                  </div>
+                </div>
+                <div class="xai-callout">
+                  ✦ <strong>Counterfactual:</strong> Automated Patching (CTRL-PATCH) reduces EAL by <strong>84%</strong> (-₹ 1.55 Cr, 222% ROSI).
+                </div>
+              </div>
+
+              <!-- Tab: Trace -->
+              <div id="xai-pane-trace" class="xai-tab-pane">
+                <div class="xai-trace-list-compact">
+                  <div class="xai-trace-item-compact"><strong>1. Telemetry:</strong> Ingested sensor probing on PostgreSQL port 5432.</div>
+                  <div class="xai-trace-item-compact"><strong>2. Exploit:</strong> CVE-2023-34362 unauthenticated RCE overcomes WAF (LEF 8.5/yr).</div>
+                  <div class="xai-trace-item-compact"><strong>3. Blast:</strong> Cascades to BharatCart Checkout and Payment Gateway.</div>
+                  <div class="xai-trace-item-compact"><strong>4. Loss:</strong> 10k Monte Carlo trials converge at ₹ 1.85 Cr EAL.</div>
+                </div>
+              </div>
+
+              <!-- Tab: Summary -->
+              <div id="xai-pane-summary" class="xai-tab-pane">
+                <div style="font-size:0.77rem; line-height:1.5; padding:0.25rem 0;">
+                  Enterprise cyber exposure stands at <strong>₹ 1.85 Cr EAL</strong> with 95% tail risk at <strong>₹ 3.42 Cr</strong>. Concentrated in Core Banking. Allocating <strong>₹ 45 Lakhs</strong> budget achieves <strong>₹ 1.45 Cr</strong> verified risk reduction.
+                </div>
+              </div>
+
+              <!-- Mini Footer -->
+              <div class="xai-meta-footer">
+                <span>Model: Gemini 3.5 Flash Lite Grounded</span>
+                <span>Open FAIR + HiGHS MILP</span>
+              </div>
             </div>
 
             <!-- Prompt Suggestions -->
@@ -1002,6 +1069,6 @@
     </svg>
   </button>
 
-  <script src="/static/js/dashboard.js"></script>
+  <script src="/static/js/dashboard.js?v=xai_tabs_v3"></script>
 </body>
 </html>
