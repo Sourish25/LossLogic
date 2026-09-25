@@ -921,6 +921,8 @@
     optResidual: document.getElementById("opt-residual"),
     optRosi: document.getElementById("opt-rosi"),
     chartFrontier: document.getElementById("chart-frontier"),
+    optControlsChips: document.getElementById("opt-controls-chips"),
+    optControlsCount: document.getElementById("opt-controls-count"),
     nlqInput: document.getElementById("nlq-input"),
     btnNlq: document.getElementById("btn-nlq"),
     nlqResult: document.getElementById("nlq-result"),
@@ -1322,7 +1324,7 @@
   /**
    * Render Pareto Frontier Chart (True Convex Knapsack Frontier)
    */
-  function renderFrontier(spend, mitigated) {
+  function renderFrontier(spend, mitigated, budget = null) {
     if (!els.chartFrontier) return;
     const width = 480;
     const height = 180;
@@ -1372,9 +1374,18 @@
     const last = coords[coords.length - 1];
     const areaD = pathD + ` L ${last.x.toFixed(1)} ${(height - padY).toFixed(1)} L ${first.x.toFixed(1)} ${(height - padY).toFixed(1)} Z`;
 
-    const curX = padX + (Math.min(spend, maxB) / maxB) * (width - 2 * padX);
+    const alloc = (budget !== null && !isNaN(budget)) ? budget : spend;
+    const curX = padX + (Math.min(alloc, maxB) / maxB) * (width - 2 * padX);
     const curY = height - padY - (Math.min(mitigated, maxR) / maxR) * (height - 2 * padY);
     const frontierGradOpacity = c.isLight ? 0.07 : 0.15;
+
+    const isSurplus = budget !== null && budget > spend;
+    const surplusAmount = isSurplus ? (budget - spend) : 0;
+    const spendX = padX + (Math.min(spend, maxB) / maxB) * (width - 2 * padX);
+    const showSurplusLabel = isSurplus && (curX - spendX > 32);
+    const tooltipText = isSurplus
+      ? `Budget: ${formatMoney(budget)} (Surplus: ${formatMoney(surplusAmount)}) • Risk Reduced: ${formatMoney(mitigated)}`
+      : `Spend: ${formatMoney(spend)} • Risk Reduced: ${formatMoney(mitigated)}`;
 
     els.chartFrontier.innerHTML = `
       <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%; overflow:visible;">
@@ -1391,9 +1402,14 @@
         <path d="${areaD}" fill="url(#frontierGrad)" />
         <path d="${pathD}" fill="none" stroke="${c.frontierCurve}" stroke-width="2" stroke-linecap="round"/>
 
-        <g class="frontier-node" style="cursor:pointer;" data-tooltip="Spend: ${formatMoney(spend)} • Risk Reduced: ${formatMoney(mitigated)}">
-          <circle cx="${curX}" cy="${curY}" r="12" fill="${c.nodeRingFill}" stroke="${c.nodeRingStroke}" stroke-width="1"/>
-          <circle cx="${curX}" cy="${curY}" r="5" fill="${c.nodeFill}" stroke="${c.nodeStroke}" stroke-width="1.5">
+        ${isSurplus ? `
+          <line x1="${spendX.toFixed(1)}" y1="${curY.toFixed(1)}" x2="${curX.toFixed(1)}" y2="${curY.toFixed(1)}" stroke="${c.frontierCurve}" stroke-width="3" stroke-dasharray="4 3" opacity="0.95"/>
+          ${showSurplusLabel ? `<text x="${((spendX + curX) / 2).toFixed(1)}" y="${(curY - 8).toFixed(1)}" fill="${c.textColor}" font-size="8.5" font-weight="700" text-anchor="middle" opacity="0.85">Surplus (+${formatMoney(surplusAmount)})</text>` : ''}
+        ` : ''}
+
+        <g class="frontier-node" style="cursor:pointer;" data-tooltip="${tooltipText}">
+          <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="12" fill="${c.nodeRingFill}" stroke="${c.nodeRingStroke}" stroke-width="1"/>
+          <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="5" fill="${c.nodeFill}" stroke="${c.nodeStroke}" stroke-width="1.5">
             <animate attributeName="r" values="4.5;6;4.5" dur="2.2s" repeatCount="indefinite"/>
           </circle>
         </g>
@@ -1417,10 +1433,13 @@
     let mitigated = 0.0;
     const sorted = [...defaultData.controls].sort((a, b) => (b.eff / b.costInr) - (a.eff / a.costInr));
 
+    const fundedControls = [];
+
     sorted.forEach(c => {
       if (spend + c.costInr <= budget) {
         spend += c.costInr;
         mitigated += (defaultData.totalEalInr * 0.28) * c.eff;
+        fundedControls.push(c);
       }
     });
 
@@ -1443,6 +1462,31 @@
     if (els.optResidual) els.optResidual.textContent = formatMoney(residual);
     if (els.optRosi) els.optRosi.textContent = `${rosi.toFixed(1)}%`;
 
+    if (els.optControlsChips) {
+      els.optControlsChips.innerHTML = sorted.map(ctrl => {
+        const isFunded = fundedControls.some(fc => fc.id === ctrl.id);
+        const badgeClass = isFunded ? "chip-funded" : "chip-unfunded";
+        const icon = isFunded ? "✓" : "✗";
+        const shortName = ctrl.name.replace(" Automated", "").replace(" Next-Gen", "").replace(" Cloud", "");
+        return `
+          <div class="opt-chip ${badgeClass}" title="${ctrl.name} (${(ctrl.eff * 100).toFixed(0)}% Eff) - ${formatMoney(ctrl.costInr)}">
+            <span class="chip-status">${icon}</span>
+            <span class="chip-title">${shortName}</span>
+            <span class="chip-cost">${formatMoney(ctrl.costInr)}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    if (els.optControlsCount) {
+      if (budget > totalControlCost) {
+        const surplus = budget - spend;
+        els.optControlsCount.innerHTML = `<span style="color:var(--accent); font-weight:700;">${fundedControls.length} of ${sorted.length} Funded (100%)</span> <span style="margin:0 4px; color:var(--glass-border);">•</span> <span style="color:var(--text-muted);">Surplus: ${formatMoney(surplus)}</span>`;
+      } else {
+        els.optControlsCount.innerHTML = `<span style="color:var(--accent); font-weight:700;">${fundedControls.length} of ${sorted.length} Funded</span> <span style="margin:0 4px; color:var(--glass-border);">•</span> <span style="color:var(--text-muted);">Spend: ${formatMoney(spend)}</span>`;
+      }
+    }
+
     document.querySelectorAll(".budget-preset-pill").forEach(p => {
       const pVal = parseFloat(p.getAttribute("data-budget"));
       if (Math.abs(pVal - budget) < 1000) {
@@ -1452,7 +1496,7 @@
       }
     });
 
-    renderFrontier(spend, mitigated);
+    renderFrontier(spend, mitigated, budget);
   }
 
   // =========================================================================

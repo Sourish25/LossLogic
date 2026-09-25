@@ -1802,17 +1802,82 @@ main.main-viewport {
   font-size: 0.8rem;
 }
 
+/* Optimization Funded Controls Breakdown */
+.opt-controls-summary {
+  margin-top: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--glass-bg-tile);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: 12px;
+}
+
+.opt-controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.45rem;
+}
+
+.opt-controls-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.opt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.opt-chip.chip-funded {
+  background: rgba(78, 240, 167, 0.12);
+  border: 1px solid rgba(78, 240, 167, 0.35);
+  color: var(--text-heading);
+}
+
+.opt-chip.chip-funded .chip-status {
+  color: #4ef0a7;
+  font-weight: 800;
+}
+
+.opt-chip.chip-unfunded {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border-subtle);
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.opt-chip.chip-unfunded .chip-status {
+  color: var(--text-muted);
+}
+
+.opt-chip .chip-cost {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
 .nlq-suggestions {
-  margin-top: 1rem;
-  font-size: 0.76rem;
+  margin-top: 0.75rem;
+  font-size: 0.74rem;
   color: var(--text-secondary);
 }
 
 .nlq-suggestions ul {
   list-style: none;
-  margin-top: 0.45rem;
+  margin-top: 0.35rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 0.35rem;
 }
 
@@ -1820,8 +1885,9 @@ main.main-viewport {
   cursor: pointer;
   color: var(--text-primary);
   font-weight: 500;
+  font-size: 0.72rem;
   transition: all 0.2s;
-  padding: 0.35rem 0.65rem;
+  padding: 0.25rem 0.55rem;
   border-radius: 6px;
   background: var(--glass-bg-tile);
   border: 1px solid var(--glass-border-subtle);

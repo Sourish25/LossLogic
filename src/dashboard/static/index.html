@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/dashboard.css?v=xai_tabs_v3">
+  <link rel="stylesheet" href="/static/css/dashboard.css?v=frontier_v4">
   <script>
     (function() {
       var known = ["dark","light","aurora","nebula","abyss","grid","ember","prism","meadow","tesseract","apex","chronos"];
@@ -501,7 +501,16 @@
             </div>
 
             <!-- Interactive Pareto Frontier Chart -->
-            <div id="chart-frontier" class="chart-container" style="height:170px;"></div>
+            <div id="chart-frontier" class="chart-container" style="height:190px;"></div>
+
+            <!-- HiGHS MILP Funded Controls Breakdown -->
+            <div id="opt-controls-summary" class="opt-controls-summary">
+              <div class="opt-controls-header">
+                <span>Funded Control Portfolio:</span>
+                <span id="opt-controls-count" class="opt-controls-count">5 of 5 Funded (100%)</span>
+              </div>
+              <div id="opt-controls-chips" class="opt-controls-chips"></div>
+            </div>
           </div>
 
           <!-- Panel 4: Explainable AI (XAI) & Model Transparency -->
@@ -1069,6 +1078,6 @@
     </svg>
   </button>
 
-  <script src="/static/js/dashboard.js?v=xai_tabs_v3"></script>
+  <script src="/static/js/dashboard.js?v=frontier_v4"></script>
 </body>
 </html>
