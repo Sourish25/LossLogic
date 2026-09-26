@@ -2773,7 +2773,10 @@
     const defaultIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
 
     state.vendorCatalog.forEach(v => {
-      const isFunded = state.purchasedVendors.has(v.vendor_id);
+      const isFunded = state.purchasedVendors.has(v.vendor_id) ||
+                       (v.canonical_vendor_id && state.purchasedVendors.has(v.canonical_vendor_id)) ||
+                       Boolean(v.is_funded);
+      if (isFunded) state.purchasedVendors.add(v.vendor_id);
       const card = document.createElement("div");
       card.className = `vendor-card ${isFunded ? "vendor-procured procured" : ""}`;
 
@@ -2800,7 +2803,7 @@
           ${isFunded ? `
             <div style="display:flex; align-items:center; gap:0.4rem; width:100%;">
               <span class="btn-procure btn-procured-done btn-procured-active" style="flex:1; padding:0.4rem 0.5rem; text-align:center;">✓ Active</span>
-              <button class="btn-unprocure" data-vendor="${v.vendor_id}" title="Revoke this solution">Revoke</button>
+              <button class="btn-unprocure" data-vendor="${v.vendor_id}" title="Unprocure Solution">Unprocure</button>
             </div>
           ` : `
             <button class="btn-procure btn-procure-active" data-vendor="${v.vendor_id}">
@@ -3029,9 +3032,11 @@
     }
 
     if (els.btnModalProcure) {
-      const isFunded = state.purchasedVendors.has(vendor.vendor_id);
+      const isFunded = state.purchasedVendors.has(vendor.vendor_id) ||
+                       (vendor.canonical_vendor_id && state.purchasedVendors.has(vendor.canonical_vendor_id)) ||
+                       Boolean(vendor.is_funded);
       if (isFunded) {
-        els.btnModalProcure.textContent = "Unprocure / Revoke Solution";
+        els.btnModalProcure.textContent = "Unprocure Solution";
         els.btnModalProcure.className = "glass-btn btn-unprocure-modal";
         els.btnModalProcure.style.background = "rgba(239, 68, 68, 0.2)";
         els.btnModalProcure.style.color = "#ef4444";
