@@ -1326,16 +1326,20 @@
   }
 
   /**
-   * Render Pareto Frontier Chart (True Convex Knapsack Frontier)
+   * Render Pareto Frontier Chart (True Convex Knapsack Frontier with Crisp Scale & Stable Marker)
    */
   function renderFrontier(spend, mitigated, budget = null) {
     if (!els.chartFrontier) return;
-    const width = 480;
-    const height = 180;
-    const padX = 48;
-    const padY = 25;
-    const maxB = 10000000.0; // ₹1 Cr
-    const maxR = 45000000.0; // ₹4.5 Cr
+    const width = 560;
+    const height = 230;
+    const padLeft = 65;
+    const padRight = 25;
+    const padTop = 22;
+    const padBottom = 42;
+    const plotW = width - padLeft - padRight;
+    const plotH = height - padTop - padBottom;
+    const maxB = 10000000.0; // ₹1.0 Cr
+    const maxR = 50000000.0; // ₹5.0 Cr
     const c = getThemeColors();
 
     // 1. Build the true Pareto efficient frontier milestones from the sorted controls
@@ -1354,42 +1358,74 @@
 
     // 2. Map milestones to screen coordinates
     const coords = milestones.map(m => ({
-      x: padX + (Math.min(m.s, maxB) / maxB) * (width - 2 * padX),
-      y: height - padY - (Math.min(m.r, maxR) / maxR) * (height - 2 * padY)
+      x: padLeft + (Math.min(m.s, maxB) / maxB) * plotW,
+      y: padTop + plotH - (Math.min(m.r, maxR) / maxR) * plotH,
+      s: m.s,
+      r: m.r
     }));
 
     // 3. Create smooth Catmull-Rom cubic bezier curve passing EXACTLY through every milestone
-    let pathD = `M ${coords[0].x.toFixed(1)} ${coords[0].y.toFixed(1)}`;
-    for (let i = 0; i < coords.length - 1; i++) {
-      const p0 = coords[Math.max(i - 1, 0)];
-      const p1 = coords[i];
-      const p2 = coords[i + 1];
-      const p3 = coords[Math.min(i + 2, coords.length - 1)];
-
-      const cp1x = p1.x + (p2.x - p0.x) / 6;
-      const cp1y = p1.y + (p2.y - p0.y) / 6;
-      const cp2x = p2.x - (p3.x - p1.x) / 6;
-      const cp2y = p2.y - (p3.y - p1.y) / 6;
-
-      pathD += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
-    }
-
+    let pathD = generateSplinePath(coords);
     const first = coords[0];
     const last = coords[coords.length - 1];
-    const areaD = pathD + ` L ${last.x.toFixed(1)} ${(height - padY).toFixed(1)} L ${first.x.toFixed(1)} ${(height - padY).toFixed(1)} Z`;
+    const areaD = pathD + ` L ${last.x.toFixed(1)} ${(padTop + plotH).toFixed(1)} L ${first.x.toFixed(1)} ${(padTop + plotH).toFixed(1)} Z`;
 
-    const alloc = (budget !== null && !isNaN(budget)) ? budget : spend;
-    const curX = padX + (Math.min(alloc, maxB) / maxB) * (width - 2 * padX);
-    const curY = height - padY - (Math.min(mitigated, maxR) / maxR) * (height - 2 * padY);
-    const frontierGradOpacity = c.isLight ? 0.07 : 0.15;
+    // 4. Milestone inflection dots along curve
+    let milestoneDotsSvg = "";
+    coords.slice(0, coords.length - 1).forEach(m => {
+      milestoneDotsSvg += `<circle cx="${m.x.toFixed(1)}" cy="${m.y.toFixed(1)}" r="2.5" fill="${c.frontierCurve}" opacity="0.65" />`;
+    });
 
-    const isSurplus = budget !== null && budget > spend;
-    const surplusAmount = isSurplus ? (budget - spend) : 0;
-    const spendX = padX + (Math.min(spend, maxB) / maxB) * (width - 2 * padX);
-    const showSurplusLabel = isSurplus && (curX - spendX > 32);
+    // 5. Y-Axis Ticks & Horizontal Gridlines (₹0 to ₹5.0 Cr)
+    const yTicks = [
+      { val: 0.0, lbl: "₹0" },
+      { val: 10000000.0, lbl: "₹1.0Cr" },
+      { val: 20000000.0, lbl: "₹2.0Cr" },
+      { val: 30000000.0, lbl: "₹3.0Cr" },
+      { val: 40000000.0, lbl: "₹4.0Cr" },
+      { val: 50000000.0, lbl: "₹5.0Cr" }
+    ];
+    let yTicksSvg = "";
+    yTicks.forEach(t => {
+      const y = padTop + plotH - (t.val / maxR) * plotH;
+      yTicksSvg += `
+        <line x1="${padLeft}" y1="${y.toFixed(1)}" x2="${(padLeft + plotW).toFixed(1)}" y2="${y.toFixed(1)}" stroke="${c.gridColor}" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6"/>
+        <text x="${(padLeft - 8).toFixed(1)}" y="${(y + 3.5).toFixed(1)}" fill="${c.textColor}" font-size="9.5" font-family="var(--font-mono, monospace)" font-weight="600" text-anchor="end" opacity="0.85">${t.lbl}</text>
+      `;
+    });
+
+    // 6. X-Axis Ticks (₹0 to ₹1.0 Cr)
+    const xTicks = [
+      { val: 0.0, lbl: "₹0" },
+      { val: 2500000.0, lbl: "₹25L" },
+      { val: 5000000.0, lbl: "₹50L" },
+      { val: 7500000.0, lbl: "₹75L" },
+      { val: 10000000.0, lbl: "₹1.0Cr" }
+    ];
+    let xTicksSvg = "";
+    xTicks.forEach(t => {
+      const x = padLeft + (t.val / maxB) * plotW;
+      xTicksSvg += `
+        <line x1="${x.toFixed(1)}" y1="${(padTop + plotH).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(padTop + plotH + 5).toFixed(1)}" stroke="${c.gridColor}" stroke-width="1.2"/>
+        <text x="${x.toFixed(1)}" y="${(padTop + plotH + 18).toFixed(1)}" fill="${c.textColor}" font-size="10.5" font-family="var(--font-mono, monospace)" font-weight="600" text-anchor="middle" opacity="0.85">${t.lbl}</text>
+      `;
+    });
+
+    // 7. Active Portfolio Marker (LOCKED EXACTLY ON THE FRONTIER CURVE)
+    const curSpend = Math.min(spend, maxB);
+    const curMitigated = Math.min(mitigated, maxR);
+    const curX = padLeft + (curSpend / maxB) * plotW;
+    const curY = padTop + plotH - (curMitigated / maxR) * plotH;
+    const frontierGradOpacity = c.isLight ? 0.08 : 0.18;
+
+    const bVal = (budget !== null && !isNaN(budget)) ? budget : spend;
+    const isSurplus = bVal > spend;
+    const surplusAmount = isSurplus ? (bVal - spend) : 0;
+    const budgetX = padLeft + (Math.min(bVal, maxB) / maxB) * plotW;
+
     const tooltipText = isSurplus
-      ? `Budget: ${formatMoney(budget)} (Surplus: ${formatMoney(surplusAmount)}) • Risk Reduced: ${formatMoney(mitigated)}`
-      : `Spend: ${formatMoney(spend)} • Risk Reduced: ${formatMoney(mitigated)}`;
+      ? `Optimal Spend: ${formatMoney(spend)} • Mitigated Risk: ${formatMoney(mitigated)} • Budget: ${formatMoney(bVal)} (Surplus: ${formatMoney(surplusAmount)})`
+      : `Optimal Spend: ${formatMoney(spend)} • Mitigated Risk: ${formatMoney(mitigated)}`;
 
     els.chartFrontier.innerHTML = `
       <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%; overflow:visible;">
@@ -1400,26 +1436,39 @@
           </linearGradient>
         </defs>
 
-        <line x1="${padX}" y1="${height - padY}" x2="${width - padX}" y2="${height - padY}" stroke="${c.gridColor}" stroke-width="1"/>
-        <line x1="${padX}" y1="${padY}" x2="${padX}" y2="${height - padY}" stroke="${c.gridColor}" stroke-width="1"/>
+        <!-- Gridlines & Ticks -->
+        ${yTicksSvg}
+        ${xTicksSvg}
 
+        <!-- Axes lines -->
+        <line x1="${padLeft}" y1="${padTop + plotH}" x2="${padLeft + plotW}" y2="${padTop + plotH}" stroke="${c.gridColor}" stroke-width="1.5"/>
+        <line x1="${padLeft}" y1="${padTop}" x2="${padLeft}" y2="${padTop + plotH}" stroke="${c.gridColor}" stroke-width="1.5"/>
+
+        <!-- Frontier Area & Curve -->
         <path d="${areaD}" fill="url(#frontierGrad)" />
-        <path d="${pathD}" fill="none" stroke="${c.frontierCurve}" stroke-width="2" stroke-linecap="round"/>
+        <path d="${pathD}" fill="none" stroke="${c.frontierCurve}" stroke-width="2.5" stroke-linecap="round"/>
+        ${milestoneDotsSvg}
 
-        ${isSurplus ? `
-          <line x1="${spendX.toFixed(1)}" y1="${curY.toFixed(1)}" x2="${curX.toFixed(1)}" y2="${curY.toFixed(1)}" stroke="${c.frontierCurve}" stroke-width="3" stroke-dasharray="4 3" opacity="0.95"/>
-          ${showSurplusLabel ? `<text x="${((spendX + curX) / 2).toFixed(1)}" y="${(curY - 8).toFixed(1)}" fill="${c.textColor}" font-size="8.5" font-weight="700" text-anchor="middle" opacity="0.85">Surplus (+${formatMoney(surplusAmount)})</text>` : ''}
+        <!-- Vertical Spend Guideline from Curve to Axis -->
+        <line x1="${curX.toFixed(1)}" y1="${curY.toFixed(1)}" x2="${curX.toFixed(1)}" y2="${(padTop + plotH).toFixed(1)}" stroke="${c.frontierCurve}" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.7"/>
+
+        <!-- Budget Ceiling Pointer on Axis (if surplus) -->
+        ${isSurplus && (budgetX - curX > 12) ? `
+          <line x1="${budgetX.toFixed(1)}" y1="${(padTop + plotH - 5).toFixed(1)}" x2="${budgetX.toFixed(1)}" y2="${(padTop + plotH + 5).toFixed(1)}" stroke="${c.textColor}" stroke-width="2" opacity="0.85"/>
+          <text x="${budgetX.toFixed(1)}" y="${(padTop + plotH - 8).toFixed(1)}" fill="${c.frontierCurve}" font-size="8.5" font-family="var(--font-mono, monospace)" font-weight="700" text-anchor="middle">Budget: ${formatMoney(bVal)}</text>
         ` : ''}
 
+        <!-- Active Portfolio Marker Node (Firmly anchored on curve) -->
         <g class="frontier-node" style="cursor:pointer;" data-tooltip="${tooltipText}">
-          <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="12" fill="${c.nodeRingFill}" stroke="${c.nodeRingStroke}" stroke-width="1"/>
+          <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="11" fill="${c.nodeRingFill}" stroke="${c.nodeRingStroke}" stroke-width="1.5"/>
           <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="5" fill="${c.nodeFill}" stroke="${c.nodeStroke}" stroke-width="1.5">
-            <animate attributeName="r" values="4.5;6;4.5" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="4.5;6;4.5" dur="2s" repeatCount="indefinite"/>
           </circle>
         </g>
 
-        <text x="${padX + (width - 2 * padX) * 0.5}" y="${height - 6}" fill="${c.textColor}" font-size="10" font-weight="600" text-anchor="middle">Capital Allocation</text>
-        <text x="14" y="${padY + (height - 2 * padY) * 0.5}" fill="${c.textColor}" font-size="10" font-weight="600" text-anchor="middle" dominant-baseline="central" transform="rotate(-90 14 ${padY + (height - 2 * padY) * 0.5})">Mitigated Risk</text>
+        <!-- Prominent Axis Titles -->
+        <text x="${(padLeft + plotW * 0.5).toFixed(1)}" y="${height - 5}" fill="${c.textColor}" font-size="11.5" font-weight="700" text-anchor="middle" letter-spacing="0.3px">Capital Budget Allocation (₹)</text>
+        <text x="14" y="${(padTop + plotH * 0.5).toFixed(1)}" fill="${c.textColor}" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="central" transform="rotate(-90 14 ${(padTop + plotH * 0.5).toFixed(1)})">Mitigated Cyber Risk (₹)</text>
       </svg>
     `;
   }
@@ -1972,8 +2021,21 @@
     const currentEal = state.demoStats ? state.demoStats.ealInr : defaultData.totalEalInr;
     const posture = state.demoStats ? state.demoStats.posture : 84.6;
 
-    // Temporal Query (Date / Time)
-    if (qLower.includes("date") || qLower.includes("today") || qLower.includes("day") || qLower.includes("time") || qLower.includes("clock")) {
+    // Temporal Query (Date / Time) - Only if asking specifically about the calendar date or clock time
+    const isExplicitDateQuery = (
+      qLower.includes("what is the date") ||
+      qLower.includes("what's the date") ||
+      qLower.includes("today's date") ||
+      qLower.includes("todays date") ||
+      qLower.includes("current date") ||
+      qLower.includes("what day is it") ||
+      qLower.includes("what day is today") ||
+      qLower.includes("what time is it") ||
+      ((qLower.includes("date") || qLower.includes("clock")) &&
+       !qLower.includes("risk") && !qLower.includes("loss") && !qLower.includes("vuln") && !qLower.includes("highest"))
+    );
+
+    if (isExplicitDateQuery) {
       const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       const timeStr = new Date().toLocaleTimeString('en-US');
       renderXAIResponse({
@@ -3396,21 +3458,23 @@
 
   function formatCopilotMarkdown(text) {
     if (!text) return "";
-    let safe = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    let safe = text;
 
-    // Bold
+    // Bold (**text** -> <strong>text</strong>)
     safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-    // Inline code
+    // Inline code (`text` -> <code>text</code>)
     safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
     // Bullet points
     safe = safe.replace(/^[*-]\s+(.+)$/gm, "<li>$1</li>");
-    safe = safe.replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
-    // Line breaks
-    safe = safe.replace(/\n\n/g, "<br><br>");
-    safe = safe.replace(/\n/g, "<br>");
+    if (safe.includes("<li>")) {
+      safe = safe.replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
+    }
+    // Line breaks (if not already using <br>)
+    if (!safe.includes("<br")) {
+      safe = safe.replace(/\r\n/g, "\n");
+      safe = safe.replace(/\n\n+/g, "<br><br>");
+      safe = safe.replace(/\n/g, "<br>");
+    }
     return safe;
   }
 

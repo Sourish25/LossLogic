@@ -509,8 +509,16 @@ class XAIEngine:
         now = datetime.datetime.now()
         date_str = now.strftime("%A, %B %d, %Y")
 
-        # Temporal Query Handling (Date / Time)
-        if any(w in q for w in ["date", "today", "day", "time", "clock", "current date"]):
+        # Temporal Query Handling (Date / Time) - Only if specifically asking for date or clock time
+        is_date_query = any(w in q for w in [
+            "what is the date", "what's the date", "today's date", "todays date",
+            "current date", "what day is today", "what day is it", "what is today",
+            "what time is it", "current time"
+        ]) or (
+            ("date" in q or "clock" in q) and not any(k in q for k in ["risk", "loss", "eal", "cyber", "vuln", "spend", "budget", "attack", "highest"])
+        )
+
+        if is_date_query:
             headline = f"Temporal Actuarial Status: {date_str}"
             plain_text = (
                 f"Today is **{date_str}**.\n\n"
