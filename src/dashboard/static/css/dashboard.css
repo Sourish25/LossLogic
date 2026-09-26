@@ -3770,6 +3770,26 @@ footer.liquid-footer {
   cursor: default;
 }
 
+.btn-unprocure {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  cursor: pointer;
+  background: rgba(239, 68, 68, 0.16);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-unprocure:hover {
+  background: rgba(239, 68, 68, 0.30);
+  border-color: #ef4444;
+  color: #fca5a5;
+  transform: translateY(-1px);
+}
+
 .btn-shields-view {
   width: 100%;
   padding: 0.25rem 0.65rem;

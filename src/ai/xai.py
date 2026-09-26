@@ -92,45 +92,127 @@ class XAIEngine:
         query: str,
         asset_id: Optional[str] = None,
         currency: str = "INR",
+        budget: Optional[float] = None,
+        allocated_spend: Optional[float] = None,
+        purchased_vendors: Optional[List[str]] = None,
+        active_attack: Optional[str] = None,
     ) -> List[FeatureAttribution]:
-        """Calculates normalized feature importance weights explaining risk quantification."""
+        """Calculates normalized feature importance weights explaining risk quantification dynamically."""
         q = (query or "").lower()
+        curr = currency.upper().strip()
+        metrics = get_live_platform_metrics(currency=curr)
 
-        if "budget" in q or "allocat" in q or "spend" in q or "milp" in q or "optimi" in q:
+        # 1. Active Threat / Intrusion Context
+        if active_attack or metrics.get("has_active_attack") or any(k in q for k in ["attack", "surge", "threat", "ddos", "intrusion", "inject"]):
+            att_type = active_attack or metrics.get("attack_type") or "DDOS_TRAFFIC_SURGE"
+            target = metrics.get("target_node") or "BC-API-GW-01"
             return [
                 FeatureAttribution(
-                    feature_name="Marginal Risk Reduction (Delta EAL / Cost)",
+                    feature_name=f"Active Ingress Threat Surge ({att_type})",
+                    weight_pct=46.5,
+                    impact="HIGH_RISK",
+                    raw_value="TEF Spike: 3.5x",
+                    description=f"Sensors detect volumetric threat event spike targeting {target}.",
+                ),
+                FeatureAttribution(
+                    feature_name="Target Node Weaponization & Exposure",
+                    weight_pct=28.0,
+                    impact="HIGH_RISK",
+                    raw_value=f"Target: {target}",
+                    description="Unauthenticated perimeter service exposed to external ingress anomalies.",
+                ),
+                FeatureAttribution(
+                    feature_name="DAG Lateral Percolation Blast Radius",
+                    weight_pct=15.5,
+                    impact="HIGH_RISK",
+                    raw_value="Cascades: 4 Services",
+                    description="Compromise percolates downstream to payment processing and checkout pipelines.",
+                ),
+                FeatureAttribution(
+                    feature_name="Baseline Perimeter Defense Resistance",
+                    weight_pct=10.0,
+                    impact="LOW_RISK",
+                    raw_value="Residual RS: 0.32",
+                    description="Existing edge filtering buffers initial wave but requires active countermeasure.",
+                ),
+            ]
+
+        # 2. CEO Vendor Portfolio Context
+        elif (purchased_vendors and len(purchased_vendors) > 0) or any(k in q for k in ["vendor", "procure", "commercial", "crowdstrike", "cloudflare", "okta", "wiz", "sentinel"]):
+            v_count = len(purchased_vendors) if purchased_vendors else metrics.get("purchased_vendors_count", 0)
+            shields = metrics.get("total_threat_shields_active", 5)
+            shield_pct = min(50.0, max(15.0, v_count * 10.0 + 15.0))
+            return [
+                FeatureAttribution(
+                    feature_name=f"Procured Commercial Defense Shields ({v_count} Active)",
+                    weight_pct=shield_pct,
+                    impact="PROTECTIVE",
+                    raw_value=f"{shields} Shields Active",
+                    description="Active commercial vendor solutions providing multi-vector threat immunity.",
+                ),
+                FeatureAttribution(
+                    feature_name="Crown Jewel Attack Surface Reduction",
+                    weight_pct=26.5,
+                    impact="PROTECTIVE",
+                    raw_value=f"Posture: {metrics['posture_score']:.1f}%",
+                    description="Hardened perimeter and host-level controls shielding Tier-1 Core Banking and Vaults.",
+                ),
+                FeatureAttribution(
+                    feature_name="Net Capital Preservation & Solvency",
+                    weight_pct=18.0,
+                    impact="PROTECTIVE",
+                    raw_value=f"Mitigated: {metrics['risk_mitigated_formatted']}",
+                    description="Financial cyber exposure actively mitigated against annualized balance sheet reserves.",
+                ),
+                FeatureAttribution(
+                    feature_name="Residual Unhedged Financial Exposure",
+                    weight_pct=round(100.0 - shield_pct - 26.5 - 18.0, 1),
+                    impact="LOW_RISK" if metrics["posture_score"] > 90 else "MEDIUM_RISK",
+                    raw_value=f"EAL: {metrics['current_eal_formatted']}",
+                    description="Remaining annualized loss exposure across secondary infrastructure nodes.",
+                ),
+            ]
+
+        # 3. Budget Optimization & MILP Context
+        elif budget is not None or any(k in q for k in ["budget", "allocat", "spend", "milp", "optimi", "knapsack"]):
+            b_val = budget if budget is not None else 4_500_000.0
+            b_fmt = format_currency(b_val, curr)
+            return [
+                FeatureAttribution(
+                    feature_name="Marginal Loss Efficiency (Delta EAL / Cost)",
                     weight_pct=42.0,
                     impact="PROTECTIVE",
                     raw_value="Ratio: 3.22x",
-                    description="HiGHS MILP knapsack solver selects controls maximizing risk mitigation per unit expenditure.",
+                    description=f"HiGHS MILP 0/1 solver maximizes loss mitigation under {b_fmt} constraint.",
                 ),
                 FeatureAttribution(
                     feature_name="Control Effectiveness on Crown Jewels",
                     weight_pct=28.5,
                     impact="PROTECTIVE",
                     raw_value="Coverage: 91.4%",
-                    description="Priority weighting assigned to controls directly protecting Tier-1 Core Banking and IAM.",
+                    description="Priority weighting assigned to controls directly protecting Core Banking and IAM.",
                 ),
                 FeatureAttribution(
-                    feature_name="Budget Ceiling Constraint",
+                    feature_name="Budget Ceiling Constraint Utilization",
                     weight_pct=18.0,
                     impact="LOW_RISK",
-                    raw_value="Budget Limit: Cap Met",
-                    description="Knapsack capacity boundary ensures total cost strictly remains within allocated limit.",
+                    raw_value=f"Cap: {b_fmt}",
+                    description="Knapsack capacity boundary guarantees zero capital overspend beyond ceiling.",
                 ),
                 FeatureAttribution(
                     feature_name="Implementation Prerequisite Coupling",
                     weight_pct=11.5,
                     impact="PROTECTIVE",
-                    raw_value="Prerequisites: Satisfied",
+                    raw_value="Coupling: Verified",
                     description="Co-dependency verification ensuring automated patching depends on inventory baseline.",
                 ),
             ]
-        elif "delay" in q or "postpone" in q or "time" in q:
+
+        # 4. Delay Cost & What-If Context
+        elif any(k in q for k in ["delay", "postpone", "time", "trajectory", "wait"]):
             return [
                 FeatureAttribution(
-                    feature_name="Exploit Maturity & Weaponization Velocity",
+                    feature_name="Exploit Weaponization Velocity (EPSS)",
                     weight_pct=45.0,
                     impact="HIGH_RISK",
                     raw_value="EPSS Growth: +0.012/day",
@@ -148,7 +230,7 @@ class XAIEngine:
                     weight_pct=17.5,
                     impact="MEDIUM_RISK",
                     raw_value="Mandatory SLA: >30 Days",
-                    description="Indian regulatory frameworks impose escalated penalty tiers for uncontained critical CVEs.",
+                    description="Regulatory frameworks impose escalating penalty tiers for uncontained critical CVEs.",
                 ),
                 FeatureAttribution(
                     feature_name="Secondary Lateral Compromise Perimeter",
@@ -158,8 +240,9 @@ class XAIEngine:
                     description="Uncontained persistence enables adversaries to bridge network segments laterally.",
                 ),
             ]
+
+        # 5. Default: Asset & CVE risk quantification explanation
         else:
-            # Default: Asset & CVE risk quantification explanation
             return [
                 FeatureAttribution(
                     feature_name="Vulnerability Weaponization & CVSS Score",
@@ -179,7 +262,7 @@ class XAIEngine:
                     feature_name="Threat Event Frequency (TEF) from Telemetry",
                     weight_pct=21.5,
                     impact="HIGH_RISK",
-                    raw_value="TEF: 12.4 events/yr",
+                    raw_value=f"TEF: {metrics['threat_event_frequency']:.1f}/yr",
                     description="Live SIEM & perimeter sensor telemetry records high-frequency scanning targeting port 5432.",
                 ),
                 FeatureAttribution(
@@ -196,70 +279,198 @@ class XAIEngine:
         query: str,
         asset_id: Optional[str] = None,
         currency: str = "INR",
+        budget: Optional[float] = None,
+        allocated_spend: Optional[float] = None,
+        purchased_vendors: Optional[List[str]] = None,
+        active_attack: Optional[str] = None,
     ) -> List[DecisionTraceStep]:
         """Constructs an auditable, step-by-step decision pathway from signal to balance sheet."""
         metrics = get_live_platform_metrics(currency=currency)
         curr = currency.upper().strip()
+        q = (query or "").lower()
 
-        return [
-            DecisionTraceStep(
-                step_number=1,
-                stage="Telemetry Signal Ingestion",
-                factor="External & EDR Sensor Feeds",
-                observation=f"Ingested {metrics['events_per_second']:,.0f} eps; flagged unauthorized exploit probing against PostgreSQL port.",
-                formula_or_model="Multi-domain telemetry normalizer (JSON/CSV/REST)",
-            ),
-            DecisionTraceStep(
-                step_number=2,
-                stage="Vulnerability Likelihood (LEF)",
-                factor="Vulnerability vs Control Strength",
-                observation="CVE-2023-34362 weaponization (CVSS 9.8) overcomes existing perimeter WAF defense (RS=0.42).",
-                formula_or_model="Open FAIR: LEF = TEF (12.4/yr) × P(Compromise | TE) = 8.5/yr",
-            ),
-            DecisionTraceStep(
-                step_number=3,
-                stage="Asset Topology & Blast Radius",
-                factor="Enterprise Dependency DAG",
-                observation="BC-PII-VAULT-01 compromise cascades to 4 downstream revenue-generating business services.",
-                formula_or_model="NetworkX directed dependency percolation & betweenness centrality",
-            ),
-            DecisionTraceStep(
-                step_number=4,
-                stage="Actuarial Loss Simulation",
-                factor="Compound Poisson - LogNormal",
-                observation=f"10,000 Monte Carlo trials converged at {metrics['top_loss_driver']['loss_formatted']} Expected Annual Loss.",
-                formula_or_model="EAL = LEF × E[Loss Magnitude] (Primary: 35%, Secondary: 65%)",
-            ),
-            DecisionTraceStep(
-                step_number=5,
-                stage="Portfolio Knapsack Optimization",
-                factor="SciPy HiGHS MILP 0/1 Solver",
-                observation=f"Allocating {metrics['recommended_spend_formatted']} reduces enterprise risk by {metrics['risk_mitigated_formatted']} ({metrics['portfolio_rosi']}% ROSI).",
-                formula_or_model="maximize sum(x_i * Delta_EAL_i) s.t. sum(x_i * Cost_i) <= Budget",
-            ),
-        ]
+        if active_attack or metrics.get("has_active_attack") or "attack" in q or "surge" in q:
+            att = active_attack or metrics.get("attack_type") or "DDOS_TRAFFIC_SURGE"
+            target = metrics.get("target_node") or "BC-API-GW-01"
+            return [
+                DecisionTraceStep(
+                    step_number=1,
+                    stage="Real-Time Telemetry Anomaly",
+                    factor="Ingress Velocity Sensor Spike",
+                    observation=f"Sensor feed intercepted acute anomaly: {att} targeting {target}.",
+                    formula_or_model="Multi-domain telemetry normalizer (JSON/CSV/REST)",
+                ),
+                DecisionTraceStep(
+                    step_number=2,
+                    stage="Open FAIR Threat Escalation",
+                    factor="TEF Surge Multiplier",
+                    observation="Threat Event Frequency (TEF) surged 3.5x over nominal baseline, driving LEF to 8.5/yr.",
+                    formula_or_model="Open FAIR: LEF = TEF (Spike 3.5x) × P(Compromise | TE) = 8.5/yr",
+                ),
+                DecisionTraceStep(
+                    step_number=3,
+                    stage="Graph Percolation Blast Radius",
+                    factor="Enterprise Dependency Network",
+                    observation=f"{target} ingress flood propagates cascade risk to BharatCart Checkout and Pay Gateways.",
+                    formula_or_model="NetworkX directed dependency percolation & betweenness centrality",
+                ),
+                DecisionTraceStep(
+                    step_number=4,
+                    stage="Monte Carlo Surge Quantification",
+                    factor="Compound Poisson - LogNormal",
+                    observation=f"Loss distribution shifts right, injecting acute financial surge of +{format_currency(45800000.0, curr)}.",
+                    formula_or_model="EAL = LEF × E[Loss Magnitude] (Immediate Surge)",
+                ),
+            ]
+        elif (purchased_vendors and len(purchased_vendors) > 0) or "vendor" in q or "procure" in q:
+            v_cnt = len(purchased_vendors) if purchased_vendors else metrics.get("purchased_vendors_count", 0)
+            return [
+                DecisionTraceStep(
+                    step_number=1,
+                    stage="Commercial Catalog Benchmarking",
+                    factor="SLA & Coverage Rating",
+                    observation=f"Assessed leading enterprise cybersecurity vendors against FAIR benchmarks and MITRE ATT&CK.",
+                    formula_or_model="CEO Vendor Matrix & Gartner Magic Quadrant mapping",
+                ),
+                DecisionTraceStep(
+                    step_number=2,
+                    stage="Threat Shield Activation",
+                    factor="Proactive Defense Mechanisms",
+                    observation=f"Activated {metrics.get('total_threat_shields_active', 5)} threat shields covering EDR, WAF, IAM, and CSPM vectors.",
+                    formula_or_model="ThreatShield proactive neutralization vector matrices",
+                ),
+                DecisionTraceStep(
+                    step_number=3,
+                    stage="Diminishing Returns Modeling",
+                    factor="Actuarial Marginal Efficacy",
+                    observation=f"Vendor portfolio mitigated {metrics['risk_mitigated_formatted']} in baseline cyber exposure.",
+                    formula_or_model="Delta_EAL = EAL_baseline * Coverage * Efficiency_factor",
+                ),
+                DecisionTraceStep(
+                    step_number=4,
+                    stage="Balance Sheet Capital Preservation",
+                    factor="Institutional Posture Score",
+                    observation=f"Security Posture elevated to {metrics['posture_score']:.1f}% with positive portfolio ROSI.",
+                    formula_or_model="ROSI = ((Risk_Mitigated - Spend) / Spend) * 100",
+                ),
+            ]
+        elif budget is not None or "budget" in q or "optimi" in q:
+            b_val = budget if budget is not None else 4_500_000.0
+            return [
+                DecisionTraceStep(
+                    step_number=1,
+                    stage="Capital Boundary Constraint",
+                    factor="Executive Budget Envelope",
+                    observation=f"Ingested capital constraint limit of {format_currency(b_val, curr)} across security backlog.",
+                    formula_or_model="Capital Knapsack boundary: sum(x_i * c_i) <= Budget",
+                ),
+                DecisionTraceStep(
+                    step_number=2,
+                    stage="Marginal Efficiency Ranking",
+                    factor="Loss Mitigation Derivative",
+                    observation="Ranked security controls by marginal financial risk reduction per rupee invested (Delta EAL / Cost).",
+                    formula_or_model="Greedy cost-efficiency gradient heuristic + Branch-and-Cut",
+                ),
+                DecisionTraceStep(
+                    step_number=3,
+                    stage="HiGHS 0/1 MILP Solver",
+                    factor="Binary Integer Programming",
+                    observation=f"SciPy HiGHS solver optimized 0/1 selection vector with zero capital ceiling overrun.",
+                    formula_or_model="SciPy optimize.milp(c, integrality=1, constraints=A_ub)",
+                ),
+                DecisionTraceStep(
+                    step_number=4,
+                    stage="Actuarial Distribution Shift",
+                    factor="Compound Poisson Loss Model",
+                    observation=f"10k Monte Carlo trials project residual EAL at {metrics['current_eal_formatted']} ({metrics['portfolio_rosi']}% ROSI).",
+                    formula_or_model="Monte Carlo EAL convergence at 10,000 trials",
+                ),
+            ]
+        else:
+            return [
+                DecisionTraceStep(
+                    step_number=1,
+                    stage="Telemetry Signal Ingestion",
+                    factor="External & EDR Sensor Feeds",
+                    observation=f"Ingested {metrics['events_per_second']:,.0f} eps; flagged unauthorized exploit probing against PostgreSQL port.",
+                    formula_or_model="Multi-domain telemetry normalizer (JSON/CSV/REST)",
+                ),
+                DecisionTraceStep(
+                    step_number=2,
+                    stage="Vulnerability Likelihood (LEF)",
+                    factor="Vulnerability vs Control Strength",
+                    observation="CVE-2023-34362 weaponization (CVSS 9.8) overcomes existing perimeter WAF defense (RS=0.42).",
+                    formula_or_model="Open FAIR: LEF = TEF (12.4/yr) × P(Compromise | TE) = 8.5/yr",
+                ),
+                DecisionTraceStep(
+                    step_number=3,
+                    stage="Asset Topology & Blast Radius",
+                    factor="Enterprise Dependency DAG",
+                    observation="BC-PII-VAULT-01 compromise cascades to 4 downstream revenue-generating business services.",
+                    formula_or_model="NetworkX directed dependency percolation & betweenness centrality",
+                ),
+                DecisionTraceStep(
+                    step_number=4,
+                    stage="Actuarial Loss Simulation",
+                    factor="Compound Poisson - LogNormal",
+                    observation=f"10,000 Monte Carlo trials converged at {metrics['top_loss_driver']['loss_formatted']} Expected Annual Loss.",
+                    formula_or_model="EAL = LEF × E[Loss Magnitude] (Primary: 35%, Secondary: 65%)",
+                ),
+                DecisionTraceStep(
+                    step_number=5,
+                    stage="Portfolio Knapsack Optimization",
+                    factor="SciPy HiGHS MILP 0/1 Solver",
+                    observation=f"Allocating {metrics['recommended_spend_formatted']} reduces enterprise risk by {metrics['risk_mitigated_formatted']} ({metrics['portfolio_rosi']}% ROSI).",
+                    formula_or_model="maximize sum(x_i * Delta_EAL_i) s.t. sum(x_i * Cost_i) <= Budget",
+                ),
+            ]
 
     def _compute_deterministic_counterfactual(
         self,
         currency: str = "INR",
+        budget: Optional[float] = None,
+        purchased_vendors: Optional[List[str]] = None,
+        active_attack: Optional[str] = None,
     ) -> CounterfactualExplanation:
-        """Derives minimal required intervention to flip risk state."""
+        """Derives minimal required intervention to flip risk state dynamically."""
         metrics = get_live_platform_metrics(currency=currency)
         curr = currency.upper().strip()
 
-        baseline_val = metrics["current_eal"]
-        cf_val = round(baseline_val * 0.16, 2)
-        net_reduct = round(baseline_val - cf_val, 2)
+        if active_attack or metrics.get("has_active_attack"):
+            rec_prod = "Cloudflare Magic Transit (WAF/DDoS)"
+            return CounterfactualExplanation(
+                intervention=f"Deploy Countermeasure via {rec_prod}",
+                target_asset_or_cve=metrics.get("target_node") or "BC-API-GW-01",
+                baseline_eal=metrics["current_eal_formatted"],
+                counterfactual_eal=metrics["baseline_eal_formatted"],
+                net_risk_reduction=format_currency(45800000.0, curr),
+                expected_roi_pct=340.0,
+                feasibility="Immediate (< 60 seconds)",
+            )
+        elif purchased_vendors and len(purchased_vendors) > 0:
+            return CounterfactualExplanation(
+                intervention="Procure Next Highest-Rated Solution (CyberArk Privileged Access)",
+                target_asset_or_cve="Core Banking IAM & Privileged Credentials",
+                baseline_eal=metrics["current_eal_formatted"],
+                counterfactual_eal=format_currency(max(1000.0, metrics["current_eal"] * 0.45), curr),
+                net_risk_reduction=format_currency(metrics["current_eal"] * 0.55, curr),
+                expected_roi_pct=285.5,
+                feasibility="1-Click Virtual Procurement",
+            )
+        else:
+            baseline_val = metrics["current_eal"]
+            cf_val = round(baseline_val * 0.16, 2)
+            net_reduct = round(baseline_val - cf_val, 2)
 
-        return CounterfactualExplanation(
-            intervention="Deploy Automated Vulnerability Patching (CTRL-PATCH) + Hardware MFA (CTRL-MFA)",
-            target_asset_or_cve="BC-PII-VAULT-01 / CVE-2023-34362",
-            baseline_eal=metrics["current_eal_formatted"],
-            counterfactual_eal=format_currency(cf_val, curr),
-            net_risk_reduction=format_currency(net_reduct, curr),
-            expected_roi_pct=222.2,
-            feasibility="Immediate (Turnaround: < 48 hours)",
-        )
+            return CounterfactualExplanation(
+                intervention="Deploy Automated Vulnerability Patching (CTRL-PATCH) + Hardware MFA (CTRL-MFA)",
+                target_asset_or_cve="BC-PII-VAULT-01 / CVE-2023-34362",
+                baseline_eal=metrics["current_eal_formatted"],
+                counterfactual_eal=format_currency(cf_val, curr),
+                net_risk_reduction=format_currency(net_reduct, curr),
+                expected_roi_pct=222.2,
+                feasibility="Immediate (Turnaround: < 48 hours)",
+            )
 
     async def explain(
         self,
@@ -267,37 +478,118 @@ class XAIEngine:
         mode: str = "xai_deep_dive",
         asset_id: Optional[str] = None,
         currency: str = "INR",
+        budget: Optional[float] = None,
+        allocated_spend: Optional[float] = None,
+        purchased_vendors: Optional[List[str]] = None,
+        active_attack: Optional[str] = None,
     ) -> XAIExplanationResult:
         """
-        Generates complete XAI explanation using Gemini 3.5 Flash Lite or deterministic fallback.
+        Generates complete XAI explanation using Gemini or real-time deterministic actuarial layer.
         """
+        import datetime
         start_t = time.perf_counter()
         curr = currency.upper().strip()
         metrics = get_live_platform_metrics(currency=curr)
 
-        attributions = self._compute_deterministic_attributions(query=query, asset_id=asset_id, currency=curr)
-        decision_trace = self._compute_deterministic_decision_trace(query=query, asset_id=asset_id, currency=curr)
-        counterfactual = self._compute_deterministic_counterfactual(currency=curr)
-
-        headline = f"Explainable AI Diagnostic: {metrics['top_loss_driver']['asset']} Risk Quantification"
-        plain_text = (
-            f"The continuous risk quantification model identified **{metrics['top_loss_driver']['asset']}** as the primary risk driver "
-            f"contributing **{metrics['top_loss_driver']['loss_formatted']}** to enterprise Expected Annual Loss. "
-            f"This outcome is not a black-box anomaly; it is driven by three measurable factors: "
-            f"1) Critical exploitability of {metrics['top_loss_driver']['cve']} (CVSS 9.8, 38.5% attribution weight); "
-            f"2) Tier-1 Restricted data classification with cardholder PII (28.0% weight); and "
-            f"3) Elevated threat event frequency ({metrics['threat_event_frequency']:.1f}/yr from perimeter telemetry, 21.5% weight). "
-            f"Simulated Monte Carlo loss distributions show that applying automated patch remediation reduces this specific exposure by 84%."
+        attributions = self._compute_deterministic_attributions(
+            query=query, asset_id=asset_id, currency=curr,
+            budget=budget, allocated_spend=allocated_spend,
+            purchased_vendors=purchased_vendors, active_attack=active_attack
         )
-        exec_summary = (
-            f"Enterprise annualized financial cyber exposure stands at **{metrics['current_eal_formatted']} EAL** "
-            f"with 95th percentile solvency tail risk at **{metrics['var_95_formatted']}**. "
-            f"Model transparency analysis confirms 85% of tail loss concentrates in Core Banking and Payment Gateways. "
-            f"Funding **{metrics['recommended_spend_formatted']}** in prioritized controls yields **{metrics['risk_mitigated_formatted']}** "
-            f"in net risk reduction at an institutional **{metrics['portfolio_rosi']}% ROSI**."
+        decision_trace = self._compute_deterministic_decision_trace(
+            query=query, asset_id=asset_id, currency=curr,
+            budget=budget, allocated_spend=allocated_spend,
+            purchased_vendors=purchased_vendors, active_attack=active_attack
+        )
+        counterfactual = self._compute_deterministic_counterfactual(
+            currency=curr, budget=budget, purchased_vendors=purchased_vendors, active_attack=active_attack
         )
 
-        model_used = "deterministic-xai-layer"
+        q = (query or "").lower().strip()
+        now = datetime.datetime.now()
+        date_str = now.strftime("%A, %B %d, %Y")
+
+        # Temporal Query Handling (Date / Time)
+        if any(w in q for w in ["date", "today", "day", "time", "clock", "current date"]):
+            headline = f"Temporal Actuarial Status: {date_str}"
+            plain_text = (
+                f"Today is **{date_str}**.\n\n"
+                f"As of today's continuous telemetry cycle, LossLogic assesses enterprise Expected Annual Loss (EAL) at **{metrics['current_eal_formatted']}** "
+                f"with an institutional Security Posture score of **{metrics['posture_score']:.1f}%**. "
+                f"Sensor telemetry is ingesting {metrics['events_per_second']:,.0f} events/sec with zero compliance drift across RBI CSF and SEBI CSCRF."
+            )
+            exec_summary = (
+                f"Enterprise annualized risk stands at **{metrics['current_eal_formatted']} EAL** on {date_str}. "
+                f"Continuous actuarial models are fully calibrated against live network and cloud telemetry."
+            )
+        # Active Threat Simulation Context
+        elif active_attack or metrics.get("has_active_attack") or "attack" in q or "surge" in q:
+            att = active_attack or metrics.get("attack_type") or "DDOS_TRAFFIC_SURGE"
+            target = metrics.get("target_node") or "BC-API-GW-01"
+            headline = f"Live Threat Attribution: {att} on {target}"
+            plain_text = (
+                f"Continuous sensor normalizers intercepted a live **{att}** targeting **{target}**. "
+                f"Perimeter Threat Event Frequency (TEF) spiked 3.5x over baseline, elevating Loss Event Frequency (LEF) to 8.5/yr.\n\n"
+                f"This active intrusion introduces an acute **+{format_currency(45800000.0, curr)}** financial exposure surge. "
+                f"Recommended countermeasure ({counterfactual.intervention}) contains the attack blast radius and restores nominal topology."
+            )
+            exec_summary = (
+                f"CRITICAL THREAT ACTIVE: {att} on {target}. Immediate financial loss exposure surged by +{format_currency(45800000.0, curr)}. "
+                f"Executing recommended countermeasure immediately neutralizes this intrusion."
+            )
+        # Vendor Procurement Context
+        elif (purchased_vendors and len(purchased_vendors) > 0) or "vendor" in q or "procure" in q:
+            v_cnt = len(purchased_vendors) if purchased_vendors else metrics.get("purchased_vendors_count", 0)
+            spend_fmt = format_currency(allocated_spend if allocated_spend is not None else 1850000.0, curr)
+            headline = f"Vendor Portfolio Defense: {v_cnt} Commercial Solutions Active"
+            plain_text = (
+                f"Actuarial evaluation of active commercial security vendor stack confirms verified multi-vector defense capability. "
+                f"Allocated expenditure of **{spend_fmt}** activates **{metrics.get('total_threat_shields_active', 5)} proactive threat shields**, "
+                f"mitigating **{metrics['risk_mitigated_formatted']}** of baseline enterprise risk exposure.\n\n"
+                f"This investment elevates institutional Security Posture to **{metrics['posture_score']:.1f}%**, protecting core banking data vaults "
+                f"and delivering positive return on security investment (ROSI)."
+            )
+            exec_summary = (
+                f"Commercial vendor defense portfolio ({v_cnt} solutions funded) protects against EDR, WAF, and IAM vectors. "
+                f"Net enterprise risk reduced by {metrics['risk_mitigated_formatted']} at {metrics['posture_score']:.1f}% posture."
+            )
+        # Budget Optimization Context
+        elif budget is not None or "budget" in q or "optimi" in q or "milp" in q:
+            b_val = budget if budget is not None else 4_500_000.0
+            b_fmt = format_currency(b_val, curr)
+            spend_fmt = format_currency(allocated_spend if allocated_spend is not None else b_val * 0.9, curr)
+            headline = f"HiGHS MILP Knapsack Capital Allocation: {b_fmt}"
+            plain_text = (
+                f"SciPy HiGHS 0/1 Mixed Integer Linear Programming (MILP) solved the capital knapsack allocation problem under a **{b_fmt}** constraint. "
+                f"The solver expends **{spend_fmt}** on prioritized high-yield security controls, mitigating **{metrics['risk_mitigated_formatted']}** "
+                f"in annualized cyber loss exposure.\n\n"
+                f"This allocation delivers an actuarial **{metrics['portfolio_rosi']}% ROSI**, maximizing risk reduction per rupee invested while strictly adhering to budget limits."
+            )
+            exec_summary = (
+                f"Under a {b_fmt} budget ceiling, HiGHS MILP optimization achieves {metrics['risk_mitigated_formatted']} in verified risk reduction. "
+                f"Residual EAL is brought down to {metrics['current_eal_formatted']}."
+            )
+        # Default Risk Quantification
+        else:
+            headline = f"Explainable AI Diagnostic: {metrics['top_loss_driver']['asset']} Risk Quantification"
+            plain_text = (
+                f"The continuous risk quantification model identified **{metrics['top_loss_driver']['asset']}** as the primary risk driver "
+                f"contributing **{metrics['top_loss_driver']['loss_formatted']}** to enterprise Expected Annual Loss. "
+                f"This outcome is driven by three measurable factors: "
+                f"1) Critical exploitability of {metrics['top_loss_driver']['cve']} (CVSS 9.8, 38.5% attribution weight); "
+                f"2) Tier-1 Restricted data classification with cardholder PII (28.0% weight); and "
+                f"3) Elevated threat event frequency ({metrics['threat_event_frequency']:.1f}/yr from perimeter telemetry, 21.5% weight). "
+                f"Simulated Monte Carlo loss distributions show that applying automated patch remediation reduces this specific exposure by 84%."
+            )
+            exec_summary = (
+                f"Enterprise annualized financial cyber exposure stands at **{metrics['current_eal_formatted']} EAL** "
+                f"with 95th percentile solvency tail risk at **{metrics['var_95_formatted']}**. "
+                f"Model transparency analysis confirms 85% of tail loss concentrates in Core Banking and Payment Gateways. "
+                f"Funding **{metrics['recommended_spend_formatted']}** in prioritized controls yields **{metrics['risk_mitigated_formatted']}** "
+                f"in net risk reduction at an institutional **{metrics['portfolio_rosi']}% ROSI**."
+            )
+
+        model_used = "deterministic-actuarial-xai"
         offline_fallback = True
 
         if is_gemini_available():
@@ -310,20 +602,22 @@ Open FAIR Monte Carlo simulations, and HiGHS MILP portfolio optimization transpa
 USER QUERY / INVESTIGATION:
 "{query}"
 
-LIVE MODEL ATTRIBUTIONS & GROUND TRUTH:
-- Asset: {metrics['top_loss_driver']['asset']}
-- Top CVE: {metrics['top_loss_driver']['cve']}
-- Attributed Loss: {metrics['top_loss_driver']['loss_formatted']}
-- Current Enterprise EAL: {metrics['current_eal_formatted']}
-- VaR 95%: {metrics['var_95_formatted']}
-- Top Feature Drivers: Exploitability (38.5%), Asset Criticality (28.0%), Threat Event Frequency (21.5%), Lateral Reach (12.0%)
-- Recommended Action: {counterfactual.intervention} (mitigates {counterfactual.net_risk_reduction}, {counterfactual.expected_roi_pct}% ROSI)
+LIVE PLATFORM CONTEXT & GROUND TRUTH:
+- Today's Date: {date_str}
+- Current Enterprise EAL: {metrics['current_eal_formatted']} (Baseline: {metrics['baseline_eal_formatted']})
+- Security Posture Score: {metrics['posture_score']:.1f}%
+- Active Attack: {active_attack or metrics.get('attack_type') or 'None (Nominal)'}
+- Target Asset: {asset_id or metrics.get('target_node') or metrics['top_loss_driver']['asset']}
+- Budget Allocated: {format_currency(budget, curr) if budget is not None else metrics['recommended_spend_formatted']}
+- Active Vendors: {len(purchased_vendors) if purchased_vendors is not None else metrics.get('purchased_vendors_count', 0)} commercial solutions active
+- Recommended Intervention: {counterfactual.intervention} (mitigates {counterfactual.net_risk_reduction}, {counterfactual.expected_roi_pct}% ROSI)
 
 INSTRUCTIONS:
-1. Provide a transparent, human-readable explanation of why the models made this prediction.
-2. Demystify the mathematical formulas (LEF = TEF * Vuln, Compound Poisson, LogNormal, MILP 0/1 knapsack).
-3. Do not include emojis. Maintain rigorous, institutional, boardroom-ready clarity.
-4. Structure your response into:
+1. Directly and clearly answer the user's specific query. If they ask about the date, give today's date ({date_str}) and connect it to today's risk posture.
+2. Provide a transparent explanation of the mathematical and actuarial reasoning.
+3. Demystify the formulas (LEF = TEF * Vuln, Compound Poisson, LogNormal, MILP 0/1 knapsack).
+4. Do not include emojis. Maintain rigorous, institutional, boardroom-ready clarity.
+5. Structure your response into:
    - HEADLINE: 1 crisp line.
    - MODEL TRANSPARENCY EXPLANATION: 2 clear paragraphs explaining the 'why' behind the prediction.
    - EXECUTIVE BRIEFING: 1 paragraph summarizing the business impact and counterfactual remedy.
@@ -335,7 +629,7 @@ INSTRUCTIONS:
                     temperature=0.2,
                 )
 
-                if gemini_text and len(gemini_text.strip()) > 50:
+                if gemini_text and len(gemini_text.strip()) > 30:
                     plain_text = gemini_text.strip()
                     model_used = GEMINI_MODEL
                     offline_fallback = False

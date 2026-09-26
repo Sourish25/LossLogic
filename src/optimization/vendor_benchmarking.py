@@ -481,6 +481,7 @@ def apply_virtual_vendor_purchase(vendor_id: str, current_portfolio: dict) -> di
     new_risk_mitigated = max(0.0, baseline_eal - new_residual)
 
     portfolio["residual_eal"] = round(new_residual, 2)
+    portfolio["new_residual_eal"] = round(new_residual, 2)
     portfolio["risk_mitigated"] = round(new_risk_mitigated, 2)
 
     # 5. Actuarial Metrics Recomputation
@@ -502,3 +503,80 @@ def apply_virtual_vendor_purchase(vendor_id: str, current_portfolio: dict) -> di
     portfolio["last_purchased_product_name"] = vendor.product_name
 
     return portfolio
+
+
+def remove_virtual_vendor_purchase(vendor_id: str, current_portfolio: dict) -> dict:
+    """
+    Remove / unprocure a vendor product from the active investment portfolio.
+    Recalculates allocated spend, residual EAL, risk mitigation, and security posture.
+    """
+    from src.optimization.rosi import (
+        calculate_security_upgrade_pct,
+        calculate_net_capital_saved,
+        calculate_security_posture_score,
+        calculate_rosi,
+    )
+
+    vendor = get_vendor_by_id(vendor_id)
+    if not vendor:
+        raise KeyError(f"Vendor '{vendor_id}' not found in VENDOR_CATALOG")
+
+    portfolio = deepcopy(current_portfolio)
+    currency = portfolio.get("currency", "INR").upper().strip()
+
+    default_baseline = 48_200_000.0 if currency == "INR" else (48_200_000.0 / USD_TO_INR_RATE)
+    baseline_eal = float(portfolio.get("baseline_eal", default_baseline))
+    if baseline_eal <= 0.0:
+        baseline_eal = default_baseline
+    portfolio["baseline_eal"] = round(baseline_eal, 2)
+
+    matched_id = vendor_id.strip()
+    canonical_id = vendor.vendor_id
+    aliases = CANONICAL_TO_ALIASES.get(canonical_id, [])
+    all_known_ids = {canonical_id, matched_id, *aliases}
+
+    selected_ids = [vid for vid in portfolio.get("selected_vendor_ids", []) if vid not in all_known_ids]
+    portfolio["selected_vendor_ids"] = selected_ids
+    portfolio["purchased_vendor_ids"] = list(selected_ids)
+
+    # Recompute from baseline using remaining unique canonical vendors
+    unique_remaining_vids = []
+    seen = set()
+    for vid in selected_ids:
+        v_prof = get_vendor_by_id(vid)
+        if v_prof and v_prof.vendor_id not in seen:
+            seen.add(v_prof.vendor_id)
+            unique_remaining_vids.append(v_prof)
+
+    total_spend = 0.0
+    current_residual = baseline_eal
+
+    for v_prof in unique_remaining_vids:
+        total_spend += v_prof.get_cost(currency)
+        cov_factor = (v_prof.overall_coverage_rating / 100.0)
+        inc_mit = min(current_residual, current_residual * cov_factor * 0.35)
+        current_residual = max(0.0, current_residual - inc_mit)
+
+    new_risk_mitigated = max(0.0, baseline_eal - current_residual)
+    portfolio["allocated_spend"] = round(total_spend, 2)
+    portfolio["residual_eal"] = round(current_residual, 2)
+    portfolio["new_residual_eal"] = round(current_residual, 2)
+    portfolio["risk_mitigated"] = round(new_risk_mitigated, 2)
+
+    portfolio["net_capital_saved"] = calculate_net_capital_saved(baseline_eal, current_residual)
+    portfolio["security_upgrade_pct"] = calculate_security_upgrade_pct(new_risk_mitigated, baseline_eal)
+    portfolio["security_posture_score"] = calculate_security_posture_score(
+        baseline_eal=baseline_eal,
+        current_eal=current_residual,
+        control_count=len(unique_remaining_vids),
+    )
+    portfolio["portfolio_rosi"] = round(calculate_rosi(new_risk_mitigated, total_spend), 1)
+
+    portfolio["status"] = "UNPROCURED"
+    portfolio["vendor_id"] = matched_id or canonical_id
+    portfolio["canonical_vendor_id"] = canonical_id
+    portfolio["last_removed_vendor_name"] = vendor.vendor_name
+    portfolio["last_removed_product_name"] = vendor.product_name
+
+    return portfolio
+

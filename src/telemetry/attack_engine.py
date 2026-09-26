@@ -422,6 +422,7 @@ class DemoAttackStateManager:
                     "allocated_spend_usd": vendor.annual_cost_usd,
                     "baseline_eal": round(self.baseline_eal_inr * rate, 2),
                     "residual_eal": round(self.current_eal_inr * rate, 2),
+                    "new_residual_eal": round(self.current_eal_inr * rate, 2),
                     "risk_mitigated": round(mitigated_inr * rate, 2),
                     "security_upgrade_pct": sup_pct,
                     "security_factor_score": self.current_posture,
@@ -446,6 +447,24 @@ class DemoAttackStateManager:
                 get_vendor_by_id(vid).get_cost(currency)
                 for vid in unique_canonical_vids
             )
+
+            # Neutralize active attack if ongoing (threat containment & surge removal)
+            if self.active_attack:
+                active_surge = getattr(self.active_attack, "total_surge_inr", 0.0)
+                degradation = getattr(self.active_attack, "posture_degradation_pts", 0.0)
+                self.current_eal_inr = max(1000.0, self.current_eal_inr - active_surge)
+                self.current_posture = min(98.5, max(84.6, self.current_posture + degradation))
+                self.active_attack = None
+                self.active_attacks.clear()
+                now_str = datetime.now(timezone.utc).isoformat()
+                self.recent_events.insert(0, {
+                    "time": now_str,
+                    "level": "INFO",
+                    "msg": f"THREAT MITIGATED: Intrusion neutralized via {vendor.vendor_name} ({vendor.product_name}). Attack surge terminated.",
+                    "node": "BC-API-GW-01",
+                })
+                if len(self.recent_events) > 15:
+                    self.recent_events.pop()
 
             portfolio = {
                 "selected_vendor_ids": list(self.purchased_vendor_ids),
@@ -482,6 +501,7 @@ class DemoAttackStateManager:
                 "allocated_spend_usd": vendor.annual_cost_usd,
                 "baseline_eal": round(self.baseline_eal_inr * rate, 2),
                 "residual_eal": round(self.current_eal_inr * rate, 2),
+                "new_residual_eal": round(self.current_eal_inr * rate, 2),
                 "risk_mitigated": updated.get("risk_mitigated", 0.0),
                 "security_upgrade_pct": updated.get("security_upgrade_pct", 0.0),
                 "security_factor_score": self.current_posture,
@@ -493,6 +513,70 @@ class DemoAttackStateManager:
                 "portfolio_rosi": updated.get("portfolio_rosi", 0.0),
                 "currency": currency.upper(),
                 "status": updated.get("status", "PURCHASED"),
+                "purchased_vendor_ids": list(self.purchased_vendor_ids),
+            }
+
+    def unprocure_vendor(self, vendor_id: str, currency: str = "INR") -> Dict[str, Any]:
+        """Revokes / unprocures a vendor product from live demo state and recomputes actuarial risk."""
+        with self._lock:
+            from src.optimization.vendor_benchmarking import (
+                get_vendor_by_id,
+                remove_virtual_vendor_purchase,
+                CANONICAL_TO_ALIASES,
+            )
+            vendor = get_vendor_by_id(vendor_id)
+            if not vendor:
+                raise ValueError(f"Vendor '{vendor_id}' not found in catalog")
+
+            rate = 1.0 if currency.upper() == "INR" else (1.0 / USD_TO_INR_RATE)
+            canonical_id = vendor.vendor_id
+            aliases = CANONICAL_TO_ALIASES.get(canonical_id, [])
+            all_known = {canonical_id, vendor_id.strip(), *aliases}
+
+            # Remove all forms from purchased set
+            self.purchased_vendor_ids = {vid for vid in self.purchased_vendor_ids if vid not in all_known}
+
+            if vendor.associated_control_id:
+                still_needed = any(
+                    get_vendor_by_id(vid) and get_vendor_by_id(vid).associated_control_id == vendor.associated_control_id
+                    for vid in self.purchased_vendor_ids
+                )
+                if not still_needed:
+                    self.funded_control_ids.discard(vendor.associated_control_id)
+
+            portfolio = {
+                "selected_vendor_ids": list(self.purchased_vendor_ids),
+                "baseline_eal": self.baseline_eal_inr,
+                "currency": currency,
+            }
+            updated = remove_virtual_vendor_purchase(vendor_id, portfolio)
+
+            self.current_eal_inr = max(1000.0, float(updated.get("residual_eal", self.baseline_eal_inr)))
+            self.current_posture = max(70.0, min(98.5, float(updated.get("security_posture_score", 84.6))))
+
+            return {
+                "vendor_id": canonical_id,
+                "canonical_vendor_id": canonical_id,
+                "product_name": vendor.product_name,
+                "vendor_name": vendor.vendor_name,
+                "category": vendor.category,
+                "allocated_spend": updated.get("allocated_spend", 0.0),
+                "allocated_spend_inr": vendor.annual_cost_inr,
+                "allocated_spend_usd": vendor.annual_cost_usd,
+                "baseline_eal": round(self.baseline_eal_inr * rate, 2),
+                "residual_eal": round(self.current_eal_inr * rate, 2),
+                "new_residual_eal": round(self.current_eal_inr * rate, 2),
+                "risk_mitigated": updated.get("risk_mitigated", 0.0),
+                "security_upgrade_pct": updated.get("security_upgrade_pct", 0.0),
+                "security_factor_score": self.current_posture,
+                "net_capital_saved": updated.get("net_capital_saved", 0.0),
+                "security_posture_score": self.current_posture,
+                "posture_score": self.current_posture,
+                "risk_factor": round((self.current_eal_inr / self.baseline_eal_inr) * 4.8, 1),
+                "future_shields_unlocked": len(vendor.future_threat_shields) if hasattr(vendor, "future_threat_shields") else 2,
+                "portfolio_rosi": updated.get("portfolio_rosi", 0.0),
+                "currency": currency.upper(),
+                "status": "UNPROCURED",
                 "purchased_vendor_ids": list(self.purchased_vendor_ids),
             }
 

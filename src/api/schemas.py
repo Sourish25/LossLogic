@@ -376,6 +376,7 @@ class VirtualPurchaseResponse(BaseModel):
     allocated_spend_usd: float
     baseline_eal: float
     residual_eal: float
+    new_residual_eal: Optional[float] = Field(default=None, description="Alias for residual_eal")
     risk_mitigated: float
     security_upgrade_pct: float
     security_factor_score: float
@@ -564,6 +565,10 @@ class XAIExplainRequest(BaseModel):
     asset_id: Optional[str] = Field(default=None, description="Optional target asset identifier")
     cve_id: Optional[str] = Field(default=None, description="Optional target CVE identifier")
     currency: str = Field(default="INR", description="'INR' or 'USD'")
+    budget: Optional[float] = Field(default=None, description="Current budget optimization slider value")
+    allocated_spend: Optional[float] = Field(default=None, description="Current allocated security spend")
+    purchased_vendors: Optional[List[str]] = Field(default=None, description="Active purchased vendor IDs")
+    active_attack: Optional[str] = Field(default=None, description="Active live attack simulation type")
 
 
 class XAIExplainResponse(BaseModel):

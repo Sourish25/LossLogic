@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Optional
 from pydantic import BaseModel, Field
 
-GEMINI_MODEL = "gemini-3.5-flash-lite"
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 DEFAULT_TIMEOUT_SECONDS = 3.0
 GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 

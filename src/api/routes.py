@@ -832,6 +832,28 @@ def purchase_vendor_solution(request: VirtualPurchaseRequest) -> VirtualPurchase
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
+@router.post(
+    "/vendor-benchmark/unprocure",
+    response_model=VirtualPurchaseResponse,
+    summary="One-Click Virtual Vendor Revocation / Unprocurement",
+    description="Revokes previously purchased vendor solution, updating the live risk model and Security Posture Gauge."
+)
+@router.post(
+    "/vendors/unprocure",
+    response_model=VirtualPurchaseResponse,
+    include_in_schema=False
+)
+def unprocure_vendor_solution(request: VirtualPurchaseRequest) -> VirtualPurchaseResponse:
+    """
+    Revokes product purchase from enterprise portfolio and recomputes residual EAL and SUP %.
+    """
+    try:
+        res = _demo_state_manager.unprocure_vendor(vendor_id=request.vendor_id, currency=request.currency)
+        return VirtualPurchaseResponse(**res)
+    except (ValueError, KeyError) as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
 # --- Google Gemini 3.5 Flash Lite AI Copilot & Action Engine Endpoints (R1) ---
 
 
@@ -895,7 +917,7 @@ async def ai_executive_summary(request: AIExecutiveSummaryRequest) -> AIExecutiv
     "/ai/xai-explain",
     response_model=XAIExplainResponse,
     summary="Explainable AI (XAI) Model Transparency & Root-Cause Attribution",
-    description="Interpretive layer wrapping continuous risk quantification models (Open FAIR, MILP, DAG) using Google Gemini 3.5 Flash Lite."
+    description="Interpretive layer wrapping continuous risk quantification models (Open FAIR, MILP, DAG) using Google Gemini."
 )
 async def ai_xai_explain(request: XAIExplainRequest) -> XAIExplainResponse:
     """
@@ -907,6 +929,10 @@ async def ai_xai_explain(request: XAIExplainRequest) -> XAIExplainResponse:
         mode=request.mode,
         asset_id=request.asset_id,
         currency=request.currency,
+        budget=request.budget,
+        allocated_spend=request.allocated_spend,
+        purchased_vendors=request.purchased_vendors,
+        active_attack=request.active_attack,
     )
     return XAIExplainResponse(
         headline=res.headline,
